@@ -31,13 +31,15 @@ namespace MusicTest
 
             introLayer = Engine.Host.Audio.CreateLayer("Intro layer", 1);
             introLayer.PlayNext(BackgroundMusicIntro);
+            //introLayer.PlayNext(BackgroundMusic);
 
             mainLayer = Engine.Host.Audio.CreateLayer("Main layer", 1);
         }
 
         public void Unload()
         {
-            Engine.AssetLoader.Destroy("fc-intro.wav");
+            //Engine.AssetLoader.Destroy("fc-intro.wav");
+            //Engine.AssetLoader.Destroy("fc.wav");
         }
 
         public void Update()
@@ -45,8 +47,20 @@ namespace MusicTest
             if (Math.Round(BackgroundMusicIntro.Playback, 2) >= 11.29 && Math.Round(BackgroundMusicIntro.Playback, 2) <= 11.3)
             {
                 mainLayer.PlayNext(BackgroundMusic);
-                mainLayer.LoopingCurrent = true;
             }
+            else if (Math.Round(BackgroundMusic.Playback, 2) >= 90.35 && Math.Round(BackgroundMusic.Playback, 2) <= 90.36 && introLayer.Status == PlaybackStatus.NotPlaying)
+            {
+                introLayer.PlayNext(BackgroundMusic);
+            }
+            else if (Math.Round(BackgroundMusic.Playback, 2) >= 90.35 && Math.Round(BackgroundMusic.Playback, 2) < 90.36 && mainLayer.Status == PlaybackStatus.NotPlaying)
+            {
+                mainLayer.PlayNext(BackgroundMusic);
+            }
+
+            //if (introLayer.CurrentTrack.File.Name == "fc.wav")
+            //{
+            //    introLayer.LoopingCurrent = true;
+            //}
         }
     }
 }

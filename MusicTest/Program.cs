@@ -8,6 +8,11 @@ namespace MusicTest
     {        
         private static void Main()
         {
+            int i = -1073740940;
+            uint ui = (uint) i;
+            Console.WriteLine(ui.ToString("X"));
+
+
             // Configuration.
             Configurator config = new Configurator();
             config.HostSize = new Vector2(1280, 720);
