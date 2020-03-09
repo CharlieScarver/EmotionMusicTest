@@ -14,16 +14,19 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Assets\fc-intro.wav">
+    <None Update="Assets\Frozen Cave 12.wav">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Assets\fc-intro2.wav">
+    <None Update="Assets\Frozen Cave Intro 2.wav">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Assets\fc.wav">
+    <None Update="Assets\Frozen Cave Intro 3.wav">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Assets\fc2.wav">
+    <None Update="Assets\Frozen Cave Intro.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Assets\Frozen Cave Loop.wav">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
