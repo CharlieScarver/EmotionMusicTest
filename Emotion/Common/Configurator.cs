@@ -27,6 +27,12 @@ namespace Emotion.Common
         /// </summary>
         public bool DebugMode { get; set; }
 
+        /// <summary>
+        /// When enabled an OpenGL debug context (platform dependent) will be created and a debug callback will be attached,
+        /// printing messages in the logs.
+        /// </summary>
+        public bool GlDebugMode { get; set; }
+
         #region Rendering
 
         /// <summary>
@@ -52,7 +58,7 @@ namespace Emotion.Common
         public bool IntScaleDrawBuffer { get; set; }
 
         /// <summary>
-        /// Whether to render with pillarboxes/letterboxes if the render size doesn't match the host size.
+        /// Whether to render with pillarboxed/letterboxed if the render size doesn't match the host size.
         /// This is off by the default and the camera adjusts the scale.
         /// </summary>
         public bool ScaleBlackBars { get; set; }
@@ -74,6 +80,7 @@ namespace Emotion.Common
         /// doubled.
         /// If the game is running fast (and it is possible to do so) your DeltaTime will be half of this.
         /// This setting applies only if using the default loop.
+        /// If VSync is on it will override the fps.
         /// </summary>
         public byte DesiredStep { get; set; } = 60;
 

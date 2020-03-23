@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using Emotion.Common;
+using Emotion.Platform.OpenGL.Meta;
 using Emotion.Standard.Logging;
 using Emotion.Utility;
 using Khronos;
@@ -23,40 +24,72 @@ namespace Emotion.Platform.Implementation.Win32.Wgl
 {
     public sealed unsafe class WglGraphicsContext : GraphicsContext
     {
-        private readonly IntPtr _openGlLibrary;
-        private const int FlagNumberPixelFormatsArb = 0x2000;
+        private IntPtr _openGlLibrary;
+        private const int FLAG_NUMBER_PIXEL_FORMATS_ARB = 0x2000;
 
-        private readonly WglFunctions.WglDeleteContext _deleteContext;
-        private readonly WglFunctions.WglGetProcAddress _getProcAddress;
-        private readonly WglFunctions.WglGetCurrentDc _getCurrentDc;
-        private readonly WglFunctions.WglGetCurrentContext _getCurrentContext;
-        private readonly WglFunctions.WglMakeCurrent _makeCurrent;
-        private readonly WglFunctions.GetExtensionsStringExt _getExtensionsStringExt;
-        private readonly WglFunctions.GetExtensionsStringArb _getExtensionsStringArb;
-        private readonly WglFunctions.SwapInternalExt _swapIntervalExt;
-        private readonly WglFunctions.GetPixelFormatAttributes _getPixelFormatAttribivArb;
+        private WglFunctions.WglDeleteContext _deleteContext;
+        private WglFunctions.WglGetProcAddress _getProcAddress;
+        private WglFunctions.WglGetCurrentDc _getCurrentDc;
+        private WglFunctions.WglGetCurrentContext _getCurrentContext;
+        private WglFunctions.WglMakeCurrent _makeCurrent;
+        private WglFunctions.GetExtensionsStringExt _getExtensionsStringExt;
+        private WglFunctions.GetExtensionsStringArb _getExtensionsStringArb;
+        private WglFunctions.CreateContextAttribs _createContextAttribs;
+        private WglFunctions.SwapInternalExt _swapIntervalExt;
+        private WglFunctions.GetPixelFormatAttributes _getPixelFormatAttribivArb;
 
         private string[] _wglExtensions;
-        private readonly bool _arbMultisample;
-        private readonly bool _arbFramebufferSRgb;
-        private readonly bool _extFramebufferSRgb;
-        private readonly bool _arbPixelFormat;
+        private bool _arbMultisample;
+        private bool _arbFramebufferSRgb;
+        private bool _extFramebufferSRgb;
+        private bool _arbCreateContextProfile;
+        private bool _arbPixelFormat;
 
-        private readonly IntPtr _contextHandle;
-        private readonly IntPtr _dc;
-        private readonly Win32Platform _platform;
+        private IntPtr _contextHandle;
+        private IntPtr _dc;
+        private Win32Platform _platform;
+
+        #region RenderDoc
+
+        // https://renderdoc.org/
 
         private delegate int RenderDocGetApi(int version, void* api);
 
         public RenderDocAPI RenderDoc;
+        private IntPtr _renderDocModule;
 
-        public WglGraphicsContext(IntPtr windowHandle, Win32Platform platform)
+        #endregion
+
+        public void Init(IntPtr windowHandle, Win32Platform platform)
         {
             _platform = platform;
 
+            // Check for RenderDoc
+            _renderDocModule = Kernel32.GetModuleHandle("renderdoc.dll");
+            if (_renderDocModule != IntPtr.Zero)
+            {
+                // Get a handle to the RenderDoc API
+                IntPtr api = Kernel32.GetProcAddress(_renderDocModule, "RENDERDOC_GetAPI");
+                if (api != IntPtr.Zero)
+                {
+                    var getApiFunc = Marshal.GetDelegateForFunctionPointer<RenderDocGetApi>(api);
+                    void* apiPointers;
+                    int ret = getApiFunc(10102, &apiPointers);
+                    if (ret == 1)
+                    {
+                        Debug.Assert(ret == 1);
+                        RenderDoc = Marshal.PtrToStructure<RenderDocAPI>((IntPtr) apiPointers);
+                    }
+                }
+            }
+
             // Load WGL.
             _openGlLibrary = _platform.LoadLibrary("opengl32.dll");
-            if (_openGlLibrary == IntPtr.Zero) throw new Exception("opengl32.dll not found.");
+            if (_openGlLibrary == IntPtr.Zero)
+            {
+                Engine.Log.Error("opengl32.dll not found.", MessageSource.WGallium);
+                return;
+            }
 
             var createContext = _platform.GetFunctionByName<WglFunctions.WglCreateContext>(_openGlLibrary, "wglCreateContext");
             _deleteContext = _platform.GetFunctionByName<WglFunctions.WglDeleteContext>(_openGlLibrary, "wglDeleteContext");
@@ -85,7 +118,7 @@ namespace Emotion.Platform.Implementation.Win32.Wgl
             if (!_makeCurrent(dc, rc))
             {
                 _deleteContext(rc);
-                Win32Platform.CheckError("WGL: Could not make dummy context current.", true);
+                Win32Platform.CheckError("Could not make dummy context current.", true);
                 return;
             }
 
@@ -96,34 +129,35 @@ namespace Emotion.Platform.Implementation.Win32.Wgl
                 if (glGetString.Major < 3)
                 {
                     _deleteContext(rc);
-                    throw new Exception("WGL: Support is lower than 3.0");
+                    Engine.Log.Error("Wgl support is lower than 3.0", MessageSource.Wgl);
+                    return;
                 }
             }
             else
             {
-                Engine.Log.Warning("WGL: Couldn't verify context version.", MessageSource.Wgl);
+                Engine.Log.Warning("Couldn't verify context version.", MessageSource.Wgl);
             }
+
+            Engine.Log.Trace("Loaded functions.", MessageSource.Wgl);
 
             // Functions must be loaded first as they're needed to retrieve the extension string that tells us whether the functions are supported
             _getExtensionsStringExt = NativeHelpers.GetFunctionByPtr<WglFunctions.GetExtensionsStringExt>(_getProcAddress("wglGetExtensionsStringEXT"));
             _getExtensionsStringArb = NativeHelpers.GetFunctionByPtr<WglFunctions.GetExtensionsStringArb>(_getProcAddress("wglGetExtensionsStringARB"));
-            var createContextAttribs = NativeHelpers.GetFunctionByPtr<WglFunctions.CreateContextAttribs>(_getProcAddress("wglCreateContextAttribsARB"));
+            _createContextAttribs = NativeHelpers.GetFunctionByPtr<WglFunctions.CreateContextAttribs>(_getProcAddress("wglCreateContextAttribsARB"));
             _swapIntervalExt = NativeHelpers.GetFunctionByPtr<WglFunctions.SwapInternalExt>(_getProcAddress("wglSwapIntervalEXT"));
             _getPixelFormatAttribivArb = NativeHelpers.GetFunctionByPtr<WglFunctions.GetPixelFormatAttributes>(_getProcAddress("wglGetPixelFormatAttribivARB"));
 
             WglGetSupportedExtensions();
             _arbMultisample = WglSupportedExtension("WGL_ARB_multisample");
-            _arbMultisample = WglSupportedExtension("WGL_ARB_multisample");
             _arbFramebufferSRgb = WglSupportedExtension("WGL_ARB_framebuffer_sRGB");
             _extFramebufferSRgb = WglSupportedExtension("WGL_EXT_framebuffer_sRGB");
-            bool arbCreateContext = WglSupportedExtension("WGL_ARB_create_context");
-            bool arbCreateContextProfile = WglSupportedExtension("WGL_ARB_create_context_profile");
+            _arbCreateContextProfile = WglSupportedExtension("WGL_ARB_create_context_profile");
             _arbPixelFormat = WglSupportedExtension("WGL_ARB_pixel_format");
-
-            Engine.Log.Trace($"ARB Pixel Format: {_arbPixelFormat}", MessageSource.Win32);
+            bool arbCreateContext = WglSupportedExtension("WGL_ARB_create_context");
 
             // Dispose of dummy context.
             _deleteContext(rc);
+            Engine.Log.Trace("Extensions loaded.", MessageSource.Wgl);
 
             // Start creating actual context.
             _dc = User32.GetDC(windowHandle);
@@ -143,79 +177,102 @@ namespace Emotion.Platform.Implementation.Win32.Wgl
                 return;
             }
 
+            Engine.Log.Trace($"Context ARB: {arbCreateContext}, Profile ARB: {_arbCreateContextProfile}", MessageSource.Wgl);
             if (arbCreateContext)
             {
-                WglContextFlags mask = 0;
-                WglContextFlags flags = 0;
-                var attributes = new List<int>();
-
-                // Check for RenderDoc
-                IntPtr renderDocModule = Kernel32.GetModuleHandle("renderdoc.dll");
-                if (renderDocModule != IntPtr.Zero)
+                // Context configurations to try.
+                var contextFactory = new List<GLContextDescription>(2)
                 {
-                    Engine.Log.Warning("Detected render doc. Setting window creation to Core Context 3.3", MessageSource.Win32);
+                    new GLContextDescription {Profile = GLProfile.Core, Debug = Engine.Configuration.GlDebugMode},
+                    new GLContextDescription {Profile = GLProfile.Any}
+                };
 
-                    attributes.Add((int) WglContextAttributes.MajorVersionArb);
-                    attributes.Add(3);
+                // ReSharper disable once ForCanBeConvertedToForeach
+                for (var i = 0; i < contextFactory.Count; i++)
+                {
+                    GLContextDescription current = contextFactory[i];
 
-                    attributes.Add((int) WglContextAttributes.MinorVersionArb);
-                    attributes.Add(3);
+                    IntPtr handle = CreateContextArb(contextFactory[i]);
+                    if (handle == IntPtr.Zero) continue;
 
-                    // ArbCreateContextProfile is required to set a profile
-                    if (arbCreateContextProfile)
-                        mask |= WglContextFlags.CoreProfileBitArb;
-
-                    flags |= WglContextFlags.DebugBitArb;
-
-                    // Get a handle to the RenderDoc API
-                    IntPtr api = Kernel32.GetProcAddress(renderDocModule, "RENDERDOC_GetAPI");
-                    if (api != IntPtr.Zero)
-                    {
-                        var getApiFunc = Marshal.GetDelegateForFunctionPointer<RenderDocGetApi>(api);
-                        void* apiPointers;
-                        int ret = getApiFunc(10102, &apiPointers);
-                        if (ret == 1)
-                        {
-                            Debug.Assert(ret == 1);
-                            RenderDoc = Marshal.PtrToStructure<RenderDocAPI>((IntPtr) apiPointers);
-                        }
-                    }
+                    _contextHandle = handle;
+                    Engine.Log.Info($"Created WGL context - {current}", MessageSource.Wgl);
+                    break;
                 }
 
-                // Add flags and mask if any. (there mostly isn't)
-                // Context creation in Wgl is mostly default and trusts(tm) the other side.
-                if (flags != 0)
-                {
-                    attributes.Add((int) WglContextAttributes.FlagsArb);
-                    attributes.Add((int) flags);
-                }
-
-                if (mask != 0)
-                {
-                    attributes.Add((int) WglContextAttributes.ProfileMaskArb);
-                    attributes.Add((int) mask);
-                }
-
-                attributes.Add(0);
-
-                int[] attArr = attributes.ToArray();
-                fixed (int* attPtr = &attArr[0])
-                {
-                    _contextHandle = createContextAttribs(_dc, IntPtr.Zero, attPtr);
-                }
-
-                if (_contextHandle == IntPtr.Zero) Win32Platform.CheckError("Creating WGL context", true);
+                // If that failed too, look for errors.
+                // Fallback to legacy creation.
+                if (_contextHandle == IntPtr.Zero) Win32Platform.CheckError("Creating WGL context");
             }
-            else
+
+            if (_contextHandle == IntPtr.Zero)
             {
                 _contextHandle = createContext(_dc);
                 if (_contextHandle == IntPtr.Zero) Win32Platform.CheckError("Creating WGL legacy context", true);
+                Engine.Log.Info("WGL legacy context created.", MessageSource.Wgl);
             }
 
             Win32Platform.CheckError("Checking if context creation passed.");
-            Engine.Log.Trace($"Requested context using pixel format id {pixelFormatIdx}", MessageSource.Win32);
-
             Valid = true;
+        }
+
+        private IntPtr CreateContextArb(GLContextDescription contextDescription)
+        {
+            WglContextFlags mask = 0;
+            WglContextFlags flags = 0;
+            var attributes = new List<int>();
+
+            if (contextDescription.Major != 1)
+            {
+                attributes.Add((int) WglContextAttributes.MajorVersionArb);
+                attributes.Add(contextDescription.Major);
+            }
+
+            if (contextDescription.Major != 1 && contextDescription.Minor != 0)
+            {
+                attributes.Add((int) WglContextAttributes.MinorVersionArb);
+                attributes.Add(contextDescription.Minor);
+            }
+
+            // ArbCreateContextProfile is required to set a profile
+            if (_arbCreateContextProfile && contextDescription.Profile != GLProfile.Any)
+            {
+                if (contextDescription.Profile == GLProfile.Core)
+                    mask |= WglContextFlags.CoreProfileBitArb;
+                else
+                    mask |= WglContextFlags.CompatibilityProfileBitArb;
+            }
+
+            if (contextDescription.Debug)
+                flags |= WglContextFlags.DebugBitArb;
+
+            if (contextDescription.ForwardCompat)
+                flags |= WglContextFlags.ForwardCompatibleBitArb;
+
+            // Add flags and mask if any. (there mostly isn't)
+            // Context creation in Wgl is mostly default and trusts(tm) the other side.
+            if (flags != 0)
+            {
+                attributes.Add((int) WglContextAttributes.FlagsArb);
+                attributes.Add((int) flags);
+            }
+
+            if (mask != 0)
+            {
+                attributes.Add((int) WglContextAttributes.ProfileMaskArb);
+                attributes.Add((int) mask);
+            }
+
+            attributes.Add(0);
+
+            IntPtr handle;
+            int[] attArr = attributes.ToArray();
+            fixed (int* attPtr = &attArr[0])
+            {
+                handle = _createContextAttribs(_dc, IntPtr.Zero, attPtr);
+            }
+
+            return handle;
         }
 
         #region Helpers
@@ -223,15 +280,9 @@ namespace Emotion.Platform.Implementation.Win32.Wgl
         private void WglGetSupportedExtensions()
         {
             string extensions = null;
-
-            if (_getExtensionsStringArb != null)
-                extensions = _getExtensionsStringArb(_getCurrentDc());
-
-            if (extensions == null && _getExtensionsStringExt != null)
-                extensions = _getExtensionsStringExt();
-
+            if (_getExtensionsStringArb != null) extensions = NativeHelpers.StringFromPtr(_getExtensionsStringArb(_getCurrentDc()));
+            if (extensions == null && _getExtensionsStringExt != null) extensions = NativeHelpers.StringFromPtr(_getExtensionsStringExt());
             if (extensions == null) return;
-
             _wglExtensions = extensions.Split(' ');
         }
 
@@ -255,7 +306,7 @@ namespace Emotion.Platform.Implementation.Win32.Wgl
             {
                 if (_getPixelFormatAttribivArb == null) throw new Exception("WGL: Unsupported graphics context, getPixelFormatAttribivArb is missing!");
 
-                int nPf = FlagNumberPixelFormatsArb;
+                int nPf = FLAG_NUMBER_PIXEL_FORMATS_ARB;
                 if (!_getPixelFormatAttribivArb(dc, 1, 0, 1, &nPf, &nativeCount))
                 {
                     Win32Platform.CheckError("WGL: Failed to retrieve pixel format attribute.", true);

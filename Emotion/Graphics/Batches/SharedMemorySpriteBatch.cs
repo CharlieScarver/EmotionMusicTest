@@ -59,7 +59,7 @@ namespace Emotion.Graphics.Batches
             // Check if have memory.
             if (_memoryPtr == IntPtr.Zero)
                 _memoryPtr = (IntPtr) _vbo.CreateUnsafeMapper(0, 0,
-                    BufferAccessMask.MapWriteBit | BufferAccessMask.MapInvalidateBufferBit | BufferAccessMask.MapFlushExplicitBit
+                    BufferAccessMask.MapWriteBit | BufferAccessMask.MapFlushExplicitBit
                 );
 
             // Get the data.

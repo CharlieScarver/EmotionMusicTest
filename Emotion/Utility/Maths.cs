@@ -571,6 +571,17 @@ namespace Emotion.Utility
         }
 
         /// <summary>
+        /// Round to the closest integer. x.5 and higher will round to 1, anything lower will round to 0.
+        /// </summary>
+        /// <param name="v"></param>
+        /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static float RoundClosest(float v)
+        {
+            return MathF.Floor(v + 0.5f);
+        }
+
+        /// <summary>
         /// returns sqrt( x * x + y * y )
         /// </summary>
         /// <param name="x">The x coordinate.</param>
@@ -671,34 +682,6 @@ namespace Emotion.Utility
         {
             // Divide 180 by Pi and multiply by the radians. Convert to an integer.
             return radian * RAD_2DEG;
-        }
-
-        /// <summary>
-        /// Find the bounding rectangle of a polygon.
-        /// </summary>
-        /// <param name="vertices">The vertices which make up the polygon.</param>
-        /// <returns>The bounding rectangle of the polygon.</returns>
-        public static Rectangle BoundingRectangleOfPolygon(params Vector3[] vertices)
-        {
-            float minX = float.MaxValue;
-            float maxX = float.MinValue;
-            float minY = float.MaxValue;
-            float maxY = float.MinValue;
-
-            for (var i = 0; i < vertices.Length; i++)
-            {
-                float x = vertices[i].X;
-                float y = vertices[i].Y;
-                minX = Math.Min(minX, x);
-                maxX = Math.Max(maxX, x);
-                minY = Math.Min(minY, y);
-                maxY = Math.Max(maxY, y);
-            }
-
-            float width = maxX - minX;
-            float height = maxY - minY;
-
-            return new Rectangle(minX, minY, width, height);
         }
     }
 }

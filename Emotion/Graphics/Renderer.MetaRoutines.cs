@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 using Emotion.Graphics.Batches;
 using Emotion.Graphics.Data;
 using Emotion.Graphics.Objects;
@@ -47,14 +48,8 @@ namespace Emotion.Graphics
 
                 if (i == 0)
                 {
-                    RenderLine(new Vector3(radius + x, radius + y, 0), new Vector3(radius + x, radius + y, 0), color);
                     fX = x;
                     fY = y;
-                }
-                else if (i == circleDetail - 1)
-                {
-                    RenderLine(new Vector3(radius + pX, radius + pY, 0), new Vector3(radius + x, radius + y, 0), color);
-                    RenderLine(new Vector3(radius + x, radius + y, 0), new Vector3(radius + fX, radius + fY, 0), color);
                 }
                 else
                 {
@@ -63,6 +58,11 @@ namespace Emotion.Graphics
 
                 pX = x;
                 pY = y;
+
+                if (i == circleDetail - 1)
+                {
+                    RenderLine(new Vector3(radius + x, radius + y, 0), new Vector3(radius + fX, radius + fY, 0), color);
+                }
             }
 
             // Remove the model matrix.
@@ -92,38 +92,30 @@ namespace Emotion.Graphics
 
             var vertices = new List<Vector3>();
 
-            // Generate points.
+            // Generate triangles.
             for (uint i = 0; i < circleDetail; i++)
             {
                 var angle = (float) (i * 2 * Math.PI / circleDetail - Math.PI / 2);
                 float x = (float) Math.Cos(angle) * radius;
                 float y = (float) Math.Sin(angle) * radius;
 
-                if (i < circleDetail - 1)
-                {
-                    vertices.Add(new Vector3(radius + pX, radius + pY, 0));
-                    vertices.Add(new Vector3(radius + x, radius + y, 0));
-                    vertices.Add(new Vector3(radius, radius, 0));
-                    vertices.Add(new Vector3(radius, radius, 0));
-                }
-                else
-                {
-                    // when @ second-to-last segment -> Draw the last 2 triangles @ once, skipping last iter of loop
-                    vertices.Add(new Vector3(radius + pX, radius + pY, 0));
-                    vertices.Add(new Vector3(radius + x, radius + y, 0));
-                    vertices.Add(new Vector3(radius + fX, radius + fY, 0));
-                    vertices.Add(new Vector3(radius, radius, 0));
-                    break;
-                }
-                
-                if (i == 0)
-                {
-                    fX = x;
-                    fY = y;
-                }
+                vertices.Add(new Vector3(radius + pX, radius + pY, 0));
+                vertices.Add(new Vector3(radius + x, radius + y, 0));
+                vertices.Add(new Vector3(radius, radius, 0));
 
                 pX = x;
                 pY = y;
+
+                if (i == circleDetail - 1)
+                {
+                    vertices.Add(new Vector3(radius + pX, radius + pY, 0));
+                    vertices.Add(new Vector3(radius + x, radius + y, 0));
+                    vertices.Add(new Vector3(radius + fX, radius + fY, 0));
+                }
+
+                if (i != 0) continue;
+                fX = x;
+                fY = y;
             }
 
             RenderVertices(vertices, color);
@@ -171,6 +163,18 @@ namespace Emotion.Graphics
             vertices[1].UV = new Vector2(uv.Width, uv.Y);
             vertices[2].UV = new Vector2(uv.Width, uv.Height);
             vertices[3].UV = new Vector2(uv.X, uv.Height);
+        }
+
+        /// <summary>
+        /// Render a framebuffer's color attachment to the currently bound buffer.
+        /// If you're "blitting" make sure the view matrix is disabled.
+        /// </summary>
+        /// <param name="buffer">The buffer to render.</param>
+        /// <param name="renderSizeOverwrite">By default the rendered quad will be the same size as the framebuffer. You can change that using this parameter.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void RenderFrameBuffer(FrameBuffer buffer, Vector2? renderSizeOverwrite = null)
+        {
+            RenderSprite(Vector3.Zero, renderSizeOverwrite ?? buffer.Size, Color.White, buffer.ColorAttachment, new Rectangle(0, buffer.AllocatedSize.Y - buffer.Size.Y, buffer.Size.X, buffer.Size.Y));
         }
     }
 }

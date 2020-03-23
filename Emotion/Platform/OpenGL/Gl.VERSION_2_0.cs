@@ -468,15 +468,6 @@ namespace OpenGL
         public const int MAX_VERTEX_UNIFORM_COMPONENTS = 0x8B4A;
 
         /// <summary>
-        /// [GL4] Gl.Get: data returns one value, the maximum number of interpolators available for processing varying variables
-        /// used by vertex and fragment shaders. This value represents the number of individual floating-point values that can be
-        /// interpolated; varying variables declared as vectors, matrices, and arrays will all consume multiple interpolators. The
-        /// value must be at least 32.
-        /// </summary>
-        [RequiredByFeature("GL_VERSION_2_0")] [RequiredByFeature("GL_ARB_vertex_shader")]
-        public const int MAX_VARYING_FLOATS = 0x8B4B;
-
-        /// <summary>
         /// [GL4|GLES3.2] Gl.Get: data returns one value, the maximum supported texture image units that can be used to access
         /// texture maps from the vertex shader. The value may be at least 16. See Gl.ActiveTexture.
         /// </summary>
@@ -822,72 +813,6 @@ namespace OpenGL
         /// </summary>
         [RequiredByFeature("GL_VERSION_2_0")] [RequiredByFeature("GL_ES_VERSION_2_0", Api = "gles2")] [RequiredByFeature("GL_SC_VERSION_2_0", Api = "glsc2")]
         public const int STENCIL_BACK_WRITEMASK = 0x8CA5;
-
-        /// <summary>
-        ///     <para>
-        ///     [GL2.1] Gl.Enable: If enabled and a vertex shader is active, it specifies that the GL will choose between front and
-        ///     back
-        ///     colors based on the polygon's face direction of which the vertex being shaded is a part. It has no effect on points
-        ///     or
-        ///     lines.
-        ///     </para>
-        ///     <para>
-        ///     [GL2.1] Gl.Get: params returns a single boolean value indicating whether vertex program two-sided color mode is
-        ///     enabled.
-        ///     If enabled, and a vertex shader is active, then the GL chooses the back color output for back-facing polygons, and
-        ///     the
-        ///     front color output for non-polygons and front-facing polygons. If disabled, and a vertex shader is active, then the
-        ///     front color output is always selected. The initial value is Gl.FALSE.
-        ///     </para>
-        /// </summary>
-        [RequiredByFeature("GL_VERSION_2_0")]
-        [RequiredByFeature("GL_ARB_vertex_program")]
-        [RequiredByFeature("GL_ARB_vertex_shader")]
-        [RequiredByFeature("GL_NV_vertex_program")]
-        [RemovedByFeature("GL_VERSION_3_2")]
-        public const int VERTEX_PROGRAM_TWO_SIDE = 0x8643;
-
-        /// <summary>
-        ///     <para>
-        ///     [GL2.1] Gl.Enable: If enabled, calculate texture coordinates for points based on texture environment and point
-        ///     parameter
-        ///     settings. Otherwise texture coordinates are constant across points.
-        ///     </para>
-        ///     <para>
-        ///     [GL2.1] Gl.Get: params returns a single boolean value indicating whether point sprite is enabled. The initial value
-        ///     is
-        ///     Gl.FALSE.
-        ///     </para>
-        /// </summary>
-        [RequiredByFeature("GL_VERSION_2_0")]
-        [RequiredByFeature("GL_ARB_point_sprite")]
-        [RequiredByFeature("GL_NV_point_sprite")]
-        [RequiredByFeature("GL_OES_point_sprite", Api = "gles1")]
-        [RemovedByFeature("GL_VERSION_3_2")]
-        public const int POINT_SPRITE = 0x8861;
-
-        /// <summary>
-        /// [GL2.1] Gl.GetTexEnv: params returns a single boolean value representing the current point sprite texture coordinate
-        /// replacement enable state. The initial value is Gl.FALSE.
-        /// </summary>
-        [RequiredByFeature("GL_VERSION_2_0")]
-        [RequiredByFeature("GL_ARB_point_sprite")]
-        [RequiredByFeature("GL_NV_point_sprite")]
-        [RequiredByFeature("GL_OES_point_sprite", Api = "gles1")]
-        [RemovedByFeature("GL_VERSION_3_2")]
-        public const int COORD_REPLACE = 0x8862;
-
-        /// <summary>
-        /// [GL2.1] Gl.Get: params returns one value, the maximum number of texture coordinate sets available to vertex and
-        /// fragment
-        /// shaders. The value must be at least 2. See Gl.ActiveTexture and Gl.ClientActiveTexture.
-        /// </summary>
-        [RequiredByFeature("GL_VERSION_2_0")]
-        [RequiredByFeature("GL_ARB_fragment_program")]
-        [RequiredByFeature("GL_ARB_vertex_shader")]
-        [RequiredByFeature("GL_NV_fragment_program")]
-        [RemovedByFeature("GL_VERSION_3_2")]
-        public const int MAX_TEXTURE_COORDS = 0x8871;
 
         /// <summary>
         /// [GL2.1] glBlendEquationSeparate: set the RGB blend equation and the alpha blend equation separately

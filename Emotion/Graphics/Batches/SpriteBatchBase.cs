@@ -164,6 +164,7 @@ namespace Emotion.Graphics.Batches
             Debug.Assert((uint) _mappedTo <= RenderComposer.MAX_INDICES);
             Debug.Assert((uint) startIndex + length <= RenderComposer.MAX_INDICES * 6);
             Gl.DrawElements(PrimitiveType.Triangles, (int) length, DrawElementsType.UnsignedShort, startIndex);
+            Gl.Finish();
         }
 
         #region Texturing API

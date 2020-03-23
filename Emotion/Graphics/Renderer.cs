@@ -14,6 +14,7 @@ using Emotion.Graphics.Shading;
 using Emotion.Platform.Input;
 using Emotion.Primitives;
 using Emotion.Standard.Logging;
+using Emotion.Utility;
 using OpenGL;
 using VertexDataBatch = Emotion.Graphics.Batches.SpriteBatchBase<Emotion.Graphics.Data.VertexData>;
 
@@ -84,7 +85,7 @@ namespace Emotion.Graphics
         /// The maximum textures that can be mapped in one StreamBuffer and/or shader. If more than the allowed textures are mapped
         /// an exception is raised.
         /// </summary>
-        public int TextureArrayLimit { get; private set; } = 16;
+        public int TextureArrayLimit { get; set; } = 1;
 
         #endregion
 
@@ -208,9 +209,16 @@ namespace Emotion.Graphics
             SoftwareRenderer = Gl.CurrentRenderer.Contains("llvmpipe");
             CompatibilityMode = SoftwareRenderer || Engine.Configuration.RendererCompatMode;
             Dsa = !CompatibilityMode && Gl.CurrentVersion.Major >= 4 && Gl.CurrentVersion.Minor >= 5;
-            TextureArrayLimit = SoftwareRenderer ? 4 : Gl.CurrentLimits.MaxTextureImageUnits;
+            TextureArrayLimit = 1; //SoftwareRenderer ? 4 : Gl.CurrentLimits.MaxTextureImageUnits;
 
             Engine.Log.Info($" Flags: {(CompatibilityMode ? "Compat, " : "")}{(Dsa ? "Dsa, " : "")}Textures[{TextureArrayLimit}]", MessageSource.Renderer);
+
+            // Attach callback if debug mode is enabled.
+            if (Engine.Configuration.GlDebugMode && !CompatibilityMode && (Gl.CurrentExtensions.DebugOutput_ARB || Gl.CurrentVersion.Major >= 4 && Gl.CurrentVersion.Minor >= 3))
+            {
+                Gl.DebugMessageCallback(_glDebugCallback, IntPtr.Zero);
+                Engine.Log.Trace("Attached OpenGL debug callback.", MessageSource.Renderer);
+            }
 
             // Create default indices.
             IndexBuffer.CreateDefaultIndexBuffers();
@@ -234,20 +242,21 @@ namespace Emotion.Graphics
             _blitState.ViewMatrix = false;
 
             // Create a representation of the screen buffer, and the buffer which will be drawn to.
-            ScreenBuffer = new FrameBuffer(0, Engine.Host.Window.Size);
-            DrawBuffer = !Engine.Configuration.UseIntermediaryBuffer ? new FrameBuffer(0, Engine.Configuration.RenderSize) : new FrameBuffer(new Texture(Engine.Configuration.RenderSize), true);
+            Vector2 windowSize = Engine.Host.Window.Size;
+            ScreenBuffer = new FrameBuffer(0, windowSize);
+            DrawBuffer = !Engine.Configuration.UseIntermediaryBuffer ? new FrameBuffer(0, windowSize) : new FrameBuffer(windowSize).WithColor().WithDepth();
             _bufferStack.Push(DrawBuffer);
 
             // Decide on scaling mode.
             if (Engine.Configuration.ScaleBlackBars)
             {
                 Engine.Host.Window.OnResize.AddListener(HostResizedBlackBars);
-                HostResizedBlackBars(Engine.Host.Window.Size);
+                HostResizedBlackBars(windowSize);
             }
             else
             {
                 Engine.Host.Window.OnResize.AddListener(HostResized);
-                HostResized(Engine.Host.Window.Size);
+                HostResized(windowSize);
             }
 
             // Put in a default camera.
@@ -273,6 +282,29 @@ namespace Emotion.Graphics
         #region Event Handles and Sizing
 
         /// <summary>
+        /// OpenGL debug callbacks.
+        /// </summary>
+        private static Gl.DebugProc _glDebugCallback = GlDebugCallback;
+
+        private static unsafe void GlDebugCallback(DebugSource source, DebugType msgType, uint id, DebugSeverity severity, int length, IntPtr message, IntPtr userParam)
+        {
+            var stringMessage = new string((sbyte*) message, 0, length);
+
+            switch (severity)
+            {
+                case DebugSeverity.DebugSeverityHigh:
+                    Engine.Log.Warning(stringMessage, $"GL_{msgType}_{source}");
+                    break;
+                case DebugSeverity.DebugSeverityMedium:
+                    Engine.Log.Info(stringMessage, $"GL_{msgType}_{source}");
+                    break;
+                default:
+                    Engine.Log.Trace(stringMessage, $"GL_{msgType}_{source}");
+                    break;
+            }
+        }
+
+        /// <summary>
         /// Apply rendering settings.
         /// </summary>
         public void ApplySettings()
@@ -291,33 +323,19 @@ namespace Emotion.Graphics
             Scale = MathF.Min(ratio.X, ratio.Y);
             IntScale = (int) MathF.Floor(MathF.Min(size.X, size.Y) / MathF.Min(baseRes.X, baseRes.Y));
 
-            // Set viewport.
-            Gl.Viewport(0, 0, (int) size.X, (int) size.Y);
-            ScreenBuffer.Viewport = new Rectangle(0, 0, size);
-            ScreenBuffer.Size = size;
-
+            Vector2 drawBufferSize = size;
             if (Engine.Configuration.IntScaleDrawBuffer)
             {
                 Scale -= IntScale - 1;
-                size /= IntScale;
-                size.X = (int) size.X;
-                size.Y = (int) size.Y;
+                drawBufferSize /= IntScale;
+                drawBufferSize.IntCastRound();
                 IntScale = 1;
             }
 
             Engine.Log.Info($"Resized host - scale is {Scale} and int scale is {IntScale}", MessageSource.Renderer);
 
-            // Recreate draw buffer.
-            if (!Engine.Configuration.UseIntermediaryBuffer)
-            {
-                DrawBuffer.Size = size;
-                DrawBuffer.Viewport = new Rectangle(0, 0, size);
-            }
-            else
-            {
-                DrawBuffer.Resize(size);
-            }
-
+            ScreenBuffer.Resize(size);
+            DrawBuffer.Resize(drawBufferSize, true);
             Camera?.RecreateMatrix();
             ApplySettings();
 
@@ -437,11 +455,12 @@ namespace Emotion.Graphics
                 // Push a blit from the draw buffer to the screen buffer.
                 SetState(_blitState);
                 RenderTo(ScreenBuffer);
-                RenderSprite(Vector3.Zero, ScreenBuffer.Size, Color.White, DrawBuffer.Texture);
+                RenderFrameBuffer(DrawBuffer, ScreenBuffer.Size);
                 RenderTo(null);
             }
 
             InvalidateStateBatches();
+            Gl.Finish();
         }
 
         public void Update()
