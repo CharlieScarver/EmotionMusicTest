@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Numerics;
 using Emotion.Common;
+using Emotion.IO;
 
 namespace MusicTest
 {
@@ -15,12 +16,17 @@ namespace MusicTest
 
             // Configuration.
             Configurator config = new Configurator();
-            config.HostSize = new Vector2(1280, 720);
+            config.HostSize = new Vector2(1920, 1080);
             config.HostTitle = "Music Test";
             config.DebugMode = true;
-
+            //config.RendererCompatMode = true;
+            //config.UseIntermediaryBuffer = true;
+            config.GlDebugMode = true;
             Engine.Setup(config);
-            Engine.SceneManager.SetScene(new MainScene());
+
+            TextAsset testRoom = Engine.AssetLoader.Get<TextAsset>("testRoom.json");
+
+            Engine.SceneManager.SetScene(new MainScene(testRoom));
             Engine.Run();
         }
     }
