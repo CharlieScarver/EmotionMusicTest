@@ -14,6 +14,8 @@ namespace MusicTest.GameObjects
 
         public TextureAsset TextureAsset { get; set; }
 
+        public ShaderAsset ShadowShader { get; set; }
+
         public Decoration(string type, string fileName, Vector2 size, Vector3 position) {
             Type = type;
             FileName = fileName;
@@ -21,16 +23,33 @@ namespace MusicTest.GameObjects
             Position = position;
 
             TextureAsset = Engine.AssetLoader.Get<TextureAsset>(FileName);
+
+            ShadowShader = Engine.AssetLoader.Get<ShaderAsset>("ShadowShader.xml");
         }
 
         public override void Render(RenderComposer composer)
         {
-            composer.RenderSprite(
-                Position,
-                Size,
-                Color.White,
-                TextureAsset.Texture
-            );
+
+            if (Type.Contains("Icicle"))
+            {
+                //composer.SetShader(ShadowShader.Shader);
+                composer.RenderSprite(
+                    Position,
+                    Size,
+                    Color.White,
+                    TextureAsset.Texture
+                );
+                //composer.SetShader();
+            }
+            else
+            {
+                composer.RenderSprite(
+                    Position,
+                    Size,
+                    Color.White,
+                    TextureAsset.Texture
+                );
+            }
         }
     }
 }

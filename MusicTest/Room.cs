@@ -1,4 +1,5 @@
-﻿using MusicTest.GameObjects;
+﻿using Emotion.Primitives;
+using MusicTest.GameObjects;
 using System.Collections.Generic;
 using System.Numerics;
 
@@ -17,5 +18,10 @@ namespace MusicTest
         public List<Decoration> Backgrounds { get; set; }
         public List<Platform> Platforms { get; set; }
         public List<Decoration> Decorations { get; set; }
+
+        public Rectangle ToRectangle()
+        {
+            return new Rectangle(Vector2.Zero, Size);
+        }
     }
 }

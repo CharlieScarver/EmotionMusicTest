@@ -73,6 +73,12 @@
     <None Update="Assets\rocks.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Assets\ShadowShader.frag">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Assets\ShadowShader.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Assets\testRoom.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

@@ -36,7 +36,7 @@ namespace MusicTest
             // Deserialize map into model.
             LoadedRoom = JsonConvert.DeserializeObject<Room>(mapFile.Content);
 
-            Player = new Unit(LoadedRoom.Spawn);
+            Player = new Midori(LoadedRoom.Spawn);
 
             Engine.Renderer.Camera.Zoom = 0.5f;
             Engine.Renderer.Camera.X = Player.X;
@@ -91,7 +91,7 @@ namespace MusicTest
 
         public void Load()
         {
-            CodeVariant = 2;
+            CodeVariant = 3;
 
             if (CodeVariant == 1)
             {
@@ -123,6 +123,14 @@ namespace MusicTest
 
         public void Unload()
         {
+        }
+
+        public bool IsTransformOnSreen(Transform transform) 
+        {
+            Vector2 windowSize = Engine.Host.Window.Size;
+            return transform.ToRectangle().IntersectsInclusive(
+                new Rectangle(Engine.Renderer.Camera.Position2 - new Vector2(windowSize.X / 2, windowSize.Y / 2), windowSize)
+            );
         }
 
         public void Update()
@@ -186,12 +194,18 @@ namespace MusicTest
 
             foreach (Decoration plat in LoadedRoom.Platforms)
             {
-                plat.Render(composer);
+                if (IsTransformOnSreen(plat))
+                {
+                    plat.Render(composer);
+                }
             }
 
             foreach (Decoration dec in LoadedRoom.Decorations)
             {
-                dec.Render(composer);
+                if (IsTransformOnSreen(dec))
+                {
+                    dec.Render(composer);
+                }
             }
 
             Player.Render(composer);

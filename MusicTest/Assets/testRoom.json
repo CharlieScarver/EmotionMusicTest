@@ -1,0 +1,167 @@
+{
+	"Name": "Test room",
+	"Size": {
+		"X": 3360,
+		"Y": 1080
+	},
+	"Spawn": {
+		"X": 1920,
+		"Y": 580,
+		"Z": 4
+	},
+	"Backgrounds": [
+		{
+			"Type": "Frozen Cave Wall",
+			"FileName": "rocks.png",
+			"Size": {
+				"X": 3360,
+				"Y": 1080
+			},
+			"Position": {
+				"X": 0,
+				"Y": 0,
+				"Z": 1
+			}
+		},
+		{
+			"Type": "Thin Ice Layer on the Wall",
+			"FileName": "thin ice layer.png",
+			"Size": {
+				"X": 3360,
+				"Y": 1080
+			},
+			"Position": {
+				"X": 0,
+				"Y": 0,
+				"Z": 2
+			}
+		}
+	],
+	"Platforms": [
+		{
+			"Type": "Floor",
+			"FileName": "Layer 8.png",
+			"Size": {
+				"X": 3360,
+				"Y": 1080
+			},
+			"Position": {
+				"X": 0,
+				"Y": 0,
+				"Z": 3
+			},
+			"CollisionLine": {
+				"Ax": 0,
+				"Ay": 920,
+				"Bx": 3360,
+				"By": 920
+			}
+		}
+	],
+	"Decorations": [
+		{
+			"Type": "Ceiling Icicle Small",
+			"FileName": "icycle 1.png",
+			"Size": {
+				"X": 196,
+				"Y": 193
+			},
+			"Position": {
+				"X": 230,
+				"Y": 0,
+				"Z": 5
+			}
+		},
+		{
+			"Type": "Ceiling Icicle Medium",
+			"FileName": "icycle 2.png",
+			"Size": {
+				"X": 289,
+				"Y": 352
+			},
+			"Position": {
+				"X": 720,
+				"Y": 0,
+				"Z": 5
+			}
+		},
+		{
+			"Type": "Ceiling Icicle Large",
+			"FileName": "icycle 3.png",
+			"Size": {
+				"X": 513,
+				"Y": 503
+			},
+			"Position": {
+				"X": 1180,
+				"Y": 0,
+				"Z": 5
+			}
+		},
+		{
+			"Type": "Ceiling Icicle Medium",
+			"FileName": "icycle 2.png",
+			"Size": {
+				"X": 289,
+				"Y": 352
+			},
+			"Position": {
+				"X": 1950,
+				"Y": 0,
+				"Z": 5
+			}
+		},
+		{
+			"Type": "Floor Icicle Large",
+			"FileName": "icycle 4.png",
+			"Size": {
+				"X": 375,
+				"Y": 506
+			},
+			"Position": {
+				"X": 0,
+				"Y": 574,
+				"Z": 5
+			}
+		},
+		{
+			"Type": "Floor Icicle Small",
+			"FileName": "icycle 6.png",
+			"Size": {
+				"X": 129,
+				"Y": 200
+			},
+			"Position": {
+				"X": 600,
+				"Y": 880,
+				"Z": 5
+			}
+		},
+		{
+			"Type": "Floor Icicle Medium",
+			"FileName": "icycle 5.png",
+			"Size": {
+				"X": 215,
+				"Y": 355
+			},
+			"Position": {
+				"X": 1150,
+				"Y": 725,
+				"Z": 5
+			}
+		},
+		{
+			"Type": "Floor Icicle Medium",
+			"FileName": "icycle 5.png",
+			"Size": {
+				"X": 215,
+				"Y": 355
+			},
+			"Position": {
+				"X": 1870,
+				"Y": 725,
+				"Z": 5
+			}
+		}
+	]
+}

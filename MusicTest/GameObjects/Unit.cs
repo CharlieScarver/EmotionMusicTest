@@ -13,37 +13,61 @@ namespace MusicTest.GameObjects
 
         public TextureAsset TextureAsset { get; set; }
 
-        public int VelocityX { get; set; } = 5;
+        public int VelocityX { get; set; } = 6;
 
+        #region Status Properties
+        public bool IsIdle { get; set; }
+        public bool IsMovingLeft { get; set; }
+        public bool IsMovingRight { get; set; }
         public bool IsFacingRight { get; set; }
+        public bool isInteracting { get; set; }
+        #endregion
 
         public Unit(Vector3 position)
         {
             Position = position;
-
-            Name = "Midori";
-            Size = new Vector2(250, 344.489f); // Full Size 1606x2213
-            TextureAsset = Engine.AssetLoader.Get<TextureAsset>("midori.png");
         }
 
-        public void Update(Room currentRoom) 
+        public Unit(string name, Vector3 position, Vector2 size, string textureFileName)
         {
-            if (Engine.InputManager.IsKeyHeld(Key.A))
+            Name = name;
+            Position = position;
+            Size = size;
+            TextureAsset = Engine.AssetLoader.Get<TextureAsset>(textureFileName);
+        }
+
+        protected void ManageMovement(Room currentRoom) 
+        {
+            if (IsMovingLeft) 
             {
+                // Make sure movement is withing room borders
                 if (X > 0 + VelocityX)
                 {
-                    X -= 5;
-                    IsFacingRight = false;
+                    X -= VelocityX;
+                }
+                else
+                {
+                    X = 0;
                 }
             }
-            else if (Engine.InputManager.IsKeyHeld(Key.D))
+            
+            if (IsMovingRight)
             {
+                // Make sure movement is withing room borders
                 if (X + Size.X < currentRoom.Size.X - VelocityX)
                 {
-                    X += 5;
-                    IsFacingRight = true;
+                    X += VelocityX;
+                }
+                else
+                {
+                    X = currentRoom.Size.X - Size.X;
                 }
             }
+        }
+
+        public virtual void Update(Room currentRoom) 
+        {
+            ManageMovement(currentRoom);
         }
 
         public override void Render(RenderComposer composer)
