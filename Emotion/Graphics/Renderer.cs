@@ -85,7 +85,7 @@ namespace Emotion.Graphics
         /// The maximum textures that can be mapped in one StreamBuffer and/or shader. If more than the allowed textures are mapped
         /// an exception is raised.
         /// </summary>
-        public int TextureArrayLimit { get; set; } = 1;
+        public int TextureArrayLimit { get; private set; } = -1;
 
         #endregion
 
@@ -128,6 +128,11 @@ namespace Emotion.Graphics
         /// VaoCache[typeof(VertexData)] will also return this object.
         /// </summary>
         public VertexArrayObject CommonVao;
+
+        /// <summary>
+        /// A ring buffer of vertex buffers, for unsynchronized drawing.
+        /// </summary>
+        public RingVertexBuffer RingBuffer;
 
         /// <summary>
         /// Cached VAOs per structure type. These are all bound to the common VBO.
@@ -209,16 +214,28 @@ namespace Emotion.Graphics
             SoftwareRenderer = Gl.CurrentRenderer.Contains("llvmpipe");
             CompatibilityMode = SoftwareRenderer || Engine.Configuration.RendererCompatMode;
             Dsa = !CompatibilityMode && Gl.CurrentVersion.Major >= 4 && Gl.CurrentVersion.Minor >= 5;
-            TextureArrayLimit = 1; //SoftwareRenderer ? 4 : Gl.CurrentLimits.MaxTextureImageUnits;
+            TextureArrayLimit = SoftwareRenderer ? 4 : Gl.CurrentLimits.MaxTextureImageUnits;
 
             Engine.Log.Info($" Flags: {(CompatibilityMode ? "Compat, " : "")}{(Dsa ? "Dsa, " : "")}Textures[{TextureArrayLimit}]", MessageSource.Renderer);
 
             // Attach callback if debug mode is enabled.
-            if (Engine.Configuration.GlDebugMode && !CompatibilityMode && (Gl.CurrentExtensions.DebugOutput_ARB || Gl.CurrentVersion.Major >= 4 && Gl.CurrentVersion.Minor >= 3))
+            bool hasDebugSupport = (Gl.CurrentExtensions.DebugOutput_ARB || Gl.CurrentVersion.Major >= 4 && Gl.CurrentVersion.Minor >= 3);
+            if (Engine.Configuration.GlDebugMode && !CompatibilityMode && hasDebugSupport)
             {
+                Gl.Enable(EnableCap.DebugOuput);
                 Gl.DebugMessageCallback(_glDebugCallback, IntPtr.Zero);
                 Engine.Log.Trace("Attached OpenGL debug callback.", MessageSource.Renderer);
             }
+#if !DEBUG
+            // In release mode GL errors are not checked after every call.
+            // In that case a error catching callback is attached so that GL errors are logged.
+            else if(hasDebugSupport)
+            {
+                Gl.Enable(EnableCap.DebugOuput);
+                Gl.DebugMessageCallback(_glErrorCatchCallback, IntPtr.Zero);
+                Engine.Log.Info("Attached OpenGL error catching callback.", MessageSource.Renderer);
+            }
+#endif
 
             // Create default indices.
             IndexBuffer.CreateDefaultIndexBuffers();
@@ -272,7 +289,15 @@ namespace Emotion.Graphics
         {
             Debug.Assert(GLThread.IsGLThread());
 
-            VertexBuffer = new VertexBuffer((uint) (MAX_INDICES * VertexData.SizeInBytes));
+            var size = (int) (MAX_INDICES * VertexData.SizeInBytes);
+            RingBuffer = new RingVertexBuffer(size, size / 8, 3, s =>
+            {
+                var vbo = new VertexBuffer((uint) s);
+                var vao = new VertexArrayObject<VertexData>(vbo);
+                return new RingGraphicsObjects(vbo, vao);
+            });
+
+            VertexBuffer = new VertexBuffer((uint) size);
             CommonVao = new VertexArrayObject<VertexData>(VertexBuffer);
             VaoCache.Add(typeof(VertexData), CommonVao);
 
@@ -282,13 +307,16 @@ namespace Emotion.Graphics
         #region Event Handles and Sizing
 
         /// <summary>
-        /// OpenGL debug callbacks.
+        /// OpenGL debug callback.
         /// </summary>
         private static Gl.DebugProc _glDebugCallback = GlDebugCallback;
 
         private static unsafe void GlDebugCallback(DebugSource source, DebugType msgType, uint id, DebugSeverity severity, int length, IntPtr message, IntPtr userParam)
         {
             var stringMessage = new string((sbyte*) message, 0, length);
+
+            // NVidia drivers love to spam the debug log with how your buffers will be mapped in the system heap.
+            if (msgType == DebugType.DebugTypeOther && stringMessage.Contains("SYSTEM HEAP")) return;
 
             switch (severity)
             {
@@ -303,6 +331,19 @@ namespace Emotion.Graphics
                     break;
             }
         }
+
+#if !DEBUG
+
+        private static Gl.DebugProc _glErrorCatchCallback = glErrorCatchCallback;
+        private static unsafe void glErrorCatchCallback(DebugSource source, DebugType msgType, uint id, DebugSeverity severity, int length, IntPtr message, IntPtr userParam)
+        {
+            if(msgType != DebugType.DebugTypeError) return;
+
+            var stringMessage = new string((sbyte*) message, 0, length);
+            Engine.Log.Error(stringMessage, $"GL_{source}");
+        }
+
+#endif
 
         /// <summary>
         /// Apply rendering settings.
@@ -460,7 +501,6 @@ namespace Emotion.Graphics
             }
 
             InvalidateStateBatches();
-            Gl.Finish();
         }
 
         public void Update()

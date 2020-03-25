@@ -38,7 +38,7 @@ namespace Emotion.Graphics
         public void InvalidateStateBatches()
         {
             if (ActiveQuadBatch == null || ActiveQuadBatch.BatchedSprites == 0) return;
-            PerfProfiler.Start($"RenderBatch {ActiveQuadBatch.BatchedSprites} Sprites");
+            PerfProfiler.Start($"RenderBatch {ActiveQuadBatch.BatchedSprites} Sprites {ActiveQuadBatch.TextureSlotUtilization} Textures");
             ActiveQuadBatch.Render(this);
             ActiveQuadBatch.Recycle();
             PerfProfiler.Stop();
@@ -54,7 +54,7 @@ namespace Emotion.Graphics
             InvalidateStateBatches();
 
             // If using shared memory, link to the composer.
-            if (batch is ISharedMemorySpriteBatch sharedMemoryBatch) sharedMemoryBatch.SetMemory(VertexBuffer);
+            if (batch is ISharedMemorySpriteBatch sharedMemoryBatch) sharedMemoryBatch.SetMemory(RingBuffer);
 
             ActiveQuadBatch = batch;
         }
@@ -67,7 +67,7 @@ namespace Emotion.Graphics
             InvalidateStateBatches();
 
             var defaultBatch = new VertexDataSharedMemorySpriteBatch();
-            defaultBatch.SetMemory(VertexBuffer);
+            defaultBatch.SetMemory(RingBuffer);
             ActiveQuadBatch = defaultBatch;
         }
 
