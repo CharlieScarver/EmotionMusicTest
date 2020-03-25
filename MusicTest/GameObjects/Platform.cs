@@ -7,7 +7,7 @@ namespace MusicTest.GameObjects
 {
     public class Platform : Decoration
     {
-        public Platform(string type, string fileName, Vector2 size, Vector3 position, Line collisionLine) : base (type, fileName, size, position)
+        public Platform(string name, string textureName, Vector2 size, Vector3 position, Line collisionLine) : base (name, textureName, size, position)
         {
             CollisionLine = collisionLine;
         }

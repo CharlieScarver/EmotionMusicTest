@@ -17,7 +17,9 @@ namespace MusicTest
         // Objects
         public List<Decoration> Backgrounds { get; set; }
         public List<Platform> Platforms { get; set; }
-        public List<Decoration> Decorations { get; set; }
+        public List<Decoration> BackgroundDecorations { get; set; }
+        public List<Decoration> ForegroundDecorations { get; set; }
+        public List<ConfigUnit> Units { get; set; }
 
         public Rectangle ToRectangle()
         {

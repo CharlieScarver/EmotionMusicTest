@@ -18,15 +18,17 @@ namespace MusicTest
             Configurator config = new Configurator();
             config.HostSize = new Vector2(1920, 1080);
             config.HostTitle = "Music Test";
+            config.InitialDisplayMode = Emotion.Platform.DisplayMode.Windowed;
             config.DebugMode = true;
             //config.RendererCompatMode = true;
             //config.UseIntermediaryBuffer = true;
             config.GlDebugMode = true;
             Engine.Setup(config);
 
+            TextAsset progressFile = Engine.AssetLoader.Get<TextAsset>("progress.json");
             TextAsset testRoom = Engine.AssetLoader.Get<TextAsset>("testRoom.json");
 
-            Engine.SceneManager.SetScene(new MainScene(testRoom));
+            Engine.SceneManager.SetScene(new MainScene(progressFile, testRoom));
             Engine.Run();
         }
     }

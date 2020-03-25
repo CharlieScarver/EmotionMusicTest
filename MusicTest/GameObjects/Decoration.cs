@@ -9,34 +9,50 @@ namespace MusicTest.GameObjects
 {
     public class Decoration : TransformRenderable
     {
-        public string Type { get; set; }
-        public string FileName { get; set; }
+        public string Name { get; set; }
+
+        public string TextureName { get; set; }
 
         public TextureAsset TextureAsset { get; set; }
 
         public ShaderAsset ShadowShader { get; set; }
 
-        public Decoration(string type, string fileName, Vector2 size, Vector3 position) {
-            Type = type;
-            FileName = fileName;
+        public int VelocityOffsetX { get; set; }
+
+        public Decoration(string name, string textureName, Vector2 size, Vector3 position) {
+            Name = name;
+            TextureName = textureName;
             Size = size;
             Position = position;
 
-            TextureAsset = Engine.AssetLoader.Get<TextureAsset>(FileName);
+            TextureAsset = Engine.AssetLoader.Get<TextureAsset>(TextureName);
+
+            if (Name.Contains("Ceiling Icicle"))
+            {
+                VelocityOffsetX = 2;
+            }
+            else if (Name.Contains("Floor Icicle"))
+            {
+                VelocityOffsetX = 4;
+            }
 
             ShadowShader = Engine.AssetLoader.Get<ShaderAsset>("ShadowShader.xml");
         }
 
         public override void Render(RenderComposer composer)
         {
+            if (TextureAsset == null)
+            {
+                return;
+            }
 
-            if (Type.Contains("Icicle"))
+            if (Name.Contains("Icicle"))
             {
                 //composer.SetShader(ShadowShader.Shader);
                 composer.RenderSprite(
                     Position,
                     Size,
-                    Color.White,
+                    new Color(180, 180, 180),
                     TextureAsset.Texture
                 );
                 //composer.SetShader();

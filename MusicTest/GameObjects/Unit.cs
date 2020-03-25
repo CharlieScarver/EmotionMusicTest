@@ -3,6 +3,7 @@ using Emotion.Graphics;
 using Emotion.IO;
 using Emotion.Platform.Input;
 using Emotion.Primitives;
+using System.Collections.Generic;
 using System.Numerics;
 
 namespace MusicTest.GameObjects
@@ -10,10 +11,13 @@ namespace MusicTest.GameObjects
     public class Unit : TransformRenderable
     {
         public string Name { get; set; }
+        public string TextureName { get; set; }
 
         public TextureAsset TextureAsset { get; set; }
 
         public int VelocityX { get; set; } = 6;
+
+        public List<DialoguePiece> Dialogues { get; set; }
 
         #region Status Properties
         public bool IsIdle { get; set; }
@@ -23,17 +27,14 @@ namespace MusicTest.GameObjects
         public bool isInteracting { get; set; }
         #endregion
 
-        public Unit(Vector3 position)
-        {
-            Position = position;
-        }
-
-        public Unit(string name, Vector3 position, Vector2 size, string textureFileName)
+        public Unit(string name, string textureName, Vector3 position, Vector2 size)
         {
             Name = name;
+            TextureName = textureName;
             Position = position;
             Size = size;
-            TextureAsset = Engine.AssetLoader.Get<TextureAsset>(textureFileName);
+
+            TextureAsset = Engine.AssetLoader.Get<TextureAsset>(TextureName);
         }
 
         protected void ManageMovement(Room currentRoom) 
@@ -80,6 +81,12 @@ namespace MusicTest.GameObjects
                 null,
                 IsFacingRight
             );
+
+            if (isInteracting) 
+            {
+                //string text = Dialogues[0].DialogueLines[0];
+                //composer.RenderString(Position + new Vector3(-30, -30, 0), Color.Black, text, Engine.AssetLoader.Get<FontAsset>("debugFont.otf").Font.GetAtlas(16));
+            }
         }
     }
 }

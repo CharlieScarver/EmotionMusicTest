@@ -11,6 +11,7 @@ using MusicTest.GameObjects;
 using Newtonsoft.Json;
 using OpenGL;
 using System;
+using System.Collections.Generic;
 using System.Numerics;
 
 namespace MusicTest
@@ -27,16 +28,24 @@ namespace MusicTest
 
         public Room LoadedRoom { get; set; }
 
+        public List<Unit> Units { get; set; }
+
         public int VelocityX { get; set; } = 7;
 
         public Unit Player { get; set; }
 
-        public MainScene(TextAsset mapFile)
+        public Progress GameProgress { get; set; }
+
+        public MainScene(TextAsset progressFile, TextAsset mapFile)
         {
             // Deserialize map into model.
             LoadedRoom = JsonConvert.DeserializeObject<Room>(mapFile.Content);
 
+            GameProgress = JsonConvert.DeserializeObject<Progress>(progressFile.Content);
+
             Player = new Midori(LoadedRoom.Spawn);
+
+            Units = new List<Unit>();
 
             Engine.Renderer.Camera.Zoom = 0.5f;
             Engine.Renderer.Camera.X = Player.X;
@@ -118,7 +127,22 @@ namespace MusicTest
             }
 
             // Set the TextureArrayLimit to 1 for GPU's that support only zero indexing
-            Engine.Renderer.TextureArrayLimit = 1;
+            // Engine.Renderer.TextureArrayLimit = 1;
+
+            foreach(ConfigUnit configUnit in LoadedRoom.Units)
+            {
+                Unit unit;
+                switch (configUnit.Type)
+                {
+                    case "Shishi":
+                        unit = new Shishi(configUnit.Name, configUnit.TextureName, configUnit.Position, configUnit.Size);
+                        break;
+                    default:
+                        unit = new Unit(configUnit.Name, configUnit.TextureName, configUnit.Position, configUnit.Size);
+                        break;
+                }
+                Units.Add(unit);
+            }
         }
 
         public void Unload()
@@ -129,7 +153,8 @@ namespace MusicTest
         {
             Vector2 windowSize = Engine.Host.Window.Size;
             return transform.ToRectangle().IntersectsInclusive(
-                new Rectangle(Engine.Renderer.Camera.Position2 - new Vector2(windowSize.X / 2, windowSize.Y / 2), windowSize)
+                Engine.Renderer.Camera.GetWorldBoundingRect()
+                //new Rectangle(Engine.Renderer.Camera.Position2 - new Vector2(windowSize.X / 2, windowSize.Y / 2), windowSize)
             );
         }
 
@@ -158,6 +183,12 @@ namespace MusicTest
                 {
                     // Engine.Renderer.Camera.X -= VelocityX;
                     Engine.Renderer.Camera.X = playerXCenter;
+
+                    // Move the foreground decorations faster than the player
+                    foreach (Decoration dec in LoadedRoom.ForegroundDecorations)
+                    {
+                        dec.X += Player.VelocityX + dec.VelocityOffsetX;
+                    }
                 }
                 else
                 {
@@ -171,6 +202,12 @@ namespace MusicTest
                 {
                     // Engine.Renderer.Camera.X += VelocityX;
                     Engine.Renderer.Camera.X = playerXCenter;
+
+                    // Move the foreground decorations faster than the player
+                    foreach (Decoration dec in LoadedRoom.ForegroundDecorations)
+                    {
+                        dec.X -= Player.VelocityX + dec.VelocityOffsetX;
+                    }
                 }
                 else
                 {
@@ -199,8 +236,8 @@ namespace MusicTest
                     plat.Render(composer);
                 }
             }
-
-            foreach (Decoration dec in LoadedRoom.Decorations)
+            
+            foreach (Decoration dec in LoadedRoom.BackgroundDecorations)
             {
                 if (IsTransformOnSreen(dec))
                 {
@@ -208,7 +245,23 @@ namespace MusicTest
                 }
             }
 
+            foreach (Unit unit in Units)
+            {
+                if (IsTransformOnSreen(unit))
+                {
+                    unit.Render(composer);
+                }
+            }
+
             Player.Render(composer);
+
+            foreach (Decoration dec in LoadedRoom.ForegroundDecorations)
+            {
+                if (IsTransformOnSreen(dec))
+                {
+                    dec.Render(composer);
+                }
+            }
 
             composer.RenderCircle(Engine.Renderer.Camera.Position, 5, Color.Red);
         }

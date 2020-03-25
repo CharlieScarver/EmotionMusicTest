@@ -12,7 +12,7 @@ namespace MusicTest.GameObjects
 {
     public class Midori : Unit
     {
-        public Midori(Vector3 position) : base(position)
+        public Midori(Vector3 position) : base("Midori", "midori.png", position, new Vector2(250, 344.489f))
         {
             Position = position;
 
