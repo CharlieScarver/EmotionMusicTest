@@ -7,6 +7,7 @@ using Emotion.Platform.Input;
 using Emotion.Primitives;
 using Emotion.Scenography;
 using Emotion.Utility;
+using MusicTest.Core;
 using MusicTest.GameObjects;
 using Newtonsoft.Json;
 using OpenGL;
@@ -16,7 +17,7 @@ using System.Numerics;
 
 namespace MusicTest
 {
-    class MainScene : IScene
+    public class MainScene : IScene
     {
         public byte CodeVariant { get; set; }
         public AudioLayer IntroLayer { get; set; }
@@ -27,14 +28,11 @@ namespace MusicTest
         public AudioAsset BackgroundMusicIntro { get; set; }
 
         public Room LoadedRoom { get; set; }
-
-        public List<Unit> Units { get; set; }
-
-        public int VelocityX { get; set; } = 7;
-
-        public Unit Player { get; set; }
-
         public Progress GameProgress { get; set; }
+
+        public Midori Player { get; set; }
+        public List<Unit> Units { get; set; }
+        public Interaction CurrentInteration { get; set; }
 
         public MainScene(TextAsset progressFile, TextAsset mapFile)
         {
@@ -43,13 +41,14 @@ namespace MusicTest
 
             GameProgress = JsonConvert.DeserializeObject<Progress>(progressFile.Content);
 
-            Player = new Midori(LoadedRoom.Spawn);
+            Player = new Midori(LoadedRoom.Spawn, this);
 
             Units = new List<Unit>();
 
-            Engine.Renderer.Camera.Zoom = 0.5f;
-            Engine.Renderer.Camera.X = Player.X;
-            Engine.Renderer.Camera.Y = 540; // Middle of the screen
+            Engine.Renderer.Camera = new ScalableArtCamera(new Vector3(Player.X, 540, 0), 0.33f);
+            //Engine.Renderer.Camera.Zoom = 0.5f;
+            //Engine.Renderer.Camera.X = Player.X;
+            //Engine.Renderer.Camera.Y = 540; // Middle of the screen
 
             Engine.Renderer.VSync = true;
             Console.WriteLine(OpenGL.Gl.CurrentLimits.MaxTextureSize);
@@ -215,6 +214,16 @@ namespace MusicTest
                 }
             }
 
+            // Interaction
+            if (Player.isInteracting && CurrentInteration == null)
+            {
+                CurrentInteration = new Interaction(Player, Player.InteractTarget);
+            }
+            else if (!Player.isInteracting && CurrentInteration != null)
+            {
+                CurrentInteration = null;
+            }
+
             // Quit on Escape press
             if (Engine.InputManager.IsKeyHeld(Key.Escape))
             {
@@ -264,6 +273,13 @@ namespace MusicTest
             }
 
             composer.RenderCircle(Engine.Renderer.Camera.Position, 5, Color.Red);
+
+            composer.RenderCircle(new Vector3(2450, 0, 5), 1, Color.Red);
+
+            if (CurrentInteration != null)
+            {
+                CurrentInteration.Render(composer);
+            }
         }
 
     }

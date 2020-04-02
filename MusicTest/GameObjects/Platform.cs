@@ -18,11 +18,11 @@ namespace MusicTest.GameObjects
         {
             base.Render(composer);
 
-            composer.RenderLine(
-                CollisionLine.AwithZ(Position.Z),
-                CollisionLine.BwithZ(Position.Z),
-                Color.Yellow
-            ); 
+            //composer.RenderLine(
+            //    CollisionLine.AwithZ(Position.Z),
+            //    CollisionLine.BwithZ(Position.Z),
+            //    Color.Yellow
+            //); 
         }
     }
 }

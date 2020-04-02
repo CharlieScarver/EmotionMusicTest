@@ -48,6 +48,8 @@ namespace MusicTest.GameObjects
 
             if (Name.Contains("Icicle"))
             {
+                //TextureAsset.Texture.Tile = false;
+                composer.SetShader(Engine.AssetLoader.Get<ShaderAsset>("Shaders/Blur.xml").Shader);
                 //composer.SetShader(ShadowShader.Shader);
                 composer.RenderSprite(
                     Position,
@@ -55,7 +57,19 @@ namespace MusicTest.GameObjects
                     new Color(180, 180, 180),
                     TextureAsset.Texture
                 );
-                //composer.SetShader();
+                //composer.SetShader(null);
+                composer.SetShader(null);
+            }
+            else if (Name.Contains("Wall"))
+            {
+                //composer.SetShader(Engine.AssetLoader.Get<ShaderAsset>("Shaders/Blur.xml").Shader);
+                composer.RenderSprite(
+                    Position,
+                    Size,
+                    Color.White,
+                    TextureAsset.Texture
+                );
+                //composer.SetShader(null)
             }
             else
             {

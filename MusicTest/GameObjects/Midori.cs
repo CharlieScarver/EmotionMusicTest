@@ -12,21 +12,82 @@ namespace MusicTest.GameObjects
 {
     public class Midori : Unit
     {
-        public Midori(Vector3 position) : base("Midori", "midori.png", position, new Vector2(250, 344.489f))
+        public Midori(Vector3 position, MainScene scene) : base("Midori", "midori.png", position, new Vector2(250, 344.489f))
         {
             Position = position;
 
             Name = "Midori";
             Size = new Vector2(250, 344.489f); // Full Size 1606x2213
             TextureAsset = Engine.AssetLoader.Get<TextureAsset>("midori.png");
+
+            InteractRange = 200;
+            Scene = scene;
         }
 
-        protected void ManageInput(Room currentRoom)
+        private MainScene Scene { get; set; }
+
+        private int InteractRange { get; set; }
+
+        public Unit InteractTarget { get; set; }
+
+        private void Interact()
+        {
+            foreach (Unit unit in Scene.Units)
+            {
+                if (unit.ToRectangle().IntersectsInclusive(this.ToRectangle()))
+                {
+                    if (InteractTarget != null)
+                    {
+                        if (Vector2.Distance(Center, unit.Center) < Vector2.Distance(Center, InteractTarget.Center))
+                        {
+                            InteractTarget = unit;
+                        }
+                    }
+                    else
+                    {
+                        InteractTarget = unit;
+                    }
+                }
+            }
+
+            if (InteractTarget == null)
+            {
+                isInteracting = false;
+            }
+        }
+
+        protected void ManageInput()
         {
             IsIdle = true;
             IsMovingLeft = false;
             IsMovingRight = false;
+            
+            // Interaction
+            if (Engine.InputManager.IsKeyDown(Key.F))
+            {
+                if (!isInteracting)
+                {
+                    IsMovingLeft = false;
+                    IsMovingRight = false;
+                    IsIdle = true;
+                    isInteracting = true;
+                    Interact();
+                    return;
+                }
+                else
+                {
+                    isInteracting = false;
+                    InteractTarget = null;
+                    return;
+                }
+            }
 
+            if (isInteracting)
+            {
+                return;
+            }
+
+            // Movement
             if (Engine.InputManager.IsKeyHeld(Key.A))
             {
                 IsMovingLeft = true;
@@ -44,7 +105,7 @@ namespace MusicTest.GameObjects
         public override void Update(Room currentRoom)
         {
             base.Update(currentRoom);
-            ManageInput(currentRoom);
+            ManageInput();
         }
 
         public override void Render(RenderComposer composer)
@@ -57,6 +118,9 @@ namespace MusicTest.GameObjects
                 null,
                 IsFacingRight
             );
+
+            composer.RenderCircleOutline(new Vector3(Center, Z), InteractRange, Color.Red, true);
+            composer.RenderOutline(Position, Size, Color.Red, 1);
         }
     }
 }

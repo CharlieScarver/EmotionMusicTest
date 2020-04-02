@@ -84,8 +84,8 @@ namespace MusicTest.GameObjects
 
             if (isInteracting) 
             {
-                //string text = Dialogues[0].DialogueLines[0];
-                //composer.RenderString(Position + new Vector3(-30, -30, 0), Color.Black, text, Engine.AssetLoader.Get<FontAsset>("debugFont.otf").Font.GetAtlas(16));
+                string text = Dialogues[0].DialogueLines[0];
+                composer.RenderString(Position + new Vector3(-30, -30, 0), Color.Black, text, Engine.AssetLoader.Get<FontAsset>("debugFont.otf").GetAtlas(16));
             }
         }
     }
