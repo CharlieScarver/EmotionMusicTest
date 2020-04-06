@@ -45,7 +45,7 @@ namespace MusicTest
 
             Units = new List<Unit>();
 
-            Engine.Renderer.Camera = new ScalableArtCamera(new Vector3(Player.X, 540, 0), 0.33f);
+            Engine.Renderer.Camera = new ScalableArtCamera(new Vector3(Player.X, 540, 0), 1f);
             //Engine.Renderer.Camera.Zoom = 0.5f;
             //Engine.Renderer.Camera.X = Player.X;
             //Engine.Renderer.Camera.Y = 540; // Middle of the screen

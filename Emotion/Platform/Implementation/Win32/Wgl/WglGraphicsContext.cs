@@ -187,7 +187,6 @@ namespace Emotion.Platform.Implementation.Win32.Wgl
                     new GLContextDescription {Profile = GLProfile.Any}
                 };
 
-                // ReSharper disable once ForCanBeConvertedToForeach
                 for (var i = 0; i < contextFactory.Count; i++)
                 {
                     GLContextDescription current = contextFactory[i];
@@ -486,7 +485,7 @@ namespace Emotion.Platform.Implementation.Win32.Wgl
 
         protected override void SetSwapIntervalPlatform(int interval)
         {
-            if (_platform.Window.DisplayMode != DisplayMode.Fullscreen)
+            if (true)
             {
                 bool dwmComposition;
 
@@ -510,7 +509,7 @@ namespace Emotion.Platform.Implementation.Win32.Wgl
 
         public override void SwapBuffers()
         {
-            if (_platform.Window.DisplayMode != DisplayMode.Fullscreen)
+            if (true)
             {
                 bool dwmComposition;
 

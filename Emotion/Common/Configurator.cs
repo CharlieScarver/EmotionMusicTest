@@ -69,6 +69,12 @@ namespace Emotion.Common
         /// </summary>
         public bool UseIntermediaryBuffer { get; set; }
 
+        /// <summary>
+        /// Whether textures should default to "smooth" (bilinear) sampling on creation.
+        /// This is off by default and textures are created with a nearest filter.
+        /// </summary>
+        public bool TextureDefaultSmooth { get; set; }
+
         #endregion
 
         #region Loop
@@ -136,6 +142,21 @@ namespace Emotion.Common
         /// Not all values are valid for all platforms - invalid ones will fallback to the platform default.
         /// </summary>
         public DisplayMode InitialDisplayMode { get; set; } = DisplayMode.Windowed;
+
+        #endregion
+
+        #region Audio
+
+        /// <summary>
+        /// Volume modulation is not linear but exponential. This is the base.
+        /// </summary>
+        public float AudioCurve { get; set; } = 2f;
+
+        /// <summary>
+        /// The master volume. This is the percentage of the layer's volume to play at.
+        /// The exponential transform is not applied to it.
+        /// </summary>
+        public float MasterVolume { get; set; } = 1f;
 
         #endregion
 

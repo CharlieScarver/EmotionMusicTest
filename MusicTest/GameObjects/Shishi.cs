@@ -20,6 +20,7 @@ namespace MusicTest.GameObjects
             Dialogues = dialogues;
 
             IsFacingRight = true;
+            InteractionOffset = new Vector2(-80, 250);
         }
     }
 }

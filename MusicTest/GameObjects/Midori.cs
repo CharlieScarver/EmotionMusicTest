@@ -21,6 +21,7 @@ namespace MusicTest.GameObjects
             TextureAsset = Engine.AssetLoader.Get<TextureAsset>("midori.png");
 
             InteractRange = 200;
+            InteractionOffset = new Vector2(0, 70);
             Scene = scene;
         }
 
@@ -53,6 +54,17 @@ namespace MusicTest.GameObjects
             if (InteractTarget == null)
             {
                 isInteracting = false;
+            }
+            else
+            {
+                if (Center.X < InteractTarget.Center.X && InteractTarget.IsFacingRight)
+                {
+                    InteractTarget.IsFacingRight = false;
+                }
+                else if (Center.X > InteractTarget.Center.X && !InteractTarget.IsFacingRight)
+                {
+                    InteractTarget.IsFacingRight = true;
+                }
             }
         }
 

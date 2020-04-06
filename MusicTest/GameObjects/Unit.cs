@@ -19,6 +19,8 @@ namespace MusicTest.GameObjects
 
         public List<DialoguePiece> Dialogues { get; set; }
 
+        public Vector2 InteractionOffset { get; set; }
+
         #region Status Properties
         public bool IsIdle { get; set; }
         public bool IsMovingLeft { get; set; }

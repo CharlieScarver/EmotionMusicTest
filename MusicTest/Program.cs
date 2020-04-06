@@ -23,6 +23,8 @@ namespace MusicTest
             //config.RendererCompatMode = true;
             //config.UseIntermediaryBuffer = true;
             config.GlDebugMode = true;
+            config.RenderSize = new Vector2(1920, 1080);
+
             Engine.Setup(config);
 
             TextAsset progressFile = Engine.AssetLoader.Get<TextAsset>("progress.json");

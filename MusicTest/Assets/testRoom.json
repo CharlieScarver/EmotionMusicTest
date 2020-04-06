@@ -169,7 +169,7 @@
 		{
 			"Name": "Shishi",
 			"Type":  "Shishi",
-			"TextureName": "shishi shading cut.png",
+			"TextureName": "shishi.png",
 			"Position": {
 				"X": 800,
 				"Y": 590,
