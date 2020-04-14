@@ -1,8 +1,11 @@
 ﻿using Emotion.Common;
+using Emotion.Game.Animation;
 using Emotion.Graphics;
+using Emotion.Graphics.Objects;
 using Emotion.IO;
 using Emotion.Platform.Input;
 using Emotion.Primitives;
+using Emotion.Utility;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
@@ -18,9 +21,19 @@ namespace MusicTest.GameObjects
 
             Name = "Midori";
             Size = new Vector2(250, 344.489f); // Full Size 1606x2213
-            TextureAsset = Engine.AssetLoader.Get<TextureAsset>("midori.png");
+            TextureAsset = Engine.AssetLoader.Get<TextureAsset>("Textures/midori.png");
 
-            InteractRange = 200;
+            TextureAsset spriteAsset = Engine.AssetLoader.Get<TextureAsset>("Textures/pixel-midori-full-sheet-transparent.png");
+            Sprite = new AnimatedTexture(
+                spriteAsset.Texture,
+                new Vector2(24, 24),
+                AnimationLoopType.Normal,
+                300,
+                0,
+                2
+            );
+
+            InteractRange = 360;
             InteractionOffset = new Vector2(0, 70);
             Scene = scene;
         }
@@ -118,21 +131,51 @@ namespace MusicTest.GameObjects
         {
             base.Update(currentRoom);
             ManageInput();
+
+            if (IsIdle)
+            {
+                Sprite.StartingFrame = 0;
+                Sprite.EndingFrame = 1;
+                Sprite.TimeBetweenFrames = 1500;
+            }
+            else if (IsMovingLeft || IsMovingRight)
+            {
+                Sprite.StartingFrame = 13;
+                Sprite.EndingFrame = 25;
+                Sprite.TimeBetweenFrames = 75;
+            }
+
+            Sprite.Update(Engine.DeltaTime);
         }
 
         public override void Render(RenderComposer composer)
         {
+            //composer.RenderSprite(
+            //    Position,
+            //    Size,
+            //    Color.White,
+            //    TextureAsset.Texture,
+            //    null,
+            //    IsFacingRight
+            //);
+
+            composer.PushModelMatrix(
+                Matrix4x4.CreateRotationZ(Maths.DegreesToRadians(45), new Vector3(Center, 0))
+            );
             composer.RenderSprite(
                 Position,
-                Size,
+                new Vector2(360, 360),
                 Color.White,
-                TextureAsset.Texture,
-                null,
-                IsFacingRight
+                Sprite.Texture,
+                Sprite.CurrentFrame,
+                IsFacingRight, false
             );
+            composer.RenderOutline(Position, new Vector2(360, 360), Color.Red, 1);
 
-            composer.RenderCircleOutline(new Vector3(Center, Z), InteractRange, Color.Red, true);
+            //composer.RenderCircleOutline(new Vector3(Center, Z), InteractRange, Color.Red, true);
             composer.RenderOutline(Position, Size, Color.Red, 1);
+
+            composer.PopModelMatrix();
         }
     }
 }

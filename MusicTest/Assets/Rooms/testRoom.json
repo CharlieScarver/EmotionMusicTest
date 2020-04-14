@@ -168,7 +168,7 @@
 	"Units": [
 		{
 			"Name": "Shishi",
-			"Type":  "Shishi",
+			"Type": "Shishi",
 			"TextureName": "shishi.png",
 			"Position": {
 				"X": 800,
@@ -180,5 +180,41 @@
 				"Y": 274.181
 			}
 		}
+	],
+	"CollisionPlatforms": [
+		{
+			"PointA": {
+				"X": 0,
+				"Y": 920
+			},
+			"PointB": {
+				"X": 3360,
+				"Y": 920
+			}
+		},
+		{
+			"PointA": {
+				"X": 400,
+				"Y": 600
+			},
+			"PointB": {
+				"X": 900,
+				"Y": 920
+			}
+		}
+	],
+	"Textures": [
+		"rocks2.png",
+		"thin ice layer.png",
+		"floor 1.png",
+		"icycle 1.png",
+		"icycle 2.png",
+		"icycle 3.png",
+		"icycle 4.png",
+		"icycle 5.png",
+		"icycle 6.png",
+		"shishi.png",
+		"midori.png",
+		"pixel-midori-full-sheet-transparent.png"
 	]
 }

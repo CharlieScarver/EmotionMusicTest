@@ -25,7 +25,7 @@ namespace MusicTest.GameObjects
             Size = size;
             Position = position;
 
-            TextureAsset = Engine.AssetLoader.Get<TextureAsset>(TextureName);
+            TextureAsset = Engine.AssetLoader.Get<TextureAsset>($"Textures/{TextureName}");
 
             if (Name.Contains("Ceiling Icicle"))
             {
@@ -36,7 +36,7 @@ namespace MusicTest.GameObjects
                 VelocityOffsetX = 4;
             }
 
-            ShadowShader = Engine.AssetLoader.Get<ShaderAsset>("ShadowShader.xml");
+            ShadowShader = Engine.AssetLoader.Get<ShaderAsset>("Shaders/ShadowShader.xml");
         }
 
         public override void Render(RenderComposer composer)
@@ -50,7 +50,7 @@ namespace MusicTest.GameObjects
             {
                 //TextureAsset.Texture.Tile = false;
                 composer.SetShader(Engine.AssetLoader.Get<ShaderAsset>("Shaders/Blur.xml").Shader);
-                //composer.SetShader(ShadowShader.Shader);
+                composer.SetShader(ShadowShader.Shader);
                 composer.RenderSprite(
                     Position,
                     Size,

@@ -1,4 +1,6 @@
 ﻿using Emotion.Primitives;
+using MusicTest.Core;
+using MusicTest.Core.Room;
 using MusicTest.GameObjects;
 using System.Collections.Generic;
 using System.Numerics;
@@ -20,6 +22,10 @@ namespace MusicTest
         public List<Decoration> BackgroundDecorations { get; set; }
         public List<Decoration> ForegroundDecorations { get; set; }
         public List<ConfigUnit> Units { get; set; }
+        public List<ConfigCollisionPlatform> CollisionPlatforms { get; set; }
+
+        // Textures
+        public List<string> Textures { get; set; }
 
         public Rectangle ToRectangle()
         {

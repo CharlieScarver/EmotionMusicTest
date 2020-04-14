@@ -1,4 +1,5 @@
 ﻿using Emotion.Common;
+using Emotion.Game.Animation;
 using Emotion.Graphics;
 using Emotion.IO;
 using Emotion.Platform.Input;
@@ -14,6 +15,8 @@ namespace MusicTest.GameObjects
         public string TextureName { get; set; }
 
         public TextureAsset TextureAsset { get; set; }
+
+        public AnimatedTexture Sprite { get; set; }
 
         public int VelocityX { get; set; } = 6;
 
@@ -36,7 +39,7 @@ namespace MusicTest.GameObjects
             Position = position;
             Size = size;
 
-            TextureAsset = Engine.AssetLoader.Get<TextureAsset>(TextureName);
+            TextureAsset = Engine.AssetLoader.Get<TextureAsset>($"Textures/{TextureName}");
         }
 
         protected void ManageMovement(Room currentRoom) 

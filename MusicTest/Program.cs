@@ -28,7 +28,7 @@ namespace MusicTest
             Engine.Setup(config);
 
             TextAsset progressFile = Engine.AssetLoader.Get<TextAsset>("progress.json");
-            TextAsset testRoom = Engine.AssetLoader.Get<TextAsset>("testRoom.json");
+            TextAsset testRoom = Engine.AssetLoader.Get<TextAsset>("Rooms/testRoom.json");
 
             Engine.SceneManager.SetScene(new MainScene(progressFile, testRoom));
             Engine.Run();

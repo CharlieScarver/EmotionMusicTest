@@ -32,6 +32,8 @@ namespace MusicTest
 
         public Midori Player { get; set; }
         public List<Unit> Units { get; set; }
+        public List<CollisionPlatform> CollisionPlatforms { get; set; }
+
         public Interaction CurrentInteration { get; set; }
 
         public MainScene(TextAsset progressFile, TextAsset mapFile)
@@ -44,6 +46,7 @@ namespace MusicTest
             Player = new Midori(LoadedRoom.Spawn, this);
 
             Units = new List<Unit>();
+            CollisionPlatforms = new List<CollisionPlatform>();
 
             Engine.Renderer.Camera = new ScalableArtCamera(new Vector3(Player.X, 540, 0), 1f);
             //Engine.Renderer.Camera.Zoom = 0.5f;
@@ -103,10 +106,10 @@ namespace MusicTest
 
             if (CodeVariant == 1)
             {
-                BackgroundMusicIntro = Engine.AssetLoader.Get<AudioAsset>("Frozen Cave Intro.wav");
-                BackgroundMusic = Engine.AssetLoader.Get<AudioAsset>("Frozen Cave 12.wav");
+                BackgroundMusicIntro = Engine.AssetLoader.Get<AudioAsset>("Audio/Frozen Cave Intro.wav");
+                BackgroundMusic = Engine.AssetLoader.Get<AudioAsset>("Audio/Frozen Cave 12.wav");
 
-                IntroLayer = Engine.Host.Audio.CreateLayer("Intro layer", 1);
+                IntroLayer = Engine.Host.Audio.CreateLayer("Audio/Intro layer", 1);
                 CustomAudioTrack fcIntro = new CustomAudioTrack(BackgroundMusicIntro, 11.29f, PlayMainTrackOnMainLayer);
                 IntroLayer.AddToQueue(fcIntro);
 
@@ -117,13 +120,15 @@ namespace MusicTest
                 //BackgroundMusicIntro = Engine.AssetLoader.Get<AudioAsset>("Frozen Cave Intro 2.wav");
                 //BackgroundMusic = Engine.AssetLoader.Get<AudioAsset>("Frozen Cave 12.wav");
 
-                BackgroundMusicIntro = Engine.AssetLoader.Get<AudioAsset>("Frozen Cave Intro 4.wav");
-                BackgroundMusic = Engine.AssetLoader.Get<AudioAsset>("Frozen Cave Loop 3.wav");
+                BackgroundMusicIntro = Engine.AssetLoader.Get<AudioAsset>("Audio/Frozen Cave Intro 4.wav");
+                BackgroundMusic = Engine.AssetLoader.Get<AudioAsset>("Audio/Frozen Cave Loop 3.wav");
 
                 SecondaryLayer = Engine.Host.Audio.CreateLayer("Secondary layer", 1);
                 SecondaryLayer.AddToQueue(BackgroundMusicIntro);
                 SecondaryLayer.AddToQueue(BackgroundMusic);
             }
+
+            TextureLoader.Load(LoadedRoom.Textures);
 
             // Set the TextureArrayLimit to 1 for GPU's that support only zero indexing
             // Engine.Renderer.TextureArrayLimit = 1;
@@ -141,6 +146,11 @@ namespace MusicTest
                         break;
                 }
                 Units.Add(unit);
+            }
+
+            for (int i = 0; i < LoadedRoom.CollisionPlatforms.Count; i++)
+            {
+                CollisionPlatforms.Add(new CollisionPlatform(LoadedRoom.CollisionPlatforms[i].PointA, LoadedRoom.CollisionPlatforms[i].PointB));
             }
         }
 
@@ -260,6 +270,11 @@ namespace MusicTest
                 {
                     unit.Render(composer);
                 }
+            }
+
+            foreach (CollisionPlatform plat in CollisionPlatforms)
+            {
+                plat.Render(composer);
             }
 
             Player.Render(composer);

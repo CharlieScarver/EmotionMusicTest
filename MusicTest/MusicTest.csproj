@@ -19,94 +19,97 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Assets\floor 1.png">
+    <None Update="Assets\Textures\floor 1.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Assets\Frozen Cave 12.wav">
+    <None Update="Assets\Audio\Frozen Cave 12.wav">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Assets\Frozen Cave Intro 2.wav">
+    <None Update="Assets\Audio\Frozen Cave Intro 2.wav">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Assets\Frozen Cave Intro 3.wav">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Assets\Frozen Cave Intro 4.wav">
+    <None Update="Assets\Audio\Frozen Cave Intro 4.wav">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Assets\Frozen Cave Intro.wav">
+    <None Update="Assets\Audio\Frozen Cave Intro.wav">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Assets\Frozen Cave Loop 3.wav">
+    <None Update="Assets\Audio\Frozen Cave Loop 3.wav">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Assets\Frozen Cave Loop.wav">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Assets\ice cave commission2.png">
+    <None Update="Assets\Textures\ice cave commission2.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Assets\icycle 1.png">
+    <None Update="Assets\Textures\icycle 1.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Assets\icycle 2.png">
+    <None Update="Assets\Textures\icycle 2.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Assets\icycle 3.png">
+    <None Update="Assets\Textures\icycle 3.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Assets\icycle 4.png">
+    <None Update="Assets\Textures\icycle 4.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Assets\icycle 5.png">
+    <None Update="Assets\Textures\icycle 5.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Assets\icycle 6.png">
+    <None Update="Assets\Textures\icycle 6.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Assets\Layer 8.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Assets\midori.png">
+    <None Update="Assets\Textures\midori.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Assets\midori_ol.png">
+    <None Update="Assets\Textures\midori_ol.png">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+    <None Update="Assets\Textures\pixel-midori-full-sheet-transparent.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Assets\progress.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Assets\rocks-paint.png">
+    <None Update="Assets\Textures\rocks-paint.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Assets\rocks.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Assets\rocks2.png">
+    <None Update="Assets\Textures\rocks2.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Assets\ShadowShader.frag">
+    <None Update="Assets\Shaders\ShadowShader.frag">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Assets\ShadowShader.xml">
+    <None Update="Assets\Shaders\ShadowShader.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Assets\shishi cut.png">
+    <None Update="Assets\Textures\shishi cut.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Assets\shishi shading cut.png">
+    <None Update="Assets\Textures\shishi shading cut.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Assets\shishi.png">
+    <None Update="Assets\Textures\shishi.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Assets\testRoom.json">
+    <None Update="Assets\Rooms\testRoom.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Assets\thin ice layer.png">
+    <None Update="Assets\Textures\thin ice layer.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Assets\transparent-black.png">
+    <None Update="Assets\Textures\transparent-black.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
