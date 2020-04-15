@@ -2,6 +2,7 @@
 using System.Numerics;
 using Emotion.Common;
 using Emotion.IO;
+using MusicTest.Core;
 
 namespace MusicTest
 {
@@ -30,7 +31,10 @@ namespace MusicTest
             TextAsset progressFile = Engine.AssetLoader.Get<TextAsset>("progress.json");
             TextAsset testRoom = Engine.AssetLoader.Get<TextAsset>("Rooms/testRoom.json");
 
-            Engine.SceneManager.SetScene(new MainScene(progressFile, testRoom));
+            MainScene scene = new MainScene(progressFile, testRoom);
+            GameContext.Scene = scene;
+
+            Engine.SceneManager.SetScene(scene);
             Engine.Run();
         }
     }

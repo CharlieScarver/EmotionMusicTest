@@ -125,6 +125,23 @@ namespace MusicTest.GameObjects
                 IsIdle = false;
                 IsFacingRight = true;
             }
+
+            // Jumping
+            if (Engine.InputManager.IsKeyHeld(Key.Space) && isGrounded)
+            {
+                isGrounded = false;
+                isJumping = true;
+                JumpTimer.GoInReverse();
+                VelocityY = 20;
+            }
+
+            if (Engine.InputManager.IsKeyHeld(Key.LeftControl))
+            {
+                isGrounded = true;
+                isJumping = false;
+                JumpTimer.End();
+                Y = 580;
+            }
         }
 
         public override void Update(Room currentRoom)
@@ -159,9 +176,9 @@ namespace MusicTest.GameObjects
             //    IsFacingRight
             //);
 
-            composer.PushModelMatrix(
-                Matrix4x4.CreateRotationZ(Maths.DegreesToRadians(45), new Vector3(Center, 0))
-            );
+            //composer.PushModelMatrix(
+            //    Matrix4x4.CreateRotationZ(Maths.DegreesToRadians(45), new Vector3(Center, 0))
+            //);
             composer.RenderSprite(
                 Position,
                 new Vector2(360, 360),
@@ -175,7 +192,7 @@ namespace MusicTest.GameObjects
             //composer.RenderCircleOutline(new Vector3(Center, Z), InteractRange, Color.Red, true);
             composer.RenderOutline(Position, Size, Color.Red, 1);
 
-            composer.PopModelMatrix();
+            //composer.PopModelMatrix();
         }
     }
 }
