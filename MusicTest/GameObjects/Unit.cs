@@ -36,8 +36,11 @@ namespace MusicTest.GameObjects
         public AfterAndBack JumpTimer { get; set; }
         public AfterAndBack GravityTimer { get; set; }
         public float VelocityY { get; set; }
+        public float StartingVelocityY { get; set; }
 
         public float InclineAngle { get; set; }
+
+        public Rectangle CollisionBox { get; set; }
 
         #region Status Properties
         public bool IsIdle { get; set; }
@@ -71,6 +74,7 @@ namespace MusicTest.GameObjects
 
         protected void ManageMovement(Room currentRoom) 
         {
+            VelocityY = StartingVelocityY;
             
             if (IsMovingLeft) 
             {
@@ -159,7 +163,14 @@ namespace MusicTest.GameObjects
         protected void ApplyGravity() 
         {
             Rectangle futurePosition = new Rectangle(X, Y - (GravityTimer.Progress * _gravityVelocity), Width, Height);
-            if (!Collision.IntersectsWithPlatforms(futurePosition))
+
+            CollisionPlatform platform = Collision.IntersectsWithSlopedPlatforms(futurePosition);
+            if (platform != null)
+            {
+                InclineAngle = platform.InclineAngleWithX;
+            }
+
+            if (!Collision.IntersectsWithPlatforms(futurePosition) && platform == null)
             {
                 Y -= GravityTimer.Progress * _gravityVelocity;
                 isGrounded = false;
@@ -215,6 +226,11 @@ namespace MusicTest.GameObjects
                 string text = Dialogues[0].DialogueLines[0];
                 composer.RenderString(Position + new Vector3(-30, -30, 0), Color.Black, text, Engine.AssetLoader.Get<FontAsset>("debugFont.otf").GetAtlas(16));
             }
+
+
+            Rectangle futurePosition = new Rectangle(X, Y - (GravityTimer.Progress * _gravityVelocity), Width, Height);
+            composer.RenderOutline(futurePosition, Color.Green, 1);
+            composer.RenderOutline(Position, Size, Color.Red, 1);
         }
     }
 }

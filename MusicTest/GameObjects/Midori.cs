@@ -15,6 +15,8 @@ namespace MusicTest.GameObjects
 {
     public class Midori : Unit
     {
+        const float _gravityVelocity = -30;
+
         public Midori(Vector3 position, MainScene scene) : base("Midori", "midori.png", position, new Vector2(250, 344.489f))
         {
             Position = position;
@@ -36,6 +38,8 @@ namespace MusicTest.GameObjects
             InteractRange = 360;
             InteractionOffset = new Vector2(0, 70);
             Scene = scene;
+
+            StartingVelocityY = _gravityVelocity;
         }
 
         private MainScene Scene { get; set; }
@@ -138,6 +142,7 @@ namespace MusicTest.GameObjects
             if (Engine.InputManager.IsKeyHeld(Key.LeftControl))
             {
                 isGrounded = true;
+                isFalling = false;
                 isJumping = false;
                 JumpTimer.End();
                 Y = 580;
@@ -197,8 +202,17 @@ namespace MusicTest.GameObjects
             //composer.RenderOutline(Position, new Vector2(360, 360), Color.Red, 1);
 
             //composer.RenderCircleOutline(new Vector3(Center, Z), InteractRange, Color.Red, true);
-            composer.RenderOutline(Position, Size, Color.Red, 1);
+            //composer.RenderOutline(Position, Size, Color.Red, 1);
 
+            Rectangle rect = ToRectangle();
+            Vector2 bottomLeft = new Vector2(rect.X, rect.Bottom);
+            composer.RenderLine(rect.TopLeft, rect.TopRight, Color.Red);
+            composer.RenderLine(rect.TopRight, rect.BottomRight, Color.Green);
+            composer.RenderLine(rect.BottomRight, bottomLeft, Color.Blue);
+            composer.RenderLine(bottomLeft, rect.TopLeft, Color.Yellow);
+
+            //Rectangle futurePosition = new Rectangle(X, Y - (GravityTimer.Progress * _gravityVelocity), Width, Height);
+            //composer.RenderOutline(futurePosition, Color.Green, 1);
             //composer.PopModelMatrix();
         }
     }

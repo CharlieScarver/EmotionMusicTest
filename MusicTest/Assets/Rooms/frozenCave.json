@@ -1,0 +1,221 @@
+{
+	"Name": "Test room",
+	"Size": {
+		"X": 3360,
+		"Y": 1080
+	},
+	"Spawn": {
+		"X": 1920,
+		"Y": 580,
+		"Z": 4
+	},
+	"Backgrounds": [
+		{
+			"Name": "Frozen Cave Wall",
+			"TextureName": "rocks2.png",
+			"Size": {
+				"X": 3360,
+				"Y": 1080
+			},
+			"Position": {
+				"X": 0,
+				"Y": 0,
+				"Z": 1
+			}
+		},
+		{
+			"Name": "Thin Ice Layer on the Wall",
+			"TextureName": "thin ice layer.png",
+			"Size": {
+				"X": 3360,
+				"Y": 1080
+			},
+			"Position": {
+				"X": 0,
+				"Y": 0,
+				"Z": 2
+			}
+		}
+	],
+	"Platforms": [
+		{
+			"Name": "Floor",
+			"TextureName": "floor 1.png",
+			"Size": {
+				"X": 3360,
+				"Y": 1080
+			},
+			"Position": {
+				"X": 0,
+				"Y": 0,
+				"Z": 3
+			},
+			"CollisionLine": {
+				"Ax": 0,
+				"Ay": 920,
+				"Bx": 3360,
+				"By": 920
+			}
+		}
+	],
+	"BackgroundDecorations": [],
+	"ForegroundDecorations": [
+		{
+			"Name": "Ceiling Icicle Small",
+			"TextureName": "icycle 1.png",
+			"Size": {
+				"X": 196,
+				"Y": 193
+			},
+			"Position": {
+				"X": -930,
+				"Y": 0,
+				"Z": 5
+			}
+		},
+		{
+			"Name": "Ceiling Icicle Medium",
+			"TextureName": "icycle 2.png",
+			"Size": {
+				"X": 289,
+				"Y": 352
+			},
+			"Position": {
+				"X": 220,
+				"Y": 0,
+				"Z": 5
+			}
+		},
+		{
+			"Name": "Ceiling Icicle Large",
+			"TextureName": "icycle 3.png",
+			"Size": {
+				"X": 513,
+				"Y": 503
+			},
+			"Position": {
+				"X": 1480,
+				"Y": 0,
+				"Z": 5
+			}
+		},
+		{
+			"Name": "Ceiling Icicle Medium",
+			"TextureName": "icycle 2.png",
+			"Size": {
+				"X": 289,
+				"Y": 352
+			},
+			"Position": {
+				"X": 2550,
+				"Y": 0,
+				"Z": 5
+			}
+		},
+		{
+			"Name": "Floor Icicle Large",
+			"TextureName": "icycle 4.png",
+			"Size": {
+				"X": 375,
+				"Y": 506
+			},
+			"Position": {
+				"X": -1400,
+				"Y": 574,
+				"Z": 5
+			}
+		},
+		{
+			"Name": "Floor Icicle Small",
+			"TextureName": "icycle 6.png",
+			"Size": {
+				"X": 129,
+				"Y": 200
+			},
+			"Position": {
+				"X": 200,
+				"Y": 880,
+				"Z": 5
+			}
+		},
+		{
+			"Name": "Floor Icicle Medium",
+			"TextureName": "icycle 5.png",
+			"Size": {
+				"X": 215,
+				"Y": 355
+			},
+			"Position": {
+				"X": 1550,
+				"Y": 725,
+				"Z": 5
+			}
+		},
+		{
+			"Name": "Floor Icicle Medium",
+			"TextureName": "icycle 5.png",
+			"Size": {
+				"X": 215,
+				"Y": 355
+			},
+			"Position": {
+				"X": 2370,
+				"Y": 725,
+				"Z": 5
+			}
+		}
+	],
+	"Units": [
+		{
+			"Name": "Shishi",
+			"Type": "Shishi",
+			"TextureName": "shishi.png",
+			"Position": {
+				"X": 800,
+				"Y": 590,
+				"Z": 4
+			},
+			"Size": {
+				"X": 224.727,
+				"Y": 274.181
+			}
+		}
+	],
+	"CollisionPlatforms": [
+		{
+			"PointA": {
+				"X": 0,
+				"Y": 950
+			},
+			"PointB": {
+				"X": 3360,
+				"Y": 950
+			}
+		},
+		{
+			"PointA": {
+				"X": 400,
+				"Y": 600
+			},
+			"PointB": {
+				"X": 900,
+				"Y": 950
+			},
+			"IsSloped": true
+		}
+	],
+	"Textures": [
+		"rocks2.png",
+		"thin ice layer.png",
+		"floor 1.png",
+		"icycle 1.png",
+		"icycle 2.png",
+		"icycle 3.png",
+		"icycle 4.png",
+		"icycle 5.png",
+		"icycle 6.png",
+		"shishi.png",
+		"midori.png",
+		"pixel-midori-full-sheet-transparent.png"
+	]
+}
