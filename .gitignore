@@ -3,6 +3,9 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
+[Mm]usicTest/[Aa]ssets/[Aa]udio/
+[Mm]usicTest/[Aa]ssets/[Tt]extures/
+
 # User-specific files
 *.rsuser
 *.suo
