@@ -7,14 +7,15 @@ namespace MusicTest.Core
 {
     public class CollisionPlatform
     {
-        public CollisionPlatform(Vector2 pointA, Vector2 pointB, bool isStraight = true)
+        public CollisionPlatform(Vector2 pointA, Vector2 pointB, bool isSloped = false)
         {
             PointA = pointA;
             PointB = pointB;
+            IsSloped = isSloped;
 
             // Set the slope (this is m from the line equation y = mx + b) (needed for the angle)
-            double divident = Math.Abs(PointB.Y - PointA.Y);
-            double divisor = Math.Abs(PointB.X - PointA.X);
+            float divident = Math.Abs(PointB.Y - PointA.Y);
+            float divisor = Math.Abs(PointB.X - PointA.X);
 
             if (divisor == 0)
             {
@@ -24,7 +25,7 @@ namespace MusicTest.Core
             Slope = divident / divisor;
 
             // Set the incline angle
-            InclineAngleWithX = Math.Atan(Slope);
+            InclineAngleWithX = (float) Math.Atan(Slope);
 
             // Set the Y axis intercept (this is b from the line equation y = mx + b)
             YIntercept = PointA.Y - (Slope * PointA.X);
@@ -33,7 +34,7 @@ namespace MusicTest.Core
             XIntercept = (0 - YIntercept) / Slope;
 
             // Set the length
-            Length = Math.Sqrt(Math.Pow(Math.Abs(PointB.X - PointA.X), 2) + Math.Pow(Math.Abs(PointB.Y - PointA.Y), 2));
+            Length = (float) Math.Sqrt(Math.Pow(Math.Abs(PointB.X - PointA.X), 2) + Math.Pow(Math.Abs(PointB.Y - PointA.Y), 2));
         }
 
         public CollisionPlatform(float pointAX, float pointAY, float pointBX, float pointBY) : this(new Vector2(pointAX, pointAY), new Vector2(pointBX, pointBY))
@@ -43,17 +44,19 @@ namespace MusicTest.Core
 
         public Vector2 PointB { get; set; }
 
-        // This is m from the line equation y = mx + b
-        public double Slope { get; set; }
+        public bool IsSloped { get; set; }
 
-        public double InclineAngleWithX { get; set; }
+        // This is m from the line equation y = mx + b
+        public float Slope { get; set; }
+
+        public float InclineAngleWithX { get; set; }
 
         // This is b from the line equation y = mx + b
-        public double YIntercept { get; set; }
+        public float YIntercept { get; set; }
 
-        public double XIntercept { get; set; }
+        public float XIntercept { get; set; }
 
-        public double Length { get; set; }
+        public float Length { get; set; }
 
         public void Render(RenderComposer composer)
         {

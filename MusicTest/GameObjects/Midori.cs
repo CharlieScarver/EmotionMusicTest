@@ -176,9 +176,12 @@ namespace MusicTest.GameObjects
             //    IsFacingRight
             //);
 
-            //composer.PushModelMatrix(
-            //    Matrix4x4.CreateRotationZ(Maths.DegreesToRadians(45), new Vector3(Center, 0))
-            //);
+            if (InclineAngle != 0f)
+            {
+                composer.PushModelMatrix(
+                    Matrix4x4.CreateRotationZ(InclineAngle, new Vector3(Center, 0))
+                );
+            }
             composer.RenderSprite(
                 Position,
                 new Vector2(360, 360),
@@ -187,7 +190,11 @@ namespace MusicTest.GameObjects
                 Sprite.CurrentFrame,
                 IsFacingRight, false
             );
-            composer.RenderOutline(Position, new Vector2(360, 360), Color.Red, 1);
+            if (InclineAngle != 0f)
+            {
+                composer.PopModelMatrix();
+            }
+            //composer.RenderOutline(Position, new Vector2(360, 360), Color.Red, 1);
 
             //composer.RenderCircleOutline(new Vector3(Center, Z), InteractRange, Color.Red, true);
             composer.RenderOutline(Position, Size, Color.Red, 1);

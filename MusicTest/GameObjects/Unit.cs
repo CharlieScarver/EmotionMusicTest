@@ -5,6 +5,8 @@ using Emotion.Graphics;
 using Emotion.IO;
 using Emotion.Platform.Input;
 using Emotion.Primitives;
+using Emotion.Utility;
+using MusicTest.Core;
 using MusicTest.Core.Collision;
 using System.Collections.Generic;
 using System.Numerics;
@@ -35,6 +37,8 @@ namespace MusicTest.GameObjects
         public AfterAndBack GravityTimer { get; set; }
         public float VelocityY { get; set; }
 
+        public float InclineAngle { get; set; }
+
         #region Status Properties
         public bool IsIdle { get; set; }
         public bool IsMovingLeft { get; set; }
@@ -61,6 +65,8 @@ namespace MusicTest.GameObjects
 
             IsIdle = true;
             isGrounded = true;
+
+            InclineAngle = 0;
         }
 
         protected void ManageMovement(Room currentRoom) 
@@ -71,7 +77,29 @@ namespace MusicTest.GameObjects
                 // Make sure movement is withing room borders
                 if (X > 0 + VelocityX)
                 {
-                    X -= VelocityX;
+                    CollisionPlatform platform;
+
+                    Rectangle futurePosition = new Rectangle(X - VelocityX, Y, Width, Height);
+                    platform = Collision.IntersectsWithSlopedPlatforms(futurePosition);
+
+                    if (platform == null)
+                    {
+                        X -= VelocityX;
+                        InclineAngle = 0;
+                    }
+                    else
+                    {
+                        do 
+                        {
+                            futurePosition.Y -= 3;
+                            InclineAngle = platform.InclineAngleWithX;
+                            platform = Collision.IntersectsWithSlopedPlatforms(futurePosition);
+                        }
+                        while (platform != null);
+
+                        X = futurePosition.X;
+                        Y = futurePosition.Y;
+                    }
                 }
                 else
                 {
@@ -123,7 +151,7 @@ namespace MusicTest.GameObjects
             }
             else
             {
-                //ApplyGravity();
+                ApplyGravity();
             }
 
         }
@@ -143,15 +171,15 @@ namespace MusicTest.GameObjects
                     GravityTimer.GoNormal();
                 }
             }
-            else
-            {
-                isJumping = false;
-                isFalling = false;
-                isGrounded = true;
-                JumpTimer.End();
-                VelocityY = 0;
-                Y = 580;
-            }
+            //else
+            //{
+            //    isJumping = false;
+            //    isFalling = false;
+            //    isGrounded = true;
+            //    JumpTimer.End();
+            //    VelocityY = 0;
+            //    Y = 580;
+            //}
         }
 
         public virtual void Update(Room currentRoom) 
@@ -163,6 +191,12 @@ namespace MusicTest.GameObjects
 
         public override void Render(RenderComposer composer)
         {
+            if (InclineAngle != 0f)
+            {
+                composer.PushModelMatrix(
+                    Matrix4x4.CreateRotationZ(InclineAngle, new Vector3(Center, 0))
+                );
+            }
             composer.RenderSprite(
                 Position,
                 Size,
@@ -171,6 +205,10 @@ namespace MusicTest.GameObjects
                 null,
                 IsFacingRight
             );
+            if (InclineAngle != 0f)
+            {
+                composer.PopModelMatrix();
+            }
 
             if (isInteracting) 
             {

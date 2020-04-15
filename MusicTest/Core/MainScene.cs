@@ -8,6 +8,7 @@ using Emotion.Primitives;
 using Emotion.Scenography;
 using Emotion.Utility;
 using MusicTest.Core;
+using MusicTest.Core.Room;
 using MusicTest.GameObjects;
 using Newtonsoft.Json;
 using OpenGL;
@@ -33,6 +34,7 @@ namespace MusicTest
         public Midori Player { get; set; }
         public List<Unit> Units { get; set; }
         public List<CollisionPlatform> CollisionPlatforms { get; set; }
+        public List<CollisionPlatform> SlopedCollisionPlatforms { get; set; }
 
         public Interaction CurrentInteration { get; set; }
 
@@ -47,6 +49,7 @@ namespace MusicTest
 
             Units = new List<Unit>();
             CollisionPlatforms = new List<CollisionPlatform>();
+            SlopedCollisionPlatforms = new List<CollisionPlatform>();
 
             Engine.Renderer.Camera = new ScalableArtCamera(new Vector3(Player.X, 540, 0), 1f);
             //Engine.Renderer.Camera.Zoom = 0.5f;
@@ -150,7 +153,17 @@ namespace MusicTest
 
             for (int i = 0; i < LoadedRoom.CollisionPlatforms.Count; i++)
             {
-                CollisionPlatforms.Add(new CollisionPlatform(LoadedRoom.CollisionPlatforms[i].PointA, LoadedRoom.CollisionPlatforms[i].PointB));
+                ConfigCollisionPlatform platform = LoadedRoom.CollisionPlatforms[i];
+                if (platform.IsSloped)
+                {
+                    SlopedCollisionPlatforms.Add(
+                        new CollisionPlatform(platform.PointA, platform.PointB, platform.IsSloped)
+                    );
+                }
+                else
+                {
+                    CollisionPlatforms.Add(new CollisionPlatform(platform.PointA, platform.PointB));
+                }
             }
         }
 
@@ -273,6 +286,11 @@ namespace MusicTest
             }
 
             foreach (CollisionPlatform plat in CollisionPlatforms)
+            {
+                plat.Render(composer);
+            }
+
+            foreach (CollisionPlatform plat in SlopedCollisionPlatforms)
             {
                 plat.Render(composer);
             }

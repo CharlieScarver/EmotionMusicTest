@@ -200,7 +200,8 @@
 			"PointB": {
 				"X": 900,
 				"Y": 950
-			}
+			},
+			"IsSloped": true
 		}
 	],
 	"Textures": [

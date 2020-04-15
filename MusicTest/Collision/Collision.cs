@@ -23,6 +23,20 @@ namespace MusicTest.Core.Collision
             return false;
         }
 
+        public static CollisionPlatform? IntersectsWithSlopedPlatforms(Rectangle rect)
+        {
+            for (int i = 0; i < GameContext.Scene.SlopedCollisionPlatforms.Count; i++)
+            {
+                CollisionPlatform platform = GameContext.Scene.SlopedCollisionPlatforms[i];
+                if (LineIntesectsRectangle(platform.PointA, platform.PointB, rect))
+                {
+                    return platform;
+                }
+            }
+
+            return null;
+        }
+
 
         // Determines if the lines AB and CD intersect.
         static bool LinesIntersect(Vector2 A, Vector2 B, Vector2 C, Vector2 D)
