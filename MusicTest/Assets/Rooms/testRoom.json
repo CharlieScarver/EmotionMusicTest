@@ -23,8 +23,8 @@
 			"Type": "Shishi",
 			"TextureName": "shishi.png",
 			"Position": {
-				"X": 800,
-				"Y": 590,
+				"X": 1200,
+				"Y": 320,
 				"Z": 4
 			},
 			"Size": {
@@ -80,6 +80,7 @@
 	"Textures": [
 		"shishi.png",
 		"midori.png",
-		"pixel-midori-full-sheet-transparent.png"
+		"pixel-midori-full-sheet-horizontal.png",
+		"transparent-black.png"
 	]
 }

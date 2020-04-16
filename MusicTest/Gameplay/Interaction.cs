@@ -33,7 +33,7 @@ namespace MusicTest.Core
             LeftPosition = new Vector3(new Vector2(0, 0), 11);
             RightPosition = new Vector3(new Vector2(1200, 0), 11);
 
-            Texture = Engine.AssetLoader.Get<TextureAsset>("transparent-black.png");
+            Texture = Engine.AssetLoader.Get<TextureAsset>("Textures/transparent-black.png");
         }
 
         private Unit Unit1 { get; set; }

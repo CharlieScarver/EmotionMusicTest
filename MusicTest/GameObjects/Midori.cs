@@ -25,7 +25,7 @@ namespace MusicTest.GameObjects
             Size = new Vector2(250, 344.489f); // Full Size 1606x2213
             TextureAsset = Engine.AssetLoader.Get<TextureAsset>("Textures/midori.png");
 
-            TextureAsset spriteAsset = Engine.AssetLoader.Get<TextureAsset>("Textures/pixel-midori-full-sheet-transparent.png");
+            TextureAsset spriteAsset = Engine.AssetLoader.Get<TextureAsset>("Textures/pixel-midori-full-sheet-horizontal.png");
             Sprite = new AnimatedTexture(
                 spriteAsset.Texture,
                 new Vector2(24, 24),
@@ -170,8 +170,8 @@ namespace MusicTest.GameObjects
             }
             else if (IsMovingLeft || IsMovingRight)
             {
-                Sprite.StartingFrame = 13;
-                Sprite.EndingFrame = 25;
+                Sprite.StartingFrame = 3;
+                Sprite.EndingFrame = 17;
                 Sprite.TimeBetweenFrames = 75;
             }
 
