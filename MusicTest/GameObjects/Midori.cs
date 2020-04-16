@@ -40,6 +40,14 @@ namespace MusicTest.GameObjects
             Scene = scene;
 
             StartingVelocityY = _gravityVelocity;
+
+            CollisionBox = new Transform(
+                X + 110,
+                Y,
+                Z,
+                Width / 2,
+                Height
+            );
         }
 
         private MainScene Scene { get; set; }
@@ -204,7 +212,7 @@ namespace MusicTest.GameObjects
             //composer.RenderCircleOutline(new Vector3(Center, Z), InteractRange, Color.Red, true);
             //composer.RenderOutline(Position, Size, Color.Red, 1);
 
-            Rectangle rect = ToRectangle();
+            Rectangle rect = CollisionBox.ToRectangle();
             Vector2 bottomLeft = new Vector2(rect.X, rect.Bottom);
             composer.RenderLine(rect.TopLeft, rect.TopRight, Color.Red);
             composer.RenderLine(rect.TopRight, rect.BottomRight, Color.Green);

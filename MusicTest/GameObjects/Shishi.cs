@@ -1,4 +1,5 @@
 ﻿using Emotion.Common;
+using Emotion.Primitives;
 using System.Collections.Generic;
 using System.Numerics;
 
@@ -21,6 +22,14 @@ namespace MusicTest.GameObjects
 
             IsFacingRight = true;
             InteractionOffset = new Vector2(-80, 250);
+
+            CollisionBox = new Transform(
+                X + 50,
+                Y,
+                Z,
+                Width / 2,
+                Height
+            );
         }
     }
 }
