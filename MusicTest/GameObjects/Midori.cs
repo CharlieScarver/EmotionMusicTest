@@ -16,6 +16,7 @@ namespace MusicTest.GameObjects
     public class Midori : Unit
     {
         const float _gravityVelocity = -30;
+        const float _horizontalVelocity = 9;
 
         public Midori(Vector3 position, MainScene scene) : base("Midori", "midori.png", position, new Vector2(250, 344.489f))
         {
@@ -40,12 +41,13 @@ namespace MusicTest.GameObjects
             Scene = scene;
 
             StartingVelocityY = _gravityVelocity;
+            VelocityX = _horizontalVelocity;
 
             CollisionBox = new Transform(
-                X + 110,
+                X + 130,
                 Y,
                 Z,
-                Width / 2,
+                Width / 3,
                 Height
             );
         }
@@ -55,6 +57,18 @@ namespace MusicTest.GameObjects
         private int InteractRange { get; set; }
 
         public Unit InteractTarget { get; set; }
+
+        protected override void SetCollisionBoxX(float x)
+        {
+            CollisionBox.X = x;
+            X = x - 130;
+        }
+
+        protected override void SetCollisionBoxY(float y)
+        {
+            CollisionBox.Y = y;
+            Y = y;
+        }
 
         private void Interact()
         {
@@ -96,8 +110,8 @@ namespace MusicTest.GameObjects
         protected void ManageInput()
         {
             IsIdle = true;
-            IsMovingLeft = false;
-            IsMovingRight = false;
+            //IsMovingLeft = false;
+            //IsMovingRight = false;
             
             // Interaction
             if (Engine.InputManager.IsKeyDown(Key.F))
@@ -127,16 +141,67 @@ namespace MusicTest.GameObjects
             // Movement
             if (Engine.InputManager.IsKeyHeld(Key.A))
             {
+                if (RunTimer.Progress == 0 && !IsMovingLeft && !IsMovingRight && isGrounded)
+                {
+                    RunTimer.GoNormal();
+                }
                 IsMovingLeft = true;
+                IsMovingRight = false;
                 IsIdle = false;
                 IsFacingRight = false;
             }
+            else
+            {
+                IsMovingLeft = false;
+                if (!IsMovingLeft && !IsMovingRight)
+                {
+                    RunTimer.GoInReverse();
+                    RunTimer.End();
+                }
+            }
+            //else
+            //{
+            //    if (IsMovingLeft && RunTimer.Progress == 1)
+            //    {
+            //        RunTimer.GoInReverse();
+            //    }
+            //    else if (IsMovingLeft && RunTimer.Progress == 0)
+            //    {
+            //        IsMovingLeft = false;
+            //    }
+            //}
+            
             if (Engine.InputManager.IsKeyHeld(Key.D))
             {
+                if (RunTimer.Progress == 0 && !IsMovingLeft && !IsMovingRight && isGrounded)
+                {
+                    RunTimer.GoNormal();
+                }
                 IsMovingRight = true;
+                IsMovingLeft = false;
                 IsIdle = false;
                 IsFacingRight = true;
             }
+            else
+            {
+                IsMovingRight = false;
+                if (!IsMovingLeft && !IsMovingRight)
+                {
+                    RunTimer.GoInReverse();
+                    RunTimer.End();
+                }
+            }
+            //else
+            //{
+            //    if (IsMovingRight && RunTimer.Progress == 1)
+            //    {
+            //        RunTimer.GoInReverse();
+            //    }
+            //    else if (IsMovingRight && RunTimer.Progress == 0)
+            //    {
+            //        IsMovingLeft = false;
+            //    }
+            //}
 
             // Jumping
             if (Engine.InputManager.IsKeyHeld(Key.Space) && isGrounded)
@@ -153,7 +218,14 @@ namespace MusicTest.GameObjects
                 isFalling = false;
                 isJumping = false;
                 JumpTimer.End();
-                Y = 580;
+                SetCollisionBoxY(600);
+                SetCollisionBoxX(8600);
+            }
+
+            if (Engine.InputManager.IsKeyDown(Key.Q))
+            {
+                CodeSwitch = !CodeSwitch;
+                Console.WriteLine(CodeSwitch);
             }
         }
 
@@ -172,7 +244,7 @@ namespace MusicTest.GameObjects
             {
                 Sprite.StartingFrame = 3;
                 Sprite.EndingFrame = 17;
-                Sprite.TimeBetweenFrames = 75;
+                Sprite.TimeBetweenFrames = 65;
             }
 
             Sprite.Update(Engine.DeltaTime);
@@ -213,11 +285,14 @@ namespace MusicTest.GameObjects
             //composer.RenderOutline(Position, Size, Color.Red, 1);
 
             Rectangle rect = CollisionBox.ToRectangle();
-            Vector2 bottomLeft = new Vector2(rect.X, rect.Bottom);
-            composer.RenderLine(rect.TopLeft, rect.TopRight, Color.Red);
-            composer.RenderLine(rect.TopRight, rect.BottomRight, Color.Green);
-            composer.RenderLine(rect.BottomRight, bottomLeft, Color.Blue);
-            composer.RenderLine(bottomLeft, rect.TopLeft, Color.Yellow);
+            Vector3 topLeft = new Vector3(rect.TopLeft, 10);
+            Vector3 topRight = new Vector3(rect.TopRight, 10);
+            Vector3 bottomRight = new Vector3(rect.BottomRight, 10);
+            Vector3 bottomLeft = new Vector3(rect.X, rect.Bottom, 10);
+            composer.RenderLine(topLeft, topRight, Color.Red);
+            composer.RenderLine(topRight, bottomRight, Color.Green);
+            composer.RenderLine(bottomRight, bottomLeft, Color.Cyan);
+            composer.RenderLine(bottomLeft, topLeft, Color.Yellow);
 
             //Rectangle futurePosition = new Rectangle(X, Y - (GravityTimer.Progress * _gravityVelocity), Width, Height);
             //composer.RenderOutline(futurePosition, Color.Green, 1);

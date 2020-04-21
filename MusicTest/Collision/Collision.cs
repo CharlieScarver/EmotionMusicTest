@@ -6,18 +6,31 @@ namespace MusicTest.Core.Collision
     public static class Collision
     {
         #region CollisionWithPlatforms
-        public static bool IntersectsWithPlatforms(Rectangle rect)
+        public static CollisionPlatform IntersectsWithPlatforms(Rectangle rect)
         {
             for (int i = 0; i < GameContext.Scene.CollisionPlatforms.Count; i++)
             {
                 CollisionPlatform platform = GameContext.Scene.CollisionPlatforms[i];
                 if (LineIntesectsRectangle(platform.PointA, platform.PointB, rect))
                 {
-                    return true;
+                    return platform;
                 }
             }
 
-            return false;
+            return null;
+        }
+        public static CollisionPlatform IntersectsWithAxisAlignedPlatforms(Rectangle rect)
+        {
+            for (int i = 0; i < GameContext.Scene.AxisAlignedCollisionPlatforms.Count; i++)
+            {
+                CollisionPlatform platform = GameContext.Scene.AxisAlignedCollisionPlatforms[i];
+                if (LineIntesectsRectangle(platform.PointA, platform.PointB, rect))
+                {
+                    return platform;
+                }
+            }
+
+            return null;
         }
 
         public static CollisionPlatform? IntersectsWithSlopedPlatforms(Rectangle rect)
@@ -187,6 +200,25 @@ namespace MusicTest.Core.Collision
             }
 
             return false; // No collision
+        }
+
+        #endregion
+
+        #region Points
+
+        /// <summary>
+        /// Checks if a point is on a line segment.
+        /// </summary>
+        /// <param name="point">The point</param>
+        /// <param name="segmPoint1">The first point of the line segment</param>
+        /// <param name="segmPoint2">The second point of the line segment</param>
+        /// <returns>Returns true if the point is on the line segment, otherwise false.</returns>
+        public static bool PointIsOnLineSegment(Vector2 point, Vector2 segmPoint1, Vector2 segmPoint2)
+        {
+            return (point.X >= segmPoint1.X && point.X <= segmPoint2.X &&
+                point.Y >= segmPoint1.Y && point.Y <= segmPoint2.Y) ||
+                (point.X >= segmPoint2.X && point.X <= segmPoint1.X &&
+                point.Y >= segmPoint2.Y && point.Y <= segmPoint1.Y);
         }
 
         #endregion

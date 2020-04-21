@@ -35,6 +35,7 @@ namespace MusicTest
         public List<Unit> Units { get; set; }
         public List<CollisionPlatform> CollisionPlatforms { get; set; }
         public List<CollisionPlatform> SlopedCollisionPlatforms { get; set; }
+        public List<CollisionPlatform> AxisAlignedCollisionPlatforms { get; set; }
 
         public Interaction CurrentInteration { get; set; }
 
@@ -50,6 +51,7 @@ namespace MusicTest
             Units = new List<Unit>();
             CollisionPlatforms = new List<CollisionPlatform>();
             SlopedCollisionPlatforms = new List<CollisionPlatform>();
+            AxisAlignedCollisionPlatforms = new List<CollisionPlatform>();
 
             Engine.Renderer.Camera = new ScalableArtCamera(new Vector3(Player.X, 540, 0), 1f);
             //Engine.Renderer.Camera.Zoom = 0.5f;
@@ -145,25 +147,25 @@ namespace MusicTest
                         unit = new Shishi(configUnit.Name, configUnit.TextureName, configUnit.Position, configUnit.Size);
                         break;
                     default:
-                        unit = new Unit(configUnit.Name, configUnit.TextureName, configUnit.Position, configUnit.Size);
-                        break;
+                        throw new Exception("No applicable classes");
                 }
                 Units.Add(unit);
             }
 
             for (int i = 0; i < LoadedRoom.CollisionPlatforms.Count; i++)
             {
-                ConfigCollisionPlatform platform = LoadedRoom.CollisionPlatforms[i];
-                if (platform.IsSloped)
+                ConfigCollisionPlatform configPlatform = LoadedRoom.CollisionPlatforms[i];
+                CollisionPlatform realPlatform = new CollisionPlatform(configPlatform.PointA, configPlatform.PointB);
+                if (realPlatform.IsSloped)
                 {
-                    SlopedCollisionPlatforms.Add(
-                        new CollisionPlatform(platform.PointA, platform.PointB, platform.IsSloped)
-                    );
+                    SlopedCollisionPlatforms.Add(realPlatform);
                 }
                 else
                 {
-                    CollisionPlatforms.Add(new CollisionPlatform(platform.PointA, platform.PointB));
+                    AxisAlignedCollisionPlatforms.Add(realPlatform);
                 }
+
+                CollisionPlatforms.Add(realPlatform);
             }
         }
 

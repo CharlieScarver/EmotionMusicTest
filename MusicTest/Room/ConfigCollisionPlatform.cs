@@ -7,7 +7,5 @@ namespace MusicTest.Core.Room
         public Vector2 PointA { get; set; }
 
         public Vector2 PointB { get; set; }
-
-        public bool IsSloped { get; set; } = false;
     }
 }

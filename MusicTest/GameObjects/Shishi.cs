@@ -31,5 +31,17 @@ namespace MusicTest.GameObjects
                 Height
             );
         }
+
+        protected override void SetCollisionBoxX(float x)
+        {
+            CollisionBox.X = x;
+            X = x - 50;
+        }
+
+        protected override void SetCollisionBoxY(float y)
+        {
+            CollisionBox.Y = y;
+            Y = y;
+        }
     }
 }

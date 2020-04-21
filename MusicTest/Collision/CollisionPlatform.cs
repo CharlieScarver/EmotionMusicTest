@@ -11,7 +11,10 @@ namespace MusicTest.Core
         {
             PointA = pointA;
             PointB = pointB;
-            IsSloped = isSloped;
+
+            IsSloped = PointA.Y != PointB.Y;
+
+            IsAscending = PointA.Y > PointB.Y;
 
             // Set the slope (this is m from the line equation y = mx + b) (needed for the angle)
             float divident = Math.Abs(PointB.Y - PointA.Y);
@@ -44,14 +47,26 @@ namespace MusicTest.Core
 
         public Vector2 PointB { get; set; }
 
+        /// <summary>
+        /// Is the line is has a sloped (m != 0) or is axis-aligned.
+        /// </summary>
         public bool IsSloped { get; set; }
 
-        // This is m from the line equation y = mx + b
+        /// <summary>
+        /// Is the line is ascending or descending from Point A to B
+        /// </summary>
+        public bool IsAscending { get; set; }
+
+        /// <summary>
+        /// This is "m" from the line equation y = mx + b
+        /// </summary>
         public float Slope { get; set; }
 
         public float InclineAngleWithX { get; set; }
 
-        // This is b from the line equation y = mx + b
+        /// <summary>
+        /// This is "b" from the line equation y = mx + b
+        /// </summary>
         public float YIntercept { get; set; }
 
         public float XIntercept { get; set; }
