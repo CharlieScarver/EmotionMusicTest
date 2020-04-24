@@ -17,23 +17,26 @@ namespace MusicTest.GameObjects
     {
         const float _gravityVelocity = -30;
         const float _horizontalVelocity = 9;
+        const string _portraitPath = "better-midori.png";
+        const string _spriteSheetPath = "Textures/pixel-midori-full-sheet-horizontal.png";
+        const string _name = "Midori";
 
-        public Midori(Vector3 position, MainScene scene) : base("Midori", "midori.png", position, new Vector2(250, 344.489f))
+        public Midori(Vector3 position, MainScene scene) : base(_name, _portraitPath, position, new Vector2(250, 344.489f))
         {
             Position = position;
 
-            Name = "Midori";
-            Size = new Vector2(250, 344.489f); // Full Size 1606x2213
-            TextureAsset = Engine.AssetLoader.Get<TextureAsset>("Textures/midori.png");
+            Name = _name;
+            Size = new Vector2(250, 344.489f); // Full Size 1773x2213
+            TextureAsset = Engine.AssetLoader.Get<TextureAsset>($"Textures/{_portraitPath}");
 
-            TextureAsset spriteAsset = Engine.AssetLoader.Get<TextureAsset>("Textures/pixel-midori-full-sheet-horizontal.png");
+            TextureAsset spriteAsset = Engine.AssetLoader.Get<TextureAsset>(_spriteSheetPath);
             Sprite = new AnimatedTexture(
-                spriteAsset.Texture,
+                spriteAsset,
                 new Vector2(24, 24),
                 AnimationLoopType.Normal,
-                300,
+                1500,
                 0,
-                2
+                1
             );
 
             InteractRange = 360;
@@ -219,7 +222,7 @@ namespace MusicTest.GameObjects
                 isJumping = false;
                 JumpTimer.End();
                 SetCollisionBoxY(600);
-                SetCollisionBoxX(8600);
+                SetCollisionBoxX(10);
             }
 
             if (Engine.InputManager.IsKeyDown(Key.Q))
@@ -234,17 +237,22 @@ namespace MusicTest.GameObjects
             base.Update(currentRoom);
             ManageInput();
 
+            // TODO: Keep last state
+            // TODO: Execute the following code once per change instead of on every frame
+            // After that use Sprite.Reset() to avoid the fast-forwarded frames caused by the frame rate switching
             if (IsIdle)
             {
                 Sprite.StartingFrame = 0;
                 Sprite.EndingFrame = 1;
                 Sprite.TimeBetweenFrames = 1500;
+                //Sprite.Reset();
             }
             else if (IsMovingLeft || IsMovingRight)
             {
                 Sprite.StartingFrame = 3;
                 Sprite.EndingFrame = 17;
                 Sprite.TimeBetweenFrames = 65;
+               // Sprite.Reset();
             }
 
             Sprite.Update(Engine.DeltaTime);
@@ -285,14 +293,14 @@ namespace MusicTest.GameObjects
             //composer.RenderOutline(Position, Size, Color.Red, 1);
 
             Rectangle rect = CollisionBox.ToRectangle();
-            Vector3 topLeft = new Vector3(rect.TopLeft, 10);
-            Vector3 topRight = new Vector3(rect.TopRight, 10);
-            Vector3 bottomRight = new Vector3(rect.BottomRight, 10);
-            Vector3 bottomLeft = new Vector3(rect.X, rect.Bottom, 10);
-            composer.RenderLine(topLeft, topRight, Color.Red);
-            composer.RenderLine(topRight, bottomRight, Color.Green);
-            composer.RenderLine(bottomRight, bottomLeft, Color.Cyan);
-            composer.RenderLine(bottomLeft, topLeft, Color.Yellow);
+            //Vector3 topLeft = new Vector3(rect.TopLeft, 10);
+            //Vector3 topRight = new Vector3(rect.TopRight, 10);
+            //Vector3 bottomRight = new Vector3(rect.BottomRight, 10);
+            //Vector3 bottomLeft = new Vector3(rect.X, rect.Bottom, 10);
+            //composer.RenderLine(topLeft, topRight, Color.Red);
+            //composer.RenderLine(topRight, bottomRight, Color.Green);
+            //composer.RenderLine(bottomRight, bottomLeft, Color.Cyan);
+            //composer.RenderLine(bottomLeft, topLeft, Color.Yellow);
 
             //Rectangle futurePosition = new Rectangle(X, Y - (GravityTimer.Progress * _gravityVelocity), Width, Height);
             //composer.RenderOutline(futurePosition, Color.Green, 1);

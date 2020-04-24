@@ -485,7 +485,7 @@ namespace Emotion.Platform.Implementation.Win32.Wgl
 
         protected override void SetSwapIntervalPlatform(int interval)
         {
-            if (true)
+            if (_platform.Window.DisplayMode != DisplayMode.Fullscreen)
             {
                 bool dwmComposition;
 
@@ -509,7 +509,7 @@ namespace Emotion.Platform.Implementation.Win32.Wgl
 
         public override void SwapBuffers()
         {
-            if (true)
+            if (_platform.Window.DisplayMode != DisplayMode.Fullscreen)
             {
                 bool dwmComposition;
 

@@ -64,7 +64,7 @@ namespace Emotion.Standard.Image.PNG
         /// <returns>A PNG image as bytes.</returns>
         public static byte[] Encode(byte[] pixels, int width, int height)
         {
-            var pngHeader = new byte[] {0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A};
+            var pngHeader = new byte[] { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A };
             const int maxBlockSize = 0xFFFF;
 
             using var stream = new MemoryStream();
@@ -104,10 +104,7 @@ namespace Emotion.Standard.Image.PNG
 
             for (var y = 0; y < height; y++)
             {
-                byte compression = 0;
-                if (y > 0) compression = 2;
-
-                data[y * rowLength] = compression;
+                data[y * rowLength] = 0;
 
                 for (var x = 0; x < width; x++)
                 {
@@ -121,15 +118,6 @@ namespace Emotion.Standard.Image.PNG
                     data[dataOffset + 1] = pixels[pixelOffset + 1];
                     data[dataOffset + 2] = pixels[pixelOffset + 0];
                     data[dataOffset + 3] = pixels[pixelOffset + 3];
-
-                    if (y <= 0) continue;
-
-                    int lastOffset = ((y - 1) * width + x) * 4;
-
-                    data[dataOffset + 0] -= pixels[lastOffset + 2];
-                    data[dataOffset + 1] -= pixels[lastOffset + 1];
-                    data[dataOffset + 2] -= pixels[lastOffset + 0];
-                    data[dataOffset + 3] -= pixels[lastOffset + 3];
                 }
             }
 
@@ -165,10 +153,10 @@ namespace Emotion.Standard.Image.PNG
             WriteInteger(stream, length);
 
             var typeArray = new byte[4];
-            typeArray[0] = (byte) type[0];
-            typeArray[1] = (byte) type[1];
-            typeArray[2] = (byte) type[2];
-            typeArray[3] = (byte) type[3];
+            typeArray[0] = (byte)type[0];
+            typeArray[1] = (byte)type[1];
+            typeArray[2] = (byte)type[2];
+            typeArray[3] = (byte)type[3];
 
             stream.Write(typeArray, 0, 4);
 
@@ -179,7 +167,7 @@ namespace Emotion.Standard.Image.PNG
 
             if (data != null) crc32.Update(data, offset, length);
 
-            WriteInteger(stream, (uint) crc32.Value);
+            WriteInteger(stream, (uint)crc32.Value);
         }
 
         private static void WriteInteger(byte[] data, int offset, int value)
@@ -246,32 +234,32 @@ namespace Emotion.Standard.Image.PNG
                 switch (currentChunk.Type)
                 {
                     case PngChunkTypes.HEADER:
-                    {
-                        Array.Reverse(currentChunk.Data, 0, 4);
-                        Array.Reverse(currentChunk.Data, 4, 4);
-
-                        fileHeader.Width = BitConverter.ToInt32(currentChunk.Data, 0);
-                        fileHeader.Height = BitConverter.ToInt32(currentChunk.Data, 4);
-
-                        fileHeader.BitDepth = currentChunk.Data[8];
-                        fileHeader.ColorType = currentChunk.Data[9];
-                        fileHeader.FilterMethod = currentChunk.Data[11];
-                        fileHeader.InterlaceMethod = currentChunk.Data[12];
-                        fileHeader.CompressionMethod = currentChunk.Data[10];
-
-                        // Validate header.
-                        if (fileHeader.ColorType >= ColorTypes.Length || ColorTypes[fileHeader.ColorType] == null)
                         {
-                            Engine.Log.Warning($"Color type '{fileHeader.ColorType}' is not supported or not valid.", MessageSource.ImagePng);
-                            return null;
+                            Array.Reverse(currentChunk.Data, 0, 4);
+                            Array.Reverse(currentChunk.Data, 4, 4);
+
+                            fileHeader.Width = BitConverter.ToInt32(currentChunk.Data, 0);
+                            fileHeader.Height = BitConverter.ToInt32(currentChunk.Data, 4);
+
+                            fileHeader.BitDepth = currentChunk.Data[8];
+                            fileHeader.ColorType = currentChunk.Data[9];
+                            fileHeader.FilterMethod = currentChunk.Data[11];
+                            fileHeader.InterlaceMethod = currentChunk.Data[12];
+                            fileHeader.CompressionMethod = currentChunk.Data[10];
+
+                            // Validate header.
+                            if (fileHeader.ColorType >= ColorTypes.Length || ColorTypes[fileHeader.ColorType] == null)
+                            {
+                                Engine.Log.Warning($"Color type '{fileHeader.ColorType}' is not supported or not valid.", MessageSource.ImagePng);
+                                return null;
+                            }
+
+                            if (!ColorTypes[fileHeader.ColorType].SupportedBitDepths.Contains(fileHeader.BitDepth))
+                                Engine.Log.Warning($"Bit depth '{fileHeader.BitDepth}' is not supported or not valid for color type {fileHeader.ColorType}.", MessageSource.ImagePng);
+
+                            if (fileHeader.FilterMethod != 0) Engine.Log.Warning("The png specification only defines 0 as filter method.", MessageSource.ImagePng);
+                            break;
                         }
-
-                        if (!ColorTypes[fileHeader.ColorType].SupportedBitDepths.Contains(fileHeader.BitDepth))
-                            Engine.Log.Warning($"Bit depth '{fileHeader.BitDepth}' is not supported or not valid for color type {fileHeader.ColorType}.", MessageSource.ImagePng);
-
-                        if (fileHeader.FilterMethod != 0) Engine.Log.Warning("The png specification only defines 0 as filter method.", MessageSource.ImagePng);
-                        break;
-                    }
                     case PngChunkTypes.DATA:
                         dataStream.Write(currentChunk.Data, 0, currentChunk.Data.Length);
                         break;
@@ -300,7 +288,9 @@ namespace Emotion.Standard.Image.PNG
 
             // Decompress data.
             dataStream.Position = 0;
+            PerfProfiler.ProfilerEventStart("PNG Decompression", "Loading");
             byte[] data = ZlibStreamUtility.Decompress(dataStream);
+            PerfProfiler.ProfilerEventEnd("PNG Decompression", "Loading");
 
             // Parse into pixels.
             var pixels = new byte[fileHeader.Width * fileHeader.Height * 4];
@@ -353,6 +343,8 @@ namespace Emotion.Standard.Image.PNG
 
             if (cannotParallel.Count == 0) return;
 
+            PerfProfiler.ProfilerEventStart("PNG Parse Sequential", "Loading");
+
             // Run scanlines which couldn't be parallel processed.
             if (scanLineCount >= 2000) Engine.Log.Trace("Loaded a big PNG with scanlines which require filtering. If you re-export it without that, it will load faster.", MessageSource.ImagePng);
             cannotParallel.Sort();
@@ -373,6 +365,8 @@ namespace Emotion.Standard.Image.PNG
 
                 reader.ReadScanline(rowData, pixels, fileHeader, idx);
             }
+
+            PerfProfiler.ProfilerEventEnd("PNG Parse Sequential", "Loading");
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -440,7 +434,7 @@ namespace Emotion.Standard.Image.PNG
             if (column >= bytesPerPixel)
             {
                 previousPixel = current[column - bytesPerPixel];
-                upperLeft = firstScanline ? (byte) 0 : previous[column - bytesPerPixel];
+                upperLeft = firstScanline ? (byte)0 : previous[column - bytesPerPixel];
             }
             else
             {
@@ -449,7 +443,7 @@ namespace Emotion.Standard.Image.PNG
             }
 
             byte pixel = current[column];
-            byte pixelAbove = firstScanline ? (byte) 0 : previous[column];
+            byte pixelAbove = firstScanline ? (byte)0 : previous[column];
 
             // ReSharper disable InvalidXmlDocComment
             return filterType switch
@@ -458,26 +452,26 @@ namespace Emotion.Standard.Image.PNG
                 /// The Sub filter transmits the difference between each byte and the value of the corresponding
                 /// byte of the prior pixel.
                 /// </summary>
-                1 => (byte) (pixel + previousPixel),
+                1 => (byte)(pixel + previousPixel),
 
                 /// <summary>
                 /// The Up filter is just like the Sub filter except that the pixel immediately above the current
                 /// pixel, rather than just to its left, is used as the predictor.
                 /// </summary>
-                2 => (byte) (pixel + pixelAbove),
+                2 => (byte)(pixel + pixelAbove),
 
                 /// <summary>
                 /// The Average filter uses the average of the two neighboring pixels (left and above) to
                 /// predict the value of a pixel.
                 /// </summary>
-                3 => (byte) (pixel + (byte) ((previousPixel + pixelAbove) / 2)),
+                3 => (byte)(pixel + (byte)((previousPixel + pixelAbove) / 2)),
 
                 /// <summary>
                 /// The Paeth filter computes a simple linear function of the three neighboring pixels (left, above, upper left),
                 /// then chooses as predictor the neighboring pixel closest to the computed value.
                 /// This technique is named after Alan W. Paeth
                 /// </summary>
-                4 => (byte) (pixel + PaethPredicator(previousPixel, pixelAbove, upperLeft)),
+                4 => (byte)(pixel + PaethPredicator(previousPixel, pixelAbove, upperLeft)),
 
                 // No filter, or unknown.
                 _ => pixel

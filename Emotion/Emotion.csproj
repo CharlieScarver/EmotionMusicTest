@@ -12,22 +12,22 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants>TRACE;PROFILER</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
-    <None Update="Standard\Text\Freetype\Emotion.Standard.FreeType.dll" Condition="$(DefineConstants.Contains('FreeType'))">
+    <None Update="Standard\OpenType\Freetype\Emotion.Standard.FreeType.dll" Condition="$(DefineConstants.Contains('FreeType'))">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Standard\Text\Freetype\freetype6.dll" Condition="$(DefineConstants.Contains('FreeType'))">
+    <None Update="Standard\OpenType\Freetype\freetype6.dll" Condition="$(DefineConstants.Contains('FreeType'))">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Standard\Text\Freetype\freetype6.dylib" Condition="$(DefineConstants.Contains('FreeType'))">
+    <None Update="Standard\OpenType\Freetype\freetype6.dylib" Condition="$(DefineConstants.Contains('FreeType'))">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Standard\Text\Freetype\freetype6.so" Condition="$(DefineConstants.Contains('FreeType'))">
+    <None Update="Standard\OpenType\Freetype\freetype6.so" Condition="$(DefineConstants.Contains('FreeType'))">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
@@ -40,7 +40,6 @@
     <PackageReference Include="Serilog.Sinks.Async" Version="1.4.0" />
     <PackageReference Include="Serilog.Sinks.ColoredConsole" Version="3.0.1" />
     <PackageReference Include="Serilog.Sinks.File" Version="4.0.0" />
-    <PackageReference Include="System.Xml.XmlSerializer" Version="4.3.0" />
     <PackageReference Include="TiledSharp" Version="1.0.1" />
   </ItemGroup>
   <ItemGroup>

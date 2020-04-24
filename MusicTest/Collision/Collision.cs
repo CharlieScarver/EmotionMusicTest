@@ -11,7 +11,7 @@ namespace MusicTest.Core.Collision
             for (int i = 0; i < GameContext.Scene.CollisionPlatforms.Count; i++)
             {
                 CollisionPlatform platform = GameContext.Scene.CollisionPlatforms[i];
-                if (LineIntesectsRectangle(platform.PointA, platform.PointB, rect))
+                if (LineSegmentIntesectsRectangle(platform.PointA, platform.PointB, rect))
                 {
                     return platform;
                 }
@@ -24,7 +24,7 @@ namespace MusicTest.Core.Collision
             for (int i = 0; i < GameContext.Scene.AxisAlignedCollisionPlatforms.Count; i++)
             {
                 CollisionPlatform platform = GameContext.Scene.AxisAlignedCollisionPlatforms[i];
-                if (LineIntesectsRectangle(platform.PointA, platform.PointB, rect))
+                if (LineSegmentIntesectsRectangle(platform.PointA, platform.PointB, rect))
                 {
                     return platform;
                 }
@@ -38,7 +38,7 @@ namespace MusicTest.Core.Collision
             for (int i = 0; i < GameContext.Scene.SlopedCollisionPlatforms.Count; i++)
             {
                 CollisionPlatform platform = GameContext.Scene.SlopedCollisionPlatforms[i];
-                if (LineIntesectsRectangle(platform.PointA, platform.PointB, rect))
+                if (LineSegmentIntesectsRectangle(platform.PointA, platform.PointB, rect))
                 {
                     return platform;
                 }
@@ -50,13 +50,27 @@ namespace MusicTest.Core.Collision
         #endregion
 
         #region Rectangle Intersection
-        static bool LineIntesectsRectangle(Vector2 A, Vector2 B, Rectangle rect)
+        /// <summary>
+        /// Checks if a line segment intersects a rectangle
+        /// </summary>
+        static bool LineSegmentIntesectsRectangle(Vector2 A, Vector2 B, Rectangle rect)
         {
             Vector2 bottomLeft = new Vector2(rect.X, rect.Bottom);
             return LineSegmentsIntersect3(A, B, bottomLeft, rect.BottomRight) ||
                 LineSegmentsIntersect3(A, B, rect.TopLeft, rect.TopRight) ||
                 LineSegmentsIntersect3(A, B, rect.TopLeft, bottomLeft) ||
                 LineSegmentsIntersect3(A, B, rect.TopRight, rect.BottomRight);
+        }
+
+        /// <summary>
+        /// Checks if an Emotion.Ray2D intersects a Rectangle using Emotion's RayIntersects()
+        /// </summary>
+        static bool RayIntesectsRectangle(Vector2 A, Vector2 B, Rectangle rect)
+        {
+            Ray2D ab = new Ray2D(A, B);
+            float distance;
+            // Uses ref to make it faster as the value is not copied ?
+            return rect.RayIntersects(ref rect, ref ab, out distance);
         }
 
         #endregion

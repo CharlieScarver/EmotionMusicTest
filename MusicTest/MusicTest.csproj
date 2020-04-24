@@ -15,14 +15,21 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Emotion.Tools\Emotion.Tools.csproj" />
     <ProjectReference Include="..\Emotion\Emotion.csproj" />
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Assets\map1.tmx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Assets\Rooms\frozenCave.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Assets\Rooms\testRoom - Copy.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Assets\Textures\better-midori.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Assets\Textures\floor 1.png">

@@ -22,12 +22,29 @@ namespace Emotion.IO
         /// </summary>
         public Texture Texture { get; set; }
 
+        public TextureAsset()
+        {
+
+        }
+
+        /// <summary>
+        /// Create a fake texture asset from a texture.
+        /// </summary>
+        /// <param name="texture"></param>
+        public TextureAsset(Texture texture)
+        {
+            Texture = texture;
+            Name = $"Synthesized TextureAsset - {texture.Pointer}";
+        }
+
         protected override void CreateInternal(byte[] data)
         {
             byte[] pixels = null;
             var width = 0;
             var height = 0;
             var flipped = false; // Whether the image was uploaded flipped - top to bottom.
+
+            PerfProfiler.ProfilerEventStart("Decoding Image", "Loading");
 
             // Check if PNG.
             if (PngFormat.IsPng(data))
@@ -51,7 +68,12 @@ namespace Emotion.IO
                 return;
             }
 
+            PerfProfiler.ProfilerEventEnd("Decoding Image", "Loading");
+            PerfProfiler.ProfilerEventStart("Uploading Image", "Loading");
+
             UploadTexture(new Vector2(width, height), pixels, flipped);
+
+            PerfProfiler.ProfilerEventEnd("Uploading Image", "Loading");
         }
 
         protected virtual void UploadTexture(Vector2 size, byte[] bgraPixels, bool flipped)

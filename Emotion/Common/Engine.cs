@@ -16,6 +16,7 @@ using Emotion.IO;
 using Emotion.Platform;
 using Emotion.Scenography;
 using Emotion.Standard.Logging;
+using Emotion.Utility;
 
 #endregion
 
@@ -84,6 +85,16 @@ namespace Emotion.Common
         /// The total time passed since the start of the engine, in milliseconds.
         /// </summary>
         public static float TotalTime { get; set; }
+
+        static Engine()
+        {
+            Helpers.AssociatedAssemblies = new List<Assembly>
+            {
+                Assembly.GetCallingAssembly(), // This is the assembly which called this function. Can be the game or the engine.
+                Assembly.GetExecutingAssembly(), // Is the engine.
+                Assembly.GetEntryAssembly() // Is game or debugger.
+            }.Distinct().Where(x => x != null).ToArray();
+        }
 
         /// <summary>
         /// Perform light setup - no platform is created. Only the logger and critical systems are initialized.
@@ -411,25 +422,25 @@ namespace Emotion.Common
             PerfProfiler.FrameStart();
 
             // Run the GLThread queued commands.
-            PerfProfiler.Start("GLThread.Run");
+            PerfProfiler.StartFrameEvent("GLThread.Run");
             GLThread.Run();
-            PerfProfiler.Stop();
+            PerfProfiler.StopFrameEvent("GLThread.Run");
 
-            PerfProfiler.Start("StartFrame");
+            PerfProfiler.StartFrameEvent("StartFrame");
             Renderer.StartFrame();
-            PerfProfiler.Stop();
+            PerfProfiler.StopFrameEvent("StartFrame");
 
-            PerfProfiler.Start("Scene.Draw");
+            PerfProfiler.StartFrameEvent("Scene.Draw");
             SceneManager.Draw(Renderer);
-            PerfProfiler.Stop();
+            PerfProfiler.StopFrameEvent("Scene.Draw");
 
-            PerfProfiler.Start("EndFrame");
+            PerfProfiler.StartFrameEvent("EndFrame");
             Renderer.EndFrame();
-            PerfProfiler.Stop();
+            PerfProfiler.StopFrameEvent("EndFrame");
 
-            PerfProfiler.Start("BufferSwap");
+            PerfProfiler.StartFrameEvent("BufferSwap");
             Host.Window.Context.SwapBuffers();
-            PerfProfiler.Stop();
+            PerfProfiler.StopFrameEvent("BufferSwap");
 #if TIMING_DEBUG
             _frameId++;
             Console.Write(_curUpdateC);
@@ -473,20 +484,10 @@ namespace Emotion.Common
         {
             var loader = new AssetLoader();
 
-            // Add default embedded sources.
-            var sourceAssemblies = new List<Assembly>
-            {
-                Assembly.GetCallingAssembly(), // This is the assembly which called this function. Can be the game or the engine.
-                Assembly.GetExecutingAssembly(), // Is the engine.
-                Assembly.GetEntryAssembly() // Is game or debugger.
-            };
-
-            // Remove duplicate assemblies and null assemblies.
-            sourceAssemblies = sourceAssemblies.Distinct().Where(x => x != null).ToList();
-
             // Create sources.
-            foreach (Assembly assembly in sourceAssemblies)
+            for (var i = 0; i < Helpers.AssociatedAssemblies.Length; i++)
             {
+                Assembly assembly = Helpers.AssociatedAssemblies[i];
                 loader.AddSource(new EmbeddedAssetSource(assembly, "Assets"));
             }
 

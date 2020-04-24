@@ -3,9 +3,10 @@
 using System;
 using System.Collections.Generic;
 using System.Numerics;
+using Emotion.Common;
 using Emotion.Common.Threading;
 using Emotion.Graphics.Objects;
-using Emotion.Standard.Text;
+using Emotion.Standard.OpenType;
 using Emotion.Utility;
 
 #endregion
@@ -15,7 +16,7 @@ namespace Emotion.IO
     public class FontAsset : Asset
     {
         /// <summary>
-        /// The Emotion.Standard.Text font generated from the font file.
+        /// The Emotion.Standard.OpenType font generated from the font file.
         /// </summary>
         public Font Font { get; protected set; }
 
@@ -58,8 +59,10 @@ namespace Emotion.IO
             if (found) return atlas;
 
             // Load the atlas manually.
+            PerfProfiler.ProfilerEventStart($"FontAtlas {Name} {fontSize} {hash}", "Loading");
             FontAtlas standardAtlas = Font.GetAtlas(fontSize, firstChar, numChars, _rasterizer);
             atlas = new DrawableFontAtlas(standardAtlas, smooth);
+            PerfProfiler.ProfilerEventEnd($"FontAtlas {Name} {fontSize} {hash}", "Loading");
 
             _loadedAtlases.Add(hash, atlas);
 

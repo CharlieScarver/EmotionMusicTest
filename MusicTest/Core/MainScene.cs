@@ -6,6 +6,8 @@ using Emotion.IO;
 using Emotion.Platform.Input;
 using Emotion.Primitives;
 using Emotion.Scenography;
+using Emotion.Standard.Image.PNG;
+using Emotion.Tools.Windows;
 using Emotion.Utility;
 using MusicTest.Core;
 using MusicTest.Core.Room;
@@ -40,52 +42,58 @@ namespace MusicTest
         public Interaction CurrentInteration { get; set; }
 
         public MainScene(TextAsset progressFile, TextAsset mapFile)
-        {
-            // Deserialize map into model.
+        { 
+            // Deserialize the map into model
             LoadedRoom = JsonConvert.DeserializeObject<Room>(mapFile.Content);
 
+            // Decode and then encode a PNG with filter zero to make it sequential and faster to load (avoiding sequential parsing)
+            //OtherAsset oa = Engine.AssetLoader.Get<OtherAsset>("textures/midori.png");
+            //byte[] bytes = PngFormat.Decode(oa.Content, out PngFileHeader header);
+            //byte[] pngfile = PngFormat.Encode(bytes, header.Width, header.Height);
+            //Engine.AssetLoader.Save(pngfile, "betterer-midori.png");
+
+            // Deserialize the progress file
             GameProgress = JsonConvert.DeserializeObject<Progress>(progressFile.Content);
 
-            Player = new Midori(LoadedRoom.Spawn, this);
-
+            // Init collections
             Units = new List<Unit>();
             CollisionPlatforms = new List<CollisionPlatform>();
             SlopedCollisionPlatforms = new List<CollisionPlatform>();
             AxisAlignedCollisionPlatforms = new List<CollisionPlatform>();
 
-            Engine.Renderer.Camera = new ScalableArtCamera(new Vector3(Player.X, 540, 0), 1f);
+            // Testing for jittering
             //Engine.Renderer.Camera.Zoom = 0.5f;
             //Engine.Renderer.Camera.X = Player.X;
             //Engine.Renderer.Camera.Y = 540; // Middle of the screen
 
             Engine.Renderer.VSync = true;
-            Console.WriteLine(OpenGL.Gl.CurrentLimits.MaxTextureSize);
-            Console.WriteLine(OpenGL.Gl.CurrentExtensions.MapBufferRange_ARB);
-            Console.WriteLine(OpenGL.Gl.CurrentExtensions.BufferStorage_ARB);
-            Console.WriteLine(OpenGL.Gl.CurrentExtensions.GpuShader5_ARB);
+            //Console.WriteLine(OpenGL.Gl.CurrentLimits.MaxTextureSize);
+            //Console.WriteLine(OpenGL.Gl.CurrentExtensions.MapBufferRange_ARB);
+            //Console.WriteLine(OpenGL.Gl.CurrentExtensions.BufferStorage_ARB);
+            //Console.WriteLine(OpenGL.Gl.CurrentExtensions.GpuShader5_ARB);
 
-            var testBuffer = new VertexBuffer(4);
-            unsafe
-            {
-                byte* mapper = testBuffer.CreateUnsafeMapper(0, 4, BufferAccessMask.MapWriteBit | BufferAccessMask.MapInvalidateBufferBit);
-                int num = Helpers.GenerateRandomNumber(0, 1337);
-                *(int*)mapper = num;
-                Engine.Log.Info($"Test number is: {num}", "");
-                testBuffer.FinishMapping();
+            //var testBuffer = new VertexBuffer(4);
+            //unsafe
+            //{
+            //    byte* mapper = testBuffer.CreateUnsafeMapper(0, 4, BufferAccessMask.MapWriteBit | BufferAccessMask.MapInvalidateBufferBit);
+            //    int num = Helpers.GenerateRandomNumber(0, 1337);
+            //    *(int*)mapper = num;
+            //    Engine.Log.Info($"Test number is: {num}", "");
+            //    testBuffer.FinishMapping();
 
-                mapper = testBuffer.CreateUnsafeMapper(0, 4, BufferAccessMask.MapReadBit);
-                int readNumber = *(int*)mapper;
-                Engine.Log.Info($"Reread number is: {readNumber}", "");
-                testBuffer.FinishMapping();
+            //    mapper = testBuffer.CreateUnsafeMapper(0, 4, BufferAccessMask.MapReadBit);
+            //    int readNumber = *(int*)mapper;
+            //    Engine.Log.Info($"Reread number is: {readNumber}", "");
+            //    testBuffer.FinishMapping();
 
-                testBuffer.CreateUnsafeMapper(0, 4, BufferAccessMask.MapWriteBit | BufferAccessMask.MapInvalidateBufferBit);
-                testBuffer.FinishMapping();
+            //    testBuffer.CreateUnsafeMapper(0, 4, BufferAccessMask.MapWriteBit | BufferAccessMask.MapInvalidateBufferBit);
+            //    testBuffer.FinishMapping();
 
-                mapper = testBuffer.CreateUnsafeMapper(0, 4, BufferAccessMask.MapReadBit);
-                readNumber = *(int*)mapper;
-                Engine.Log.Info($"Second time reread number is: {readNumber}", "");
-                testBuffer.FinishMapping();
-            }
+            //    mapper = testBuffer.CreateUnsafeMapper(0, 4, BufferAccessMask.MapReadBit);
+            //    readNumber = *(int*)mapper;
+            //    Engine.Log.Info($"Second time reread number is: {readNumber}", "");
+            //    testBuffer.FinishMapping();
+            //}
         }
 
         public void PlayMainTrackOnMainLayer()
@@ -107,6 +115,7 @@ namespace MusicTest
 
         public void Load()
         {
+            // Music testing
             CodeVariant = 3;
 
             if (CodeVariant == 1)
@@ -133,12 +142,21 @@ namespace MusicTest
                 SecondaryLayer.AddToQueue(BackgroundMusic);
             }
 
+            // Texture loading should be done before any texture usages
+            // to make sure they are loaded in parallel
             TextureLoader.Load(LoadedRoom.Textures);
+
+            // Init the player
+            Player = new Midori(LoadedRoom.Spawn, this);
+
+            // Init the camera
+            Engine.Renderer.Camera = new ScalableArtCamera(new Vector3(Player.X, 540, 0), 1f);
 
             // Set the TextureArrayLimit to 1 for GPU's that support only zero indexing
             // Engine.Renderer.TextureArrayLimit = 1;
 
-            foreach(ConfigUnit configUnit in LoadedRoom.Units)
+            // Create units
+            foreach (ConfigUnit configUnit in LoadedRoom.Units)
             {
                 Unit unit;
                 switch (configUnit.Type)
@@ -152,6 +170,7 @@ namespace MusicTest
                 Units.Add(unit);
             }
 
+            // Create platforms
             for (int i = 0; i < LoadedRoom.CollisionPlatforms.Count; i++)
             {
                 ConfigCollisionPlatform configPlatform = LoadedRoom.CollisionPlatforms[i];
@@ -167,6 +186,7 @@ namespace MusicTest
 
                 CollisionPlatforms.Add(realPlatform);
             }
+
         }
 
         public void Unload()
@@ -175,10 +195,8 @@ namespace MusicTest
 
         public bool IsTransformOnSreen(Transform transform) 
         {
-            Vector2 windowSize = Engine.Host.Window.Size;
             return transform.ToRectangle().IntersectsInclusive(
                 Engine.Renderer.Camera.GetWorldBoundingRect()
-                //new Rectangle(Engine.Renderer.Camera.Position2 - new Vector2(windowSize.X / 2, windowSize.Y / 2), windowSize)
             );
         }
 
@@ -292,11 +310,6 @@ namespace MusicTest
                 plat.Render(composer);
             }
 
-            foreach (CollisionPlatform plat in SlopedCollisionPlatforms)
-            {
-                plat.Render(composer);
-            }
-
             Player.Render(composer);
 
             foreach (Decoration dec in LoadedRoom.ForegroundDecorations)
@@ -307,14 +320,18 @@ namespace MusicTest
                 }
             }
 
-            composer.RenderCircle(Engine.Renderer.Camera.Position, 5, Color.Red);
+            //composer.RenderCircle(Engine.Renderer.Camera.Position, 5, Color.Red);
 
-            composer.RenderCircle(new Vector3(2450, 0, 5), 1, Color.Red);
+            //composer.RenderCircle(new Vector3(2450, 0, 5), 1, Color.Red);
 
+            // Display the current interaction
             if (CurrentInteration != null)
             {
                 CurrentInteration.Render(composer);
             }
+
+            // Render the Emotion Tools UI
+            composer.RenderToolsMenu();
         }
 
     }
