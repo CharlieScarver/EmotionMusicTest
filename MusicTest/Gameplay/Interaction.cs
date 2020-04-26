@@ -13,6 +13,7 @@ namespace MusicTest.Core
     public class Interaction
     {
         private const float _backgroundZ = 10;
+        private const int _defaultFontSize = 24;
 
         public Interaction(Unit unit1, Unit unit2)
         {
@@ -34,6 +35,16 @@ namespace MusicTest.Core
             RightPosition = new Vector3(new Vector2(1200, 0), 11);
 
             Texture = Engine.AssetLoader.Get<TextureAsset>("Textures/transparent-black.png");
+
+            FontSize = _defaultFontSize;
+            Font = Engine.AssetLoader.Get<FontAsset>("debugFont.otf");
+            Finished = false;
+
+            CurrentLetterIndex = 0;
+            LastLetterFrame = 0;
+            CurrentFrame = 0;
+
+            TextScrollSpeed = 5;
         }
 
         private Unit Unit1 { get; set; }
@@ -48,6 +59,28 @@ namespace MusicTest.Core
         private Vector3 RightPosition { get; set; }
 
         private TextureAsset Texture { get; set; }
+
+        private int CurrentLetterIndex { get; set; }
+        private int LastLetterFrame { get; set; }
+        private int CurrentFrame{ get; set; }
+        private int TextScrollSpeed { get; set; }
+
+        private bool IsLineFinished { get; set; }
+
+        public int FontSize { get; set; }
+        public FontAsset Font { get; set; }
+
+        public bool Finished { get; set; }
+
+        public void Update() 
+        {
+            CurrentFrame++;
+            if (CurrentFrame - LastLetterFrame == TextScrollSpeed)
+            {
+                CurrentLetterIndex++;
+                LastLetterFrame = CurrentFrame;
+            }
+        }
 
         public void Render(RenderComposer composer)
         {
@@ -95,6 +128,33 @@ namespace MusicTest.Core
                 null,
                 !Unit1OnTheLeft
             );
+
+            if(Unit2.Dialogues != null)
+            {
+                if (CurrentLetterIndex >= Unit2.Dialogues[0].DialogueLines[0].Length)
+                {
+                    // Set whenever the user initiates the next line
+                    //CurrentLetterIndex = 0;
+                    //LastLetterFrame = CurrentFrame;
+                    Finished = true;
+
+                    composer.RenderString(
+                      new Vector3(760, 900, 12), // 200px left of the center
+                      Color.Green,
+                      Unit2.Dialogues[0].DialogueLines[0],
+                      Font.GetAtlas(FontSize)
+                );
+                }
+                else
+                {
+                    composer.RenderString(
+                          new Vector3(760, 900, 12), // 200px left of the center
+                          Color.Green,
+                          Unit2.Dialogues[0].DialogueLines[0].Substring(0, CurrentLetterIndex + 1),
+                          Font.GetAtlas(FontSize)
+                    );
+                }
+            }
         }
     }
 }

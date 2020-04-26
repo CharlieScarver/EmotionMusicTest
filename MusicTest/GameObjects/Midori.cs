@@ -6,6 +6,7 @@ using Emotion.IO;
 using Emotion.Platform.Input;
 using Emotion.Primitives;
 using Emotion.Utility;
+using MusicTest.Core;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
@@ -21,7 +22,7 @@ namespace MusicTest.GameObjects
         const string _spriteSheetPath = "Textures/pixel-midori-full-sheet-horizontal.png";
         const string _name = "Midori";
 
-        public Midori(Vector3 position, MainScene scene) : base(_name, _portraitPath, position, new Vector2(250, 344.489f))
+        public Midori(Vector3 position) : base(_name, _portraitPath, position, new Vector2(250, 344.489f))
         {
             Position = position;
 
@@ -41,7 +42,6 @@ namespace MusicTest.GameObjects
 
             InteractRange = 360;
             InteractionOffset = new Vector2(0, 70);
-            Scene = scene;
 
             StartingVelocityY = _gravityVelocity;
             VelocityX = _horizontalVelocity;
@@ -55,10 +55,7 @@ namespace MusicTest.GameObjects
             );
         }
 
-        private MainScene Scene { get; set; }
-
         private int InteractRange { get; set; }
-
         public Unit InteractTarget { get; set; }
 
         protected override void SetCollisionBoxX(float x)
@@ -75,7 +72,7 @@ namespace MusicTest.GameObjects
 
         private void Interact()
         {
-            foreach (Unit unit in Scene.Units)
+            foreach (Unit unit in GameContext.Scene.Units)
             {
                 if (unit.ToRectangle().IntersectsInclusive(this.ToRectangle()))
                 {
@@ -128,7 +125,7 @@ namespace MusicTest.GameObjects
                     Interact();
                     return;
                 }
-                else
+                else if (GameContext.Scene.CurrentInteration.Finished)
                 {
                     isInteracting = false;
                     InteractTarget = null;
@@ -221,8 +218,8 @@ namespace MusicTest.GameObjects
                 isFalling = false;
                 isJumping = false;
                 JumpTimer.End();
-                SetCollisionBoxY(600);
-                SetCollisionBoxX(10);
+                SetCollisionBoxY(500);
+                SetCollisionBoxX(700);
             }
 
             if (Engine.InputManager.IsKeyDown(Key.Q))

@@ -147,7 +147,7 @@ namespace MusicTest
             TextureLoader.Load(LoadedRoom.Textures);
 
             // Init the player
-            Player = new Midori(LoadedRoom.Spawn, this);
+            Player = new Midori(LoadedRoom.Spawn);
 
             // Init the camera
             Engine.Renderer.Camera = new ScalableArtCamera(new Vector3(Player.X, 540, 0), 1f);
@@ -265,6 +265,10 @@ namespace MusicTest
             else if (!Player.isInteracting && CurrentInteration != null)
             {
                 CurrentInteration = null;
+            }
+            else if (Player.isInteracting && CurrentInteration != null)
+            {
+                CurrentInteration.Update();
             }
 
             // Quit on Escape press
