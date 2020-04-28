@@ -144,6 +144,7 @@ namespace MusicTest.GameObjects
                 if (RunTimer.Progress == 0 && !IsMovingLeft && !IsMovingRight && isGrounded)
                 {
                     RunTimer.GoNormal();
+                    Sprite.Reset();
                 }
                 IsMovingLeft = true;
                 IsMovingRight = false;
@@ -176,6 +177,7 @@ namespace MusicTest.GameObjects
                 if (RunTimer.Progress == 0 && !IsMovingLeft && !IsMovingRight && isGrounded)
                 {
                     RunTimer.GoNormal();
+                    Sprite.Reset();
                 }
                 IsMovingRight = true;
                 IsMovingLeft = false;
