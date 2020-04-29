@@ -1,6 +1,6 @@
 ﻿using System.Numerics;
 
-namespace MusicTest.Core.Room
+namespace MusicTest.RoomData
 {
     public class ConfigCollisionPlatform
     {

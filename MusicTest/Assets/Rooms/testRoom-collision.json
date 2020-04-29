@@ -23,7 +23,7 @@
 		{
 			"Name": "Shishi",
 			"Type": "Shishi",
-			"TextureName": "shishi.png",
+			"TextureName": "better-shishi.png",
 			"Position": {
 				"X": 1200,
 				"Y": 320,
@@ -333,10 +333,10 @@
 		}
 	],
 	"Textures": [
-		"shishi.png",
+		"better-shishi.png",
 		"better-midori.png",
 		"pixel-midori-full-sheet-horizontal.png",
-		"transparent-black.png",
+		"better-transparent-black.png",
 		"mapTexture_13.png"
 	]
 }

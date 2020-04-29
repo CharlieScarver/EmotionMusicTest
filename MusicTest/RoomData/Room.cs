@@ -1,11 +1,9 @@
 ﻿using Emotion.Primitives;
-using MusicTest.Core;
-using MusicTest.Core.Room;
 using MusicTest.GameObjects;
 using System.Collections.Generic;
 using System.Numerics;
 
-namespace MusicTest
+namespace MusicTest.RoomData
 {
     public class Room
     {
@@ -17,10 +15,10 @@ namespace MusicTest
         public Vector3 Spawn { get; set; }
 
         // Objects
-        public List<Decoration> Backgrounds { get; set; }
+        public List<ConfigDecoration> Backgrounds { get; set; }
         public List<Platform> Platforms { get; set; }
-        public List<Decoration> BackgroundDecorations { get; set; }
-        public List<Decoration> ForegroundDecorations { get; set; }
+        public List<ConfigDecoration> BackgroundDecorations { get; set; }
+        public List<ConfigDecoration> ForegroundDecorations { get; set; }
         public List<ConfigUnit> Units { get; set; }
         public List<ConfigCollisionPlatform> CollisionPlatforms { get; set; }
 

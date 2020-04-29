@@ -169,7 +169,7 @@
 		{
 			"Name": "Shishi",
 			"Type": "Shishi",
-			"TextureName": "shishi.png",
+			"TextureName": "better-shishi.png",
 			"Position": {
 				"X": 800,
 				"Y": 590,
@@ -214,9 +214,9 @@
 		"icycle 4.png",
 		"icycle 5.png",
 		"icycle 6.png",
-		"shishi.png",
+		"better-shishi.png",
 		"midori.png",
 		"pixel-midori-full-sheet-horizontal.png",
-		"transparent-black.png"
+		"better-transparent-black.png"
 	]
 }

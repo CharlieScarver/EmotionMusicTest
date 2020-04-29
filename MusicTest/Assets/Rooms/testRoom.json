@@ -11,12 +11,10 @@
 	},
 	"Backgrounds": [
 	],
-	"Platforms": [
-	],
 	"BackgroundDecorations": [
 		{
 			"Name": "Snow Floor 4",
-			"TextureName": "mapTexture_13.png",
+			"TextureName": "better-mapTexture_13.png",
 			"Size": {
 				"X": 1545,
 				"Y": 675
@@ -35,7 +33,7 @@
 		},
 		{
 			"Name": "Snow Floor 3",
-			"TextureName": "mapTexture_13.png",
+			"TextureName": "better-mapTexture_13.png",
 			"Size": {
 				"X": 1545,
 				"Y": 675
@@ -54,7 +52,7 @@
 		},
 		{
 			"Name": "Snow Floor 2",
-			"TextureName": "mapTexture_13.png",
+			"TextureName": "better-mapTexture_13.png",
 			"Size": {
 				"X": 1545,
 				"Y": 675
@@ -73,7 +71,7 @@
 		},
 		{
 			"Name": "Snow Floor 1",
-			"TextureName": "mapTexture_13.png",
+			"TextureName": "better-mapTexture_13.png",
 			"Size": {
 				"X": 1545,
 				"Y": 675
@@ -92,7 +90,7 @@
 		},
 		{
 			"Name": "Snow Floor 0",
-			"TextureName": "mapTexture_13.png",
+			"TextureName": "better-mapTexture_13.png",
 			"Size": {
 				"X": 1545,
 				"Y": 675
@@ -111,7 +109,7 @@
 		},
 		{
 			"Name": "Snow Floor -1",
-			"TextureName": "mapTexture_13.png",
+			"TextureName": "better-mapTexture_13.png",
 			"Size": {
 				"X": 1545,
 				"Y": 675
@@ -131,7 +129,7 @@
 		// Rocks
 		{
 			"Name": "Snowy Rock 1 BG",
-			"TextureName": "mapTexture_13.png",
+			"TextureName": "better-mapTexture_13.png",
 			"Size": {
 				"X": 600,
 				"Y": 335
@@ -150,7 +148,7 @@
 		},
 		{
 			"Name": "Snowy Rock 2 BG",
-			"TextureName": "mapTexture_13.png",
+			"TextureName": "better-mapTexture_13.png",
 			"Size": {
 				"X": 600,
 				"Y": 335
@@ -173,8 +171,8 @@
 			"FlipX": true
 		},
 		{
-			"Name": "Snowy Rock 2 BG",
-			"TextureName": "mapTexture_13.png",
+			"Name": "Snowy Rock 3 BG",
+			"TextureName": "better-mapTexture_13.png",
 			"Size": {
 				"X": 600,
 				"Y": 335
@@ -200,7 +198,7 @@
 	"ForegroundDecorations": [
 		{
 			"Name": "Snowy Rock 1 FG",
-			"TextureName": "mapTexture_13.png",
+			"TextureName": "better-mapTexture_13.png",
 			"Size": {
 				"X": 600,
 				"Y": 335
@@ -219,11 +217,13 @@
 				"Y": 970,
 				"Width": 600,
 				"Height": 335
-			}
+			},
+			"BlurIntensity": 5,
+			"ShadowReverseIntensity":  180
 		},
 		{
 			"Name": "Snowy Rock 2 FG",
-			"TextureName": "mapTexture_13.png",
+			"TextureName": "better-mapTexture_13.png",
 			"Size": {
 				"X": 600,
 				"Y": 335
@@ -250,7 +250,7 @@
 		{
 			"Name": "Shishi",
 			"Type": "Shishi",
-			"TextureName": "shishi.png",
+			"TextureName": "better-shishi.png",
 			"Position": {
 				"X": 1200,
 				"Y": 320,
@@ -560,10 +560,10 @@
 		}
 	],
 	"Textures": [
-		"shishi.png",
+		"better-shishi.png",
 		"better-midori.png",
 		"pixel-midori-full-sheet-horizontal.png",
-		"transparent-black.png",
-		"mapTexture_13.png"
+		"better-transparent-black.png",
+		"better-mapTexture_13.png"
 	]
 }

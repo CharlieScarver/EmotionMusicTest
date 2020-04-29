@@ -1,6 +1,6 @@
 ﻿using System.Numerics;
 
-namespace MusicTest
+namespace MusicTest.RoomData
 {
     public class ConfigUnit
 	{

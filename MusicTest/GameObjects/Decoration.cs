@@ -8,7 +8,7 @@ using System.Numerics;
 
 namespace MusicTest.GameObjects
 {
-    public class Decoration : TransformRenderable
+    public class Decoration : TransformRenderable, IGameObject
     {
         public string Name { get; set; }
 
@@ -23,11 +23,25 @@ namespace MusicTest.GameObjects
 
         public bool FlipX { get; set; }
 
+        /// <summary>
+        /// Determines the intensity of the Shadow effect.
+        /// Values range from 255 (no shadow) to 0 (completely black).
+        /// Defaults to 255.
+        /// </summary>
+        public int ShadowReverseIntensity { get; set; } = 255;
+
+        /// <summary>
+        /// Determines the intensity of the Blur effect.
+        /// Defaults to 0.
+        /// </summary>
+        public float BlurIntensity { get; set; }
+
         public ShaderAsset ShadowShader { get; set; }
+        public ShaderAsset BlurShader { get; set; }
 
         public int VelocityOffsetX { get; set; }
 
-        public Decoration(string name, string textureName, Vector2 size, Vector3 position, Vector2? displaySize = null, Rectangle? textureArea = null, bool flipX = false) {
+        public Decoration(string name, string textureName, Vector2 size, Vector3 position, Vector2? displaySize = null, Rectangle? textureArea = null, bool flipX = false, float blurIntensity = 0, int shadowReverseIntensity = 255) {
             Name = name;
             TextureName = textureName;
             Size = size;
@@ -37,6 +51,11 @@ namespace MusicTest.GameObjects
             DisplaySize = displaySize ?? size;
             TextureArea = textureArea;
             FlipX = flipX;
+
+            // Effects
+            // TODO: Default values for numerical parameters are not taken into account for some reason
+            BlurIntensity = blurIntensity;
+            ShadowReverseIntensity = shadowReverseIntensity == 0 ? 255 : shadowReverseIntensity; // temporary fix
 
             if (Name.Contains("Ceiling Icicle"))
             {
@@ -48,6 +67,7 @@ namespace MusicTest.GameObjects
             }
 
             ShadowShader = Engine.AssetLoader.Get<ShaderAsset>("Shaders/ShadowShader.xml");
+            BlurShader = Engine.AssetLoader.Get<ShaderAsset>("Shaders/Blur.xml");
         }
 
         public override void Render(RenderComposer composer)
@@ -57,56 +77,33 @@ namespace MusicTest.GameObjects
                 return;
             }
 
-            if (Name.Contains("Icicle") || Name.Contains("Snowy Rock 1 FG"))
+            // Apply Blur effect if such is set
+            if (BlurIntensity > 0)
             {
-                //TextureAsset.Texture.Tile = false;
-                composer.SetShader(Engine.AssetLoader.Get<ShaderAsset>("Shaders/Blur.xml").Shader);
-                composer.SetShader(ShadowShader.Shader);
-                composer.RenderSprite(
-                    Position,
-                    DisplaySize,
-                    new Color(180, 180, 180),
-                    TextureAsset.Texture,
-                    TextureArea,
-                    FlipX
-                );
-                //composer.SetShader(null);
+                composer.SetShader(BlurShader.Shader);
+                BlurShader.Shader.SetUniformFloat("sigma", BlurIntensity);
+            }
+
+            // Apply Shadow effect if such is set
+            Color color = Color.White;
+            if (ShadowReverseIntensity < 255)
+            {
+                color = new Color(ShadowReverseIntensity, ShadowReverseIntensity, ShadowReverseIntensity); // 180 for a shadowy look
+            }
+
+            // Render
+            composer.RenderSprite(
+                Position,
+                DisplaySize,
+                color,
+                TextureAsset.Texture,
+                TextureArea,
+                FlipX
+            );
+
+            if (BlurIntensity > 0)
+            {
                 composer.SetShader(null);
-            }
-            else if (Name.Contains("Wall"))
-            {
-                //composer.SetShader(Engine.AssetLoader.Get<ShaderAsset>("Shaders/Blur.xml").Shader);
-                composer.RenderSprite(
-                    Position,
-                    Size,
-                    Color.White,
-                    TextureAsset.Texture,
-                    TextureArea,
-                    FlipX
-                );
-                //composer.SetShader(null)
-            }
-            else if (Name.Contains("Snow Floor"))
-            {
-                composer.RenderSprite(
-                    Position,
-                    DisplaySize,
-                    Color.White,
-                    TextureAsset.Texture,
-                    TextureArea,
-                    FlipX
-                );
-            }
-            else
-            {
-                composer.RenderSprite(
-                    Position,
-                    DisplaySize,
-                    Color.White,
-                    TextureAsset.Texture,
-                    TextureArea,
-                    FlipX
-                );
             }
         }
     }

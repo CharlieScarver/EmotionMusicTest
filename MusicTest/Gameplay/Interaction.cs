@@ -34,7 +34,7 @@ namespace MusicTest.Core
             LeftPosition = new Vector3(new Vector2(0, 0), 11);
             RightPosition = new Vector3(new Vector2(1200, 0), 11);
 
-            Texture = Engine.AssetLoader.Get<TextureAsset>("Textures/transparent-black.png");
+            Texture = Engine.AssetLoader.Get<TextureAsset>("Textures/better-transparent-black.png");
 
             FontSize = _defaultFontSize;
             Font = Engine.AssetLoader.Get<FontAsset>("debugFont.otf");

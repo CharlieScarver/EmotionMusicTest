@@ -7,6 +7,7 @@ using Emotion.Platform.Input;
 using Emotion.Primitives;
 using Emotion.Utility;
 using MusicTest.Core;
+using MusicTest.RoomData;
 using MusicTest.Core.Collision;
 using System;
 using System.Collections.Generic;
@@ -14,7 +15,7 @@ using System.Numerics;
 
 namespace MusicTest.GameObjects
 {
-    public abstract class Unit : TransformRenderable
+    public abstract class Unit : TransformRenderable, IGameObject
     {
         const float _gravityVelocity = -30;
         const float _jumpHeight = 200;
@@ -125,8 +126,10 @@ namespace MusicTest.GameObjects
             }
         }
 
-        protected void ManageMovement(Room currentRoom) 
+        protected void ManageMovement()
         {
+            Room currentRoom = GameContext.Scene.LoadedRoom;
+
             if(RunTimer.Progress != 0)
             {
                 Console.WriteLine(RunTimer.Progress);
@@ -244,9 +247,9 @@ namespace MusicTest.GameObjects
             }
         }
 
-        public virtual void Update(Room currentRoom) 
+        public virtual void Update()
         {
-            ManageMovement(currentRoom);
+            ManageMovement();
 
             RunTimer.Update();
             JumpTimer.Update();

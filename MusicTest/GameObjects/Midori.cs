@@ -1,16 +1,12 @@
 ﻿using Emotion.Common;
 using Emotion.Game.Animation;
 using Emotion.Graphics;
-using Emotion.Graphics.Objects;
 using Emotion.IO;
 using Emotion.Platform.Input;
 using Emotion.Primitives;
-using Emotion.Utility;
 using MusicTest.Core;
 using System;
-using System.Collections.Generic;
 using System.Numerics;
-using System.Text;
 
 namespace MusicTest.GameObjects
 {
@@ -19,7 +15,7 @@ namespace MusicTest.GameObjects
         const float _gravityVelocity = -30;
         const float _horizontalVelocity = 9;
         const string _portraitPath = "better-midori.png";
-        const string _spriteSheetPath = "Textures/pixel-midori-full-sheet-horizontal.png";
+        const string _spriteSheetPath = "Textures/better-pixel-midori-full-sheet-horizontal.png";
         const string _name = "Midori";
 
         public Midori(Vector3 position) : base(_name, _portraitPath, position, new Vector2(250, 344.489f))
@@ -231,9 +227,9 @@ namespace MusicTest.GameObjects
             }
         }
 
-        public override void Update(Room currentRoom)
+        public override void Update()
         {
-            base.Update(currentRoom);
+            base.Update();
             ManageInput();
 
             // TODO: Keep last state

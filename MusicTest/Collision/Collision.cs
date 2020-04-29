@@ -235,6 +235,11 @@ namespace MusicTest.Core.Collision
                 point.Y >= segmPoint2.Y && point.Y <= segmPoint1.Y);
         }
 
+        public static bool PointIsInRectangleInclusive(Vector2 point, Rectangle rect)
+        {
+            return (point.X >= rect.X && point.X <= rect.X) && (point.Y >= rect.Y && point.Y <= rect.Y);
+        }
+
         #endregion
     }
 }
