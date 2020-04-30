@@ -10,13 +10,15 @@ using Emotion.Standard.Image.PNG;
 using Emotion.Tools.Windows;
 using Emotion.Utility;
 using MusicTest.Core;
-using MusicTest.Core.Room;
+using MusicTest.RoomData;
 using MusicTest.GameObjects;
 using Newtonsoft.Json;
 using OpenGL;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
+using MusicTest.Debug;
+using MusicTest.Core.Collision;
 
 namespace MusicTest
 {
@@ -38,19 +40,25 @@ namespace MusicTest
         public List<CollisionPlatform> CollisionPlatforms { get; set; }
         public List<CollisionPlatform> SlopedCollisionPlatforms { get; set; }
         public List<CollisionPlatform> AxisAlignedCollisionPlatforms { get; set; }
+        public List<Decoration> Backgrounds { get; set; }
+        public List<Decoration> BackgroundDecorations { get; set; }
+        public List<Decoration> ForegroundDecorations { get; set; }
+
+        public List<DebugObject> DebugObjects { get; set; }
 
         public Interaction CurrentInteration { get; set; }
 
         public MainScene(TextAsset progressFile, TextAsset mapFile)
         { 
             // Deserialize the map into model
+            // Note: Make sure not to load any textures inside the constructors here because it will be sequential!
             LoadedRoom = JsonConvert.DeserializeObject<Room>(mapFile.Content);
 
             // Decode and then encode a PNG with filter zero to make it sequential and faster to load (avoiding sequential parsing)
-            //OtherAsset oa = Engine.AssetLoader.Get<OtherAsset>("textures/midori.png");
+            //OtherAsset oa = Engine.AssetLoader.Get<OtherAsset>("textures/pixel-midori-full-sheet-horizontal.png");
             //byte[] bytes = PngFormat.Decode(oa.Content, out PngFileHeader header);
             //byte[] pngfile = PngFormat.Encode(bytes, header.Width, header.Height);
-            //Engine.AssetLoader.Save(pngfile, "betterer-midori.png");
+            //Engine.AssetLoader.Save(pngfile, "better-pixel-midori-full-sheet-horizontal.png");
 
             // Deserialize the progress file
             GameProgress = JsonConvert.DeserializeObject<Progress>(progressFile.Content);
@@ -60,6 +68,10 @@ namespace MusicTest
             CollisionPlatforms = new List<CollisionPlatform>();
             SlopedCollisionPlatforms = new List<CollisionPlatform>();
             AxisAlignedCollisionPlatforms = new List<CollisionPlatform>();
+            Backgrounds = new List<Decoration>();
+            BackgroundDecorations = new List<Decoration>();
+            ForegroundDecorations = new List<Decoration>();
+            DebugObjects = new List<DebugObject>();
 
             // Testing for jittering
             //Engine.Renderer.Camera.Zoom = 0.5f;
@@ -148,6 +160,7 @@ namespace MusicTest
 
             // Init the player
             Player = new Midori(LoadedRoom.Spawn);
+            Units.Add(Player);
 
             // Init the camera
             Engine.Renderer.Camera = new ScalableArtCamera(new Vector3(Player.X, 540, 0), 1f);
@@ -187,6 +200,61 @@ namespace MusicTest
                 CollisionPlatforms.Add(realPlatform);
             }
 
+            // Create decorations
+            // Backgrounds
+            for (int i = 0; i < LoadedRoom.Backgrounds.Count; i++)
+            {
+                ConfigDecoration configDecor = LoadedRoom.Backgrounds[i];
+                Backgrounds.Add(
+                    new Decoration(
+                        configDecor.Name,
+                        configDecor.TextureName,
+                        configDecor.Size,
+                        configDecor.Position,
+                        configDecor.DisplaySize,
+                        configDecor.TextureArea,
+                        configDecor.FlipX,
+                        configDecor.BlurIntensity,
+                        configDecor.ShadowReverseIntensity
+                    )
+                );
+            }
+            // Background Decorations
+            for (int i = 0; i < LoadedRoom.BackgroundDecorations.Count; i++)
+            {
+                ConfigDecoration configDecor = LoadedRoom.BackgroundDecorations[i];
+                BackgroundDecorations.Add(
+                    new Decoration(
+                        configDecor.Name,
+                        configDecor.TextureName,
+                        configDecor.Size,
+                        configDecor.Position,
+                        configDecor.DisplaySize,
+                        configDecor.TextureArea,
+                        configDecor.FlipX,
+                        configDecor.BlurIntensity,
+                        configDecor.ShadowReverseIntensity
+                    )
+                );
+            }
+            // Foreground Decorations
+            for (int i = 0; i < LoadedRoom.ForegroundDecorations.Count; i++)
+            {
+                ConfigDecoration configDecor = LoadedRoom.ForegroundDecorations[i];
+                ForegroundDecorations.Add(
+                    new Decoration(
+                        configDecor.Name,
+                        configDecor.TextureName,
+                        configDecor.Size,
+                        configDecor.Position,
+                        configDecor.DisplaySize,
+                        configDecor.TextureArea,
+                        configDecor.FlipX,
+                        configDecor.BlurIntensity,
+                        configDecor.ShadowReverseIntensity
+                    )
+                );
+            }
         }
 
         public void Unload()
@@ -211,7 +279,7 @@ namespace MusicTest
             }
 
             // Update the player
-            Player.Update(LoadedRoom);
+            Player.Update();
 
             // Update the camera
             Vector2 windowSize = Engine.Host.Window.Size;
@@ -227,7 +295,7 @@ namespace MusicTest
                     Engine.Renderer.Camera.X = playerXCenter;
 
                     // Move the foreground decorations faster than the player
-                    foreach (Decoration dec in LoadedRoom.ForegroundDecorations)
+                    foreach (Decoration dec in ForegroundDecorations)
                     {
                         dec.X += Player.VelocityX + dec.VelocityOffsetX;
                     }
@@ -246,7 +314,7 @@ namespace MusicTest
                     Engine.Renderer.Camera.X = playerXCenter;
 
                     // Move the foreground decorations faster than the player
-                    foreach (Decoration dec in LoadedRoom.ForegroundDecorations)
+                    foreach (Decoration dec in ForegroundDecorations)
                     {
                         dec.X -= Player.VelocityX + dec.VelocityOffsetX;
                     }
@@ -271,6 +339,27 @@ namespace MusicTest
                 CurrentInteration.Update();
             }
 
+            if (Engine.InputManager.IsMouseKeyDown(MouseKey.Left))
+            {
+                for (int i = 0; i < Units.Count; i++)
+                {
+                    Unit unit = Units[i];
+                    Vector2 worldMousePos = Engine.Renderer.Camera.ScreenToWorld(Engine.InputManager.MousePosition);
+                    if (unit.ToRectangle().IntersectsInclusive(worldMousePos))
+                    {
+                        DebugObject debugObj = new DebugObject(unit);
+                        if (DebugObjects.Find(o => o.Item.Name == unit.Name) == null)
+                        {
+                            DebugObjects.Add(debugObj);
+                        }
+                    }
+                }
+            }
+            else if (Engine.InputManager.IsMouseKeyDown(MouseKey.Right) && DebugObjects.Count > 0)
+            {
+                DebugObjects.RemoveAt(DebugObjects.Count - 1);
+            }
+
             // Quit on Escape press
             if (Engine.InputManager.IsKeyHeld(Key.Escape))
             {
@@ -280,20 +369,12 @@ namespace MusicTest
 
         public void Draw(RenderComposer composer)
         {
-            foreach (Decoration bg in LoadedRoom.Backgrounds)
+            foreach (Decoration bg in Backgrounds)
             {
                 bg.Render(composer);
             }
 
-            foreach (Decoration plat in LoadedRoom.Platforms)
-            {
-                if (IsTransformOnSreen(plat))
-                {
-                    plat.Render(composer);
-                }
-            }
-            
-            foreach (Decoration dec in LoadedRoom.BackgroundDecorations)
+            foreach (Decoration dec in BackgroundDecorations)
             {
                 if (IsTransformOnSreen(dec))
                 {
@@ -316,7 +397,7 @@ namespace MusicTest
 
             Player.Render(composer);
 
-            foreach (Decoration dec in LoadedRoom.ForegroundDecorations)
+            foreach (Decoration dec in ForegroundDecorations)
             {
                 if (IsTransformOnSreen(dec))
                 {
@@ -334,8 +415,38 @@ namespace MusicTest
                 CurrentInteration.Render(composer);
             }
 
+            // Disabled the camera and draw on Screen Space instead of World Space
+            composer.SetUseViewMatrix(false);
+
+            // Draw Debug
+            for (int i = 0; i < DebugObjects.Count; i++)
+            {
+                DebugObject debugObj = DebugObjects[i];
+                int fontSize = 18;
+                float debugObjDisplayWidth = debugObj.LongestLine.Length * 7; // Magic number
+                TextureAsset textureAsset = Engine.AssetLoader.Get<TextureAsset>("Textures/better-transparent-black.png");
+                composer.RenderSprite(
+                    new Vector3(debugObjDisplayWidth * i, 0, 15),
+                    new Vector2(debugObjDisplayWidth, Engine.Configuration.RenderSize.Y),
+                    Color.White,
+                    textureAsset.Texture
+                );
+                composer.RenderString(
+                    new Vector3(debugObjDisplayWidth * i, 0, 15),
+                    Color.Red,
+                    debugObj.ToString(),
+                    Engine.AssetLoader.Get<FontAsset>("debugFont.otf").GetAtlas(fontSize)
+                );
+            }
+
+            composer.RenderCircle(new Vector3(Engine.InputManager.MousePosition, 15), 5, Color.Red, false);
+
+            // Enable the camera again
+            composer.SetUseViewMatrix(true);
+
             // Render the Emotion Tools UI
             composer.RenderToolsMenu();
+
         }
 
     }
