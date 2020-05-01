@@ -65,13 +65,13 @@ namespace MusicTest.Core.Collision
         /// <summary>
         /// Checks if an Emotion.Ray2D intersects a Rectangle using Emotion's RayIntersects()
         /// </summary>
-        static bool RayIntesectsRectangle(Vector2 A, Vector2 B, Rectangle rect)
-        {
-            Ray2D ab = new Ray2D(A, B);
-            float distance;
-            // Uses ref to make it faster as the value is not copied ?
-            return rect.RayIntersects(ref rect, ref ab, out distance);
-        }
+        //static bool RayIntesectsRectangle(Vector2 A, Vector2 B, Rectangle rect)
+        //{
+        //    Ray2D ab = new Ray2D(A, B);
+        //    float distance;
+        //    // Uses ref to make it faster as the value is not copied ?
+        //    return rect.RayIntersects(ref rect, ref ab, out distance);
+        //}
 
         #endregion
 
@@ -237,7 +237,7 @@ namespace MusicTest.Core.Collision
 
         public static bool PointIsInRectangleInclusive(Vector2 point, Rectangle rect)
         {
-            return (point.X >= rect.X && point.X <= rect.X) && (point.Y >= rect.Y && point.Y <= rect.Y);
+            return (point.X >= rect.Left && point.X <= rect.Right) && (point.Y >= rect.Top && point.Y <= rect.Bottom);
         }
 
         #endregion

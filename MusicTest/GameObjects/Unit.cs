@@ -44,6 +44,7 @@ namespace MusicTest.GameObjects
 
         // Interaction
         public Vector2 InteractionOffset { get; set; }
+        public bool IsPlayer { get; set; }
 
         // Other
         public List<DialoguePiece> Dialogues { get; set; }
@@ -71,6 +72,7 @@ namespace MusicTest.GameObjects
 
             TextureAsset = Engine.AssetLoader.Get<TextureAsset>($"Textures/{TextureName}");
 
+            IsPlayer = false;
             IsIdle = true;
             isGrounded = true;
 

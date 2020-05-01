@@ -20,9 +20,10 @@ namespace MusicTest.GameObjects
 
         public Midori(Vector3 position) : base(_name, _portraitPath, position, new Vector2(250, 344.489f))
         {
-            Position = position;
-
             Name = _name;
+            IsPlayer = true;
+
+            Position = position;
             Size = new Vector2(250, 344.489f); // Full Size 1773x2213
             TextureAsset = Engine.AssetLoader.Get<TextureAsset>($"Textures/{_portraitPath}");
 
@@ -70,6 +71,11 @@ namespace MusicTest.GameObjects
         {
             foreach (Unit unit in GameContext.Scene.Units)
             {
+                if (unit.IsPlayer)
+                {
+                    continue;
+                }
+
                 if (unit.ToRectangle().IntersectsInclusive(this.ToRectangle()))
                 {
                     if (InteractTarget != null)

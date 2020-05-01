@@ -345,10 +345,36 @@ namespace MusicTest
                 {
                     Unit unit = Units[i];
                     Vector2 worldMousePos = Engine.Renderer.Camera.ScreenToWorld(Engine.InputManager.MousePosition);
-                    if (unit.ToRectangle().IntersectsInclusive(worldMousePos))
+                    if (Collision.PointIsInRectangleInclusive(worldMousePos, unit.ToRectangle()))
                     {
                         DebugObject debugObj = new DebugObject(unit);
                         if (DebugObjects.Find(o => o.Item.Name == unit.Name) == null)
+                        {
+                            DebugObjects.Add(debugObj);
+                        }
+                    }
+                }
+                for (int i = 0; i < BackgroundDecorations.Count; i++)
+                {
+                    Decoration dec = BackgroundDecorations[i];
+                    Vector2 worldMousePos = Engine.Renderer.Camera.ScreenToWorld(Engine.InputManager.MousePosition);
+                    if (Collision.PointIsInRectangleInclusive(worldMousePos, dec.ToRectangle()))
+                    {
+                        DebugObject debugObj = new DebugObject(dec);
+                        if (DebugObjects.Find(o => o.Item.Name == dec.Name) == null)
+                        {
+                            DebugObjects.Add(debugObj);
+                        }
+                    }
+                }
+                for (int i = 0; i < ForegroundDecorations.Count; i++)
+                {
+                    Decoration dec = ForegroundDecorations[i];
+                    Vector2 worldMousePos = Engine.Renderer.Camera.ScreenToWorld(Engine.InputManager.MousePosition);
+                    if (Collision.PointIsInRectangleInclusive(worldMousePos, dec.ToRectangle()))
+                    {
+                        DebugObject debugObj = new DebugObject(dec);
+                        if (DebugObjects.Find(o => o.Item.Name == dec.Name) == null)
                         {
                             DebugObjects.Add(debugObj);
                         }
