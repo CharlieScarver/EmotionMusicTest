@@ -24,6 +24,7 @@ namespace MusicTest
 {
     public class MainScene : IScene
     {
+        // MusicTest
         public byte CodeVariant { get; set; }
         public AudioLayer IntroLayer { get; set; }
         public AudioLayer MainLayer { get; set; }
@@ -32,9 +33,11 @@ namespace MusicTest
         public AudioAsset BackgroundMusic { get; set; }
         public AudioAsset BackgroundMusicIntro { get; set; }
 
+        // Configs
         public Room LoadedRoom { get; set; }
         public Progress GameProgress { get; set; }
 
+        // Game Objects
         public Midori Player { get; set; }
         public List<Unit> Units { get; set; }
         public List<CollisionPlatform> CollisionPlatforms { get; set; }
@@ -43,9 +46,9 @@ namespace MusicTest
         public List<Decoration> Backgrounds { get; set; }
         public List<Decoration> BackgroundDecorations { get; set; }
         public List<Decoration> ForegroundDecorations { get; set; }
-
         public List<DebugObject> DebugObjects { get; set; }
 
+        // Interaction
         public Interaction CurrentInteration { get; set; }
 
         public MainScene(TextAsset progressFile, TextAsset mapFile)
@@ -106,23 +109,6 @@ namespace MusicTest
             //    Engine.Log.Info($"Second time reread number is: {readNumber}", "");
             //    testBuffer.FinishMapping();
             //}
-        }
-
-        public void PlayMainTrackOnMainLayer()
-        {
-            CustomAudioTrack fcMain = new CustomAudioTrack(BackgroundMusic, 90.35f, PlayMainTrackLoopOnIntroLayer);
-            MainLayer.AddToQueue(fcMain);
-        }
-
-        public void PlayMainTrackLoopOnIntroLayer()
-        {
-            CustomAudioTrack fcMain = new CustomAudioTrack(BackgroundMusic, 90.35f, PlayMainTrackOnMainLayer);
-            IntroLayer.AddToQueue(fcMain);
-        }
-
-        public bool IsPositionValid()
-        {
-            return true;
         }
 
         public void Load()
@@ -261,6 +247,66 @@ namespace MusicTest
         {
         }
 
+        public void PlayMainTrackOnMainLayer()
+        {
+            CustomAudioTrack fcMain = new CustomAudioTrack(BackgroundMusic, 90.35f, PlayMainTrackLoopOnIntroLayer);
+            MainLayer.AddToQueue(fcMain);
+        }
+
+        public void PlayMainTrackLoopOnIntroLayer()
+        {
+            CustomAudioTrack fcMain = new CustomAudioTrack(BackgroundMusic, 90.35f, PlayMainTrackOnMainLayer);
+            IntroLayer.AddToQueue(fcMain);
+        }
+
+        public bool IsPositionValid()
+        {
+            return true;
+        }
+
+        public bool AddGameObjectIfCollidesWithMouse<T>(IList<T> collection) where T : GameObject
+        {
+            for (int i = 0; i < collection.Count; i++)
+            {
+                GameObject gameObj = collection[i];
+                Vector2 worldMousePos = Engine.Renderer.Camera.ScreenToWorld(Engine.InputManager.MousePosition);
+                // Check if object collides with the mouse pointer
+                if (Collision.PointIsInRectangleInclusive(worldMousePos, gameObj.ToRectangle()))
+                {
+                    // Check if an object with this Name already exists in DebugObjects
+                    DebugObject debugObj = new DebugObject(gameObj);
+                    if (DebugObjects.Find(o => o.Item.Name == gameObj.Name) == null)
+                    {
+                        // Add the object to DebugObjects
+                        DebugObjects.Add(debugObj);
+                        // Return true to signal that an object was added and the other calls can be skipped
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        public void AddDebugObject()
+        {
+            // Add only one object per call to AddDebugObject
+            // After an object is added the function returns
+            // The calls below are ordered by "debug priority"
+            if (AddGameObjectIfCollidesWithMouse(Units))
+            {
+                return;
+            }
+            if (AddGameObjectIfCollidesWithMouse(ForegroundDecorations))
+            {
+                return;
+            }
+            if (AddGameObjectIfCollidesWithMouse(BackgroundDecorations))
+            {
+                return;
+            }
+        }
+
         public bool IsTransformOnSreen(Transform transform) 
         {
             return transform.ToRectangle().IntersectsInclusive(
@@ -341,45 +387,7 @@ namespace MusicTest
 
             if (Engine.InputManager.IsMouseKeyDown(MouseKey.Left))
             {
-                for (int i = 0; i < Units.Count; i++)
-                {
-                    Unit unit = Units[i];
-                    Vector2 worldMousePos = Engine.Renderer.Camera.ScreenToWorld(Engine.InputManager.MousePosition);
-                    if (Collision.PointIsInRectangleInclusive(worldMousePos, unit.ToRectangle()))
-                    {
-                        DebugObject debugObj = new DebugObject(unit);
-                        if (DebugObjects.Find(o => o.Item.Name == unit.Name) == null)
-                        {
-                            DebugObjects.Add(debugObj);
-                        }
-                    }
-                }
-                for (int i = 0; i < BackgroundDecorations.Count; i++)
-                {
-                    Decoration dec = BackgroundDecorations[i];
-                    Vector2 worldMousePos = Engine.Renderer.Camera.ScreenToWorld(Engine.InputManager.MousePosition);
-                    if (Collision.PointIsInRectangleInclusive(worldMousePos, dec.ToRectangle()))
-                    {
-                        DebugObject debugObj = new DebugObject(dec);
-                        if (DebugObjects.Find(o => o.Item.Name == dec.Name) == null)
-                        {
-                            DebugObjects.Add(debugObj);
-                        }
-                    }
-                }
-                for (int i = 0; i < ForegroundDecorations.Count; i++)
-                {
-                    Decoration dec = ForegroundDecorations[i];
-                    Vector2 worldMousePos = Engine.Renderer.Camera.ScreenToWorld(Engine.InputManager.MousePosition);
-                    if (Collision.PointIsInRectangleInclusive(worldMousePos, dec.ToRectangle()))
-                    {
-                        DebugObject debugObj = new DebugObject(dec);
-                        if (DebugObjects.Find(o => o.Item.Name == dec.Name) == null)
-                        {
-                            DebugObjects.Add(debugObj);
-                        }
-                    }
-                }
+                AddDebugObject();
             }
             else if (Engine.InputManager.IsMouseKeyDown(MouseKey.Right) && DebugObjects.Count > 0)
             {
@@ -444,7 +452,7 @@ namespace MusicTest
             // Disabled the camera and draw on Screen Space instead of World Space
             composer.SetUseViewMatrix(false);
 
-            // Draw Debug
+            // Draw DebugObjects
             for (int i = 0; i < DebugObjects.Count; i++)
             {
                 DebugObject debugObj = DebugObjects[i];

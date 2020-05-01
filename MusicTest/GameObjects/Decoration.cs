@@ -1,6 +1,5 @@
 ﻿using Emotion.Common;
 using Emotion.Graphics;
-using Emotion.Graphics.Objects;
 using Emotion.IO;
 using Emotion.Primitives;
 using Newtonsoft.Json;
@@ -8,10 +7,8 @@ using System.Numerics;
 
 namespace MusicTest.GameObjects
 {
-    public class Decoration : TransformRenderable, IGameObject
+    public class Decoration : GameObject, IGameObject
     {
-        public string Name { get; set; }
-
         public string TextureName { get; set; }
 
         public TextureAsset TextureAsset { get; set; }

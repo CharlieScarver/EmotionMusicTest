@@ -8,7 +8,7 @@ namespace MusicTest.Debug
     public class DebugObject
     {
 
-        public DebugObject(IGameObject item)
+        public DebugObject(GameObject item)
         {
             this.Item = item;
             this.Attributes = new List<System.Reflection.PropertyInfo>(item.GetType().GetProperties());
@@ -37,7 +37,7 @@ namespace MusicTest.Debug
             }
         }
         
-        public IGameObject Item { get; set; }
+        public GameObject Item { get; set; }
 
         public Vector2 Position { get; set; }
 

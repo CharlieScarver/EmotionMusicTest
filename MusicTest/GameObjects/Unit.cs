@@ -3,7 +3,6 @@ using Emotion.Game.Animation;
 using Emotion.Game.Time;
 using Emotion.Graphics;
 using Emotion.IO;
-using Emotion.Platform.Input;
 using Emotion.Primitives;
 using Emotion.Utility;
 using MusicTest.Core;
@@ -15,13 +14,11 @@ using System.Numerics;
 
 namespace MusicTest.GameObjects
 {
-    public abstract class Unit : TransformRenderable, IGameObject
+    public abstract class Unit : GameObject, IGameObject
     {
         const float _gravityVelocity = -30;
         const float _jumpHeight = 200;
         const float _jumpVelocity = 100;
-
-        public string Name { get; set; }
 
         // Textures
         public string TextureName { get; set; }
