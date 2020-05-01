@@ -476,8 +476,8 @@ namespace Emotion.Graphics
             }
 
             // Check if a render target was forgotten.
-            //if (_bufferStack.Count > 1)
-            //    Debug.Assert(false);
+            if (_bufferStack.Count > 1)
+                Debug.Assert(false);
 
             return this;
         }

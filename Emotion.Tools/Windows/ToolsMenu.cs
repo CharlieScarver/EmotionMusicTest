@@ -37,12 +37,13 @@ namespace Emotion.Tools.Windows
                 if (ImGui.MenuItem("Rogue Alpha Remover")) manager.AddWindow(new RogueAlphaRemoval());
                 if (ImGui.MenuItem("Palette Editor")) manager.AddWindow(new PaletteEditor());
                 if (ImGui.MenuItem("Font Preview")) manager.AddWindow(new FontEditor());
+                if (ImGui.MenuItem("PNG Exporter")) manager.AddWindow(new PngExporter());
                 ImGui.EndMenu();
             }
 
             if (ImGui.BeginMenu("Gameplay"))
             {
-                if (ImGui.MenuItem("Map Editor")) manager.AddWindow(new MapEditor());
+                if (ImGui.MenuItem("Map Viewer")) manager.AddWindow(new MapViewer());
                 ImGui.EndMenu();
             }
 
@@ -70,6 +71,9 @@ namespace Emotion.Tools.Windows
         public static void RenderToolsMenu(this RenderComposer composer)
         {
             if (ToolsWindowManager == null) ToolsWindowManager = new WindowManager();
+
+            composer.SetDepthTest(false);
+            composer.SetUseViewMatrix(false);
 
             ToolsWindowManager.Update();
 

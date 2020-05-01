@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Emotion.Common;
@@ -134,7 +135,11 @@ namespace Emotion.IO
             // Check if loaded.
             bool loaded = _loadedAssets.TryGetValue(name, out Asset asset);
             // If loaded and not disposed - return it.
-            if (loaded && !asset.Disposed) return (T) asset;
+            if (loaded && !asset.Disposed)
+            {
+                Debug.Assert(asset is T, "Asset was requested twice as different types.");
+                return (T) asset;
+            }
 
             // Get the source which contains it, if any.
             AssetSource source = GetSource(name);
@@ -266,6 +271,32 @@ namespace Emotion.IO
         public static string NameToEngineName(string name)
         {
             return name.Replace("//", "/").Replace('/', '$').Replace('\\', '$').Replace('$', '/').ToLower();
+        }
+
+        public static string GetDirectoryName(string name)
+        {
+            if (string.IsNullOrEmpty(name)) return name;
+            if (name[^1] == '/') return name;
+
+            int lastSlash = name.LastIndexOf("/", StringComparison.Ordinal);
+            return lastSlash == -1 ? "" : name.Substring(0, lastSlash);
+        }
+
+        public static string GetRelativePath(string relativeTo, string path)
+        {
+            int lastBack = path.LastIndexOf("../", StringComparison.Ordinal);
+            if (lastBack == -1) return path;
+
+            path = path.Substring(0, lastBack);
+            string directory = GetDirectoryName(relativeTo);
+            return directory + "/" + path;
+        }   
+
+        public static string JoinPath(string left, string right)
+        {
+            if (string.IsNullOrEmpty(left)) return right;
+            if (string.IsNullOrEmpty(right)) return left;
+            return left + "/" + right;
         }
     }
 }

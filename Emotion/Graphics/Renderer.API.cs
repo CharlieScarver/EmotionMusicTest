@@ -38,10 +38,10 @@ namespace Emotion.Graphics
         public void InvalidateStateBatches()
         {
             if (ActiveQuadBatch == null || ActiveQuadBatch.BatchedSprites == 0) return;
-            PerfProfiler.StartFrameEvent($"RenderBatch {ActiveQuadBatch.BatchedSprites} Sprites {ActiveQuadBatch.TextureSlotUtilization} Textures");
+            PerfProfiler.FrameEventStart($"RenderBatch {ActiveQuadBatch.BatchedSprites} Sprites {ActiveQuadBatch.TextureSlotUtilization} Textures");
             ActiveQuadBatch.Render(this);
             ActiveQuadBatch.Recycle();
-            PerfProfiler.StopFrameEvent($"RenderBatch {ActiveQuadBatch.BatchedSprites} Sprites {ActiveQuadBatch.TextureSlotUtilization} Textures");
+            PerfProfiler.FrameEventEnd($"RenderBatch {ActiveQuadBatch.BatchedSprites} Sprites {ActiveQuadBatch.TextureSlotUtilization} Textures");
         }
 
         /// <summary>
@@ -299,8 +299,8 @@ namespace Emotion.Graphics
             InvalidateStateBatches();
             shader ??= ShaderFactory.DefaultProgram;
             ShaderProgram.EnsureBound(shader.Pointer);
-            Engine.Renderer.CurrentState.Shader = shader;
-            Engine.Renderer.SyncShader();
+            CurrentState.Shader = shader;
+            SyncShader();
 
             return shader;
         }
