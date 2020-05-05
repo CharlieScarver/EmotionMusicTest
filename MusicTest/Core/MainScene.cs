@@ -449,6 +449,13 @@ namespace MusicTest
                 CurrentInteration.Render(composer);
             }
 
+            // Draw DebugObjects' CollisionBoxes
+            for (int i = 0; i < DebugObjects.Count; i++)
+            {
+                DebugObject debugObj = DebugObjects[i];
+                debugObj.RenderObjectRectange(composer);
+            }
+
             // Disabled the camera and draw on Screen Space instead of World Space
             composer.SetUseViewMatrix(false);
 
@@ -473,7 +480,7 @@ namespace MusicTest
                 );
             }
 
-            composer.RenderCircle(new Vector3(Engine.InputManager.MousePosition, 15), 5, Color.Red, false);
+            composer.RenderCircle(new Vector3(Engine.InputManager.MousePosition, 15), 5, Color.Red, true);
 
             // Enable the camera again
             composer.SetUseViewMatrix(true);
