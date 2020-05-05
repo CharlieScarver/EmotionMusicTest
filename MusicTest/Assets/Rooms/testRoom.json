@@ -557,6 +557,28 @@
 				"X": 8300,
 				"Y": 950
 			}
+		},
+		// Platform on medium rock
+		{
+			"PointA": {
+				"X": 7980,
+				"Y": 675
+			},
+			"PointB": {
+				"X": 8400,
+				"Y": 675
+			}
+		},
+		// Platform on the big rock
+		{
+			"PointA": {
+				"X": 10980,
+				"Y": 480
+			},
+			"PointB": {
+				"X": 11640,
+				"Y": 420
+			}
 		}
 	],
 	"Textures": [
