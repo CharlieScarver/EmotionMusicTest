@@ -113,6 +113,14 @@ namespace MusicTest.Debug
                 // Draw CollisionBox for units
                 composer.RenderOutline(unit.CollisionBox.Position, unit.CollisionBox.Size, Color.Red, 2);
             }
+            else if (Item is Decoration dec)
+            {
+                // Draw texture center
+                composer.RenderCircle(Item.Center.ToVec3(Item.Z), 3, Color.Green, true);
+
+                // Draw CollisionBox for units
+                composer.RenderOutline(dec.Position, dec.DisplaySize, Color.Red, 2);
+            }
         }
     }
 }
