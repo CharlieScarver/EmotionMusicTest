@@ -12,6 +12,7 @@ using Emotion.Utility;
 using MusicTest.Core;
 using MusicTest.RoomData;
 using MusicTest.GameObjects;
+using MusicTest.Interactions;
 using Newtonsoft.Json;
 using OpenGL;
 using System;

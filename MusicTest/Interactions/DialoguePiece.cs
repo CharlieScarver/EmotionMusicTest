@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace MusicTest
+namespace MusicTest.Interactions
 {
     public class DialoguePiece
     {

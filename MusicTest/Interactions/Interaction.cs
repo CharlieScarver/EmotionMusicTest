@@ -3,12 +3,9 @@ using Emotion.Graphics;
 using Emotion.IO;
 using Emotion.Primitives;
 using MusicTest.GameObjects;
-using System;
-using System.Collections.Generic;
 using System.Numerics;
-using System.Text;
 
-namespace MusicTest.Core
+namespace MusicTest.Interactions
 {
     public class Interaction
     {

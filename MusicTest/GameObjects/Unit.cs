@@ -11,6 +11,7 @@ using MusicTest.Core.Collision;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
+using MusicTest.Interactions;
 
 namespace MusicTest.GameObjects
 {
