@@ -465,7 +465,7 @@ namespace MusicTest
             {
                 DebugObject debugObj = DebugObjects[i];
                 int fontSize = 18;
-                float debugObjDisplayWidth = debugObj.LongestLine.Length * 7; // Magic number
+                float debugObjDisplayWidth = debugObj.LongestLine.Length * 8; // Magic number
                 TextureAsset textureAsset = Engine.AssetLoader.Get<TextureAsset>("Textures/better-transparent-black.png");
                 composer.RenderSprite(
                     new Vector3(debugObjDisplayWidth * i, 0, 15),
@@ -481,7 +481,16 @@ namespace MusicTest
                 );
             }
 
+            // Draw circle on mouse pointer
             composer.RenderCircle(new Vector3(Engine.InputManager.MousePosition, 15), 5, Color.Red, true);
+            // Draw mouse coordinates
+            composer.RenderString(
+                new Vector3(20, Engine.Configuration.RenderSize.Y - 80, 15),
+                Color.Red,
+                Engine.InputManager.MousePosition.ToString(),
+                Engine.AssetLoader.Get<FontAsset>("debugFont.otf").GetAtlas(18)
+            );
+
 
             // Enable the camera again
             composer.SetUseViewMatrix(true);
