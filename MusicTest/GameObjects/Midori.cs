@@ -16,6 +16,7 @@ namespace MusicTest.GameObjects
     {
         //const float _verticalVelocity = -100;
         const float _verticalVelocity = -40;
+        const float _jumpVelocity = 45;
         const float _horizontalVelocity = 11;
         const string _portraitPath = "better-midori.png";
         const string _spriteSheetPath = "Textures/better-pixel-midori-full-sheet-horizontal.png";
@@ -59,7 +60,7 @@ namespace MusicTest.GameObjects
 
             RunTimer = new AfterAndBack(150); // Progress 0
 
-            JumpTimer = new AfterAndBack(600);
+            JumpTimer = new AfterAndBack(400);
             GravityTimer = new AfterAndBack(100);
             GravityTimer.End(); // Set Progress to 1
         }
@@ -228,9 +229,11 @@ namespace MusicTest.GameObjects
                 isGrounded = false;
                 isJumping = true;
                 JumpTimer.GoInReverse();
-                VelocityY = 30;
+                VelocityY = _jumpVelocity;
             }
 
+            // Debug
+            // Teleport to X
             if (Engine.InputManager.IsKeyHeld(Key.LeftControl))
             {
                 isGrounded = true;
@@ -239,6 +242,14 @@ namespace MusicTest.GameObjects
                 JumpTimer.End();
                 SetCollisionBoxY(500);
                 SetCollisionBoxX(700);
+            } else if (Engine.InputManager.IsKeyHeld(Key.RightControl))
+            {
+                isGrounded = true;
+                isFalling = false;
+                isJumping = false;
+                JumpTimer.End();
+                SetCollisionBoxY(500);
+                SetCollisionBoxX(11500);
             }
 
             if (Engine.InputManager.IsKeyDown(Key.Q))
