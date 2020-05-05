@@ -261,8 +261,10 @@ namespace MusicTest.GameObjects
 
         public override void Update()
         {
-            base.Update();
+            // We manage the input first so we can immediately react to it in the base.Update() before changing the animation
+            // This prevents an animation being set for an input that has been negated by the base.Update()
             ManageInput();
+            base.Update();
 
             // TODO: Keep last state
             // TODO: Execute the following code once per change instead of on every frame

@@ -180,6 +180,8 @@ namespace MusicTest.GameObjects
                 else
                 {
                     SetCollisionBoxX(0);
+                    IsMovingLeft = false;
+                    IsIdle = true;
                 }
             }
             
@@ -193,7 +195,9 @@ namespace MusicTest.GameObjects
                 }
                 else
                 {
-                    SetCollisionBoxX(currentRoom.Size.X - Size.X);
+                    SetCollisionBoxX(currentRoom.Size.X - CollisionBox.Width);
+                    IsMovingRight = false;
+                    IsIdle = true;
                 }
             }
 
