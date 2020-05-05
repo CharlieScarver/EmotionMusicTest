@@ -62,5 +62,10 @@ namespace Emotion.Game.Time
             _function?.Invoke();
             Finished = true;
         }
+
+        public override string ToString()
+        {
+            return $"<Delay: {_delay}, Progress: {Math.Round(Progress, 2)}, Finished: {Finished}, InReverse: {InReverse}>";
+        }
     }
 }
