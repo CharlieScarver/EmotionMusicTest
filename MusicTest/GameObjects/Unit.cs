@@ -16,7 +16,8 @@ namespace MusicTest.GameObjects
 {
     public abstract class Unit : GameObject, IGameObject
     {
-        const float _gravityVelocity = -30;
+        const float _defaultHorizontalVelocity = 9;
+        const float _defaultVerticalVelocity = -30;
         const float _jumpHeight = 200;
         const float _jumpVelocity = 100;
 
@@ -48,6 +49,7 @@ namespace MusicTest.GameObjects
 
         // Debug
         public bool CodeSwitch { get; set; }
+        public Unit LastState { get; set; }
 
         #region Status Properties
         public bool IsIdle { get; set; }
@@ -79,7 +81,39 @@ namespace MusicTest.GameObjects
             GravityTimer = new AfterAndBack(300);
             GravityTimer.End(); // Set Progress to 1
 
+            StartingVelocityY = _defaultVerticalVelocity;
+            VelocityX = _defaultHorizontalVelocity;
+
             InclineAngle = 0;
+        }
+
+        public Unit(Unit unit) 
+        {
+            Position = unit.Position;
+            Size = unit.Size;
+
+            TextureName = unit.TextureName;
+            TextureAsset = unit.TextureAsset;
+            Sprite = unit.Sprite;
+            VelocityX = unit.VelocityX;
+            RunTimer = unit.RunTimer;
+            JumpTimer = unit.JumpTimer;
+            GravityTimer = unit.GravityTimer;
+            VelocityY = unit.VelocityY;
+            StartingVelocityY = unit.StartingVelocityY;
+            CollisionBox = unit.CollisionBox;
+            InclineAngle = unit.InclineAngle;
+            InteractionOffset = unit.InteractionOffset;
+            IsPlayer = unit.IsPlayer;
+
+            IsIdle = unit.IsIdle;
+            IsMovingLeft = unit.IsMovingLeft;
+            IsMovingRight = unit.IsMovingRight;
+            IsFacingRight = unit.IsFacingRight;
+            isInteracting = unit.isInteracting;
+            isJumping = unit.isJumping;
+            isFalling = unit.isFalling;
+            isGrounded = unit.isGrounded;
         }
 
         protected abstract void SetCollisionBoxX(float x);
@@ -172,7 +206,7 @@ namespace MusicTest.GameObjects
 
                 if (isFalling)
                 {
-                    VelocityY = _gravityVelocity;
+                    VelocityY = StartingVelocityY;
                 }
 
                 Rectangle futurePosition = new Rectangle(CollisionBox.X, CollisionBox.Y - (JumpTimer.Progress * VelocityY), CollisionBox.Width, CollisionBox.Height);
@@ -228,7 +262,7 @@ namespace MusicTest.GameObjects
                                 : intersectedPlatform.InclineAngleWithX;
                         }
                         // Check for collision a little higher
-                        futurePosition.Y -= 3;
+                        futurePosition.Y -= Math.Abs(StartingVelocityY * 0.1f);
                         intersectedPlatform = Collision.IntersectsWithSlopedPlatforms(futurePosition);
                     }
                     while (intersectedPlatform != null);
@@ -252,6 +286,8 @@ namespace MusicTest.GameObjects
 
             RunTimer.Update();
             JumpTimer.Update();
+
+            LastState = new Midori(this);
         }
 
         public override void Render(RenderComposer composer)
@@ -282,9 +318,9 @@ namespace MusicTest.GameObjects
             }
 
 
-            Rectangle futurePosition = new Rectangle(CollisionBox.X, CollisionBox.Y - (GravityTimer.Progress * _gravityVelocity), CollisionBox.Width, CollisionBox.Height);
-            composer.RenderOutline(futurePosition, Color.Green, 1);
-            composer.RenderOutline(CollisionBox.ToRectangle(), Color.Red, 2);
+            //Rectangle futurePosition = new Rectangle(CollisionBox.X, CollisionBox.Y - (GravityTimer.Progress * StartingVelocityY), CollisionBox.Width, CollisionBox.Height);
+            //composer.RenderOutline(futurePosition, Color.Green, 1);
+            //composer.RenderOutline(CollisionBox.ToRectangle(), Color.Red, 2);
         }
     }
 }

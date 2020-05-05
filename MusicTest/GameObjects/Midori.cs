@@ -1,5 +1,6 @@
 ﻿using Emotion.Common;
 using Emotion.Game.Animation;
+using Emotion.Game.Time;
 using Emotion.Graphics;
 using Emotion.IO;
 using Emotion.Platform.Input;
@@ -7,13 +8,15 @@ using Emotion.Primitives;
 using MusicTest.Core;
 using System;
 using System.Numerics;
+using Emotion.Utility;
 
 namespace MusicTest.GameObjects
 {
     public class Midori : Unit
     {
-        const float _gravityVelocity = -30;
-        const float _horizontalVelocity = 9;
+        //const float _verticalVelocity = -100;
+        const float _verticalVelocity = -40;
+        const float _horizontalVelocity = 11;
         const string _portraitPath = "better-midori.png";
         const string _spriteSheetPath = "Textures/better-pixel-midori-full-sheet-horizontal.png";
         const string _name = "Midori";
@@ -24,7 +27,7 @@ namespace MusicTest.GameObjects
             IsPlayer = true;
 
             Position = position;
-            Size = new Vector2(250, 344.489f); // Full Size 1773x2213
+            Size = new Vector2(360, 360); // Full Size 1773x2213
             TextureAsset = Engine.AssetLoader.Get<TextureAsset>($"Textures/{_portraitPath}");
 
             TextureAsset spriteAsset = Engine.AssetLoader.Get<TextureAsset>(_spriteSheetPath);
@@ -40,17 +43,29 @@ namespace MusicTest.GameObjects
             InteractRange = 360;
             InteractionOffset = new Vector2(0, 70);
 
-            StartingVelocityY = _gravityVelocity;
+            StartingVelocityY = _verticalVelocity;
             VelocityX = _horizontalVelocity;
 
+            // Set CollisionBox offsets
+            // Reminder: Don't forget to update the SetCollisionBox methods!
             CollisionBox = new Transform(
-                X + 130,
-                Y,
-                Z,
-                Width / 3,
-                Height
+                X + 140,
+                Y + 40,
+                Z + 15,
+                80,
+                320
             );
+
+
+            RunTimer = new AfterAndBack(150); // Progress 0
+
+            JumpTimer = new AfterAndBack(600);
+            GravityTimer = new AfterAndBack(100);
+            GravityTimer.End(); // Set Progress to 1
         }
+
+        public Midori(Unit unit) : base(unit)
+        {}
 
         private int InteractRange { get; set; }
         public Unit InteractTarget { get; set; }
@@ -58,13 +73,13 @@ namespace MusicTest.GameObjects
         protected override void SetCollisionBoxX(float x)
         {
             CollisionBox.X = x;
-            X = x - 130;
+            X = x - 140;
         }
 
         protected override void SetCollisionBoxY(float y)
         {
             CollisionBox.Y = y;
-            Y = y;
+            Y = y - 40;
         }
 
         private void Interact()
@@ -143,7 +158,7 @@ namespace MusicTest.GameObjects
             // Movement
             if (Engine.InputManager.IsKeyHeld(Key.A))
             {
-                if (RunTimer.Progress == 0 && !IsMovingLeft && !IsMovingRight && isGrounded)
+                if (RunTimer.Progress == 0 && !IsMovingLeft && !IsMovingRight)
                 {
                     RunTimer.GoNormal();
                     Sprite.Reset();
@@ -176,7 +191,7 @@ namespace MusicTest.GameObjects
             
             if (Engine.InputManager.IsKeyHeld(Key.D))
             {
-                if (RunTimer.Progress == 0 && !IsMovingLeft && !IsMovingRight && isGrounded)
+                if (RunTimer.Progress == 0 && !IsMovingLeft && !IsMovingRight)
                 {
                     RunTimer.GoNormal();
                     Sprite.Reset();
@@ -213,7 +228,7 @@ namespace MusicTest.GameObjects
                 isGrounded = false;
                 isJumping = true;
                 JumpTimer.GoInReverse();
-                VelocityY = 20;
+                VelocityY = 30;
             }
 
             if (Engine.InputManager.IsKeyHeld(Key.LeftControl))
@@ -293,15 +308,15 @@ namespace MusicTest.GameObjects
             //composer.RenderCircleOutline(new Vector3(Center, Z), InteractRange, Color.Red, true);
             //composer.RenderOutline(Position, Size, Color.Red, 1);
 
-            Rectangle rect = CollisionBox.ToRectangle();
+            //Rectangle rect = CollisionBox.ToRectangle();
             //Vector3 topLeft = new Vector3(rect.TopLeft, 10);
             //Vector3 topRight = new Vector3(rect.TopRight, 10);
             //Vector3 bottomRight = new Vector3(rect.BottomRight, 10);
             //Vector3 bottomLeft = new Vector3(rect.X, rect.Bottom, 10);
-            //composer.RenderLine(topLeft, topRight, Color.Red);
-            //composer.RenderLine(topRight, bottomRight, Color.Green);
-            //composer.RenderLine(bottomRight, bottomLeft, Color.Cyan);
-            //composer.RenderLine(bottomLeft, topLeft, Color.Yellow);
+            //composer.RenderLine(rect.TopLeft.ToVec3(CollisionBox.Z), rect.TopRight.ToVec3(CollisionBox.Z), Color.Red);
+            //composer.RenderLine(rect.TopRight.ToVec3(CollisionBox.Z), rect.BottomRight.ToVec3(CollisionBox.Z), Color.Green);
+            //composer.RenderLine(rect.BottomRight.ToVec3(CollisionBox.Z), rect.BottomLeft.ToVec3(CollisionBox.Z), Color.Cyan);
+            //composer.RenderLine(rect.BottomLeft.ToVec3(CollisionBox.Z), rect.TopLeft.ToVec3(CollisionBox.Z), Color.Yellow);
 
             //Rectangle futurePosition = new Rectangle(X, Y - (GravityTimer.Progress * _gravityVelocity), Width, Height);
             //composer.RenderOutline(futurePosition, Color.Green, 1);
