@@ -329,7 +329,7 @@ namespace MusicTest
             Player.Update();
 
             // Update the camera
-            Vector2 windowSize = Engine.Host.Window.Size;
+            Vector2 windowSize = Engine.Host.Window.Size; // Change to render size?
             // The center of the player on the X axis only
             float playerXCenter = Player.X + Player.Size.X / 2;
 
@@ -347,6 +347,7 @@ namespace MusicTest
                         dec.X += Player.VelocityX + dec.VelocityOffsetX;
                     }
                 }
+                // If not fix the camera along the edge of the room
                 else
                 {
                     Engine.Renderer.Camera.X = 0 + (windowSize.X / 2);
@@ -366,10 +367,34 @@ namespace MusicTest
                         dec.X -= Player.VelocityX + dec.VelocityOffsetX;
                     }
                 }
+                // If not fix the camera along the edge of the room
                 else
                 {
                     Engine.Renderer.Camera.X = LoadedRoom.Size.X - (windowSize.X / 2);
                 }
+            }
+
+            float playYCenterWithOffset = Player.Center.Y - 216;
+            if (playYCenterWithOffset < Engine.Renderer.Camera.Y)
+            {
+                // When the vertical velocity is negative treat it as 0 in the calculations
+                float velocityY = Player.VelocityY > 0 ? Player.VelocityY : 0;
+
+                // If the upper border of the camera has enough room to move up with velocityY, then move it
+                if (Engine.Renderer.Camera.Y - (windowSize.Y / 2) > 0 + velocityY)
+                {
+                    Engine.Renderer.Camera.Y = playYCenterWithOffset; // CameraOffsetY
+                }
+                // If not fix the camera along the edge of the room
+                else
+                {
+                    Engine.Renderer.Camera.Y = 0 + (windowSize.Y / 2);
+                }
+            }
+            else if (playYCenterWithOffset > Engine.Renderer.Camera.Y)
+            {
+                // When falling the camera always follows the player
+                Engine.Renderer.Camera.Y = playYCenterWithOffset; // CameraOffsetY
             }
 
             // Interaction
@@ -440,9 +465,11 @@ namespace MusicTest
                 }
             }
 
-            //composer.RenderCircle(Engine.Renderer.Camera.Position, 5, Color.Red);
+            // Draw the room ceiling
+            composer.RenderLine(new Vector3(0, 0, 15), new Vector3(LoadedRoom.Size.X, 0, 6), Color.Cyan, 1);
 
-            //composer.RenderCircle(new Vector3(2450, 0, 5), 1, Color.Red);
+            // Draw camera position (probably the center of the screen)
+            composer.RenderCircle(Engine.Renderer.Camera.Position, 1, Color.Cyan);
 
             // Display the current interaction
             if (CurrentInteration != null)
@@ -482,7 +509,7 @@ namespace MusicTest
             }
 
             // Draw circle on mouse pointer
-            composer.RenderCircle(new Vector3(Engine.InputManager.MousePosition, 15), 5, Color.Red, true);
+            composer.RenderCircle(new Vector3(Engine.InputManager.MousePosition, 15), 3, Color.Red, true);
             // Draw mouse coordinates
             composer.RenderString(
                 new Vector3(20, Engine.Configuration.RenderSize.Y - 80, 15),
@@ -497,7 +524,6 @@ namespace MusicTest
 
             // Render the Emotion Tools UI
             composer.RenderToolsMenu();
-
         }
 
     }
