@@ -41,9 +41,9 @@ namespace MusicTest
         // Game Objects
         public Midori Player { get; set; }
         public List<Unit> Units { get; set; }
-        public List<CollisionPlatform> CollisionPlatforms { get; set; }
-        public List<CollisionPlatform> SlopedCollisionPlatforms { get; set; }
-        public List<CollisionPlatform> AxisAlignedCollisionPlatforms { get; set; }
+        public List<Core.LineSegment> CollisionPlatforms { get; set; }
+        public List<Core.LineSegment> SlopedCollisionPlatforms { get; set; }
+        public List<Core.LineSegment> AxisAlignedCollisionPlatforms { get; set; }
         public List<Decoration> Backgrounds { get; set; }
         public List<Decoration> BackgroundDecorations { get; set; }
         public List<Decoration> ForegroundDecorations { get; set; }
@@ -69,9 +69,9 @@ namespace MusicTest
 
             // Init collections
             Units = new List<Unit>();
-            CollisionPlatforms = new List<CollisionPlatform>();
-            SlopedCollisionPlatforms = new List<CollisionPlatform>();
-            AxisAlignedCollisionPlatforms = new List<CollisionPlatform>();
+            CollisionPlatforms = new List<Core.LineSegment>();
+            SlopedCollisionPlatforms = new List<Core.LineSegment>();
+            AxisAlignedCollisionPlatforms = new List<Core.LineSegment>();
             Backgrounds = new List<Decoration>();
             BackgroundDecorations = new List<Decoration>();
             ForegroundDecorations = new List<Decoration>();
@@ -110,6 +110,17 @@ namespace MusicTest
             //    Engine.Log.Info($"Second time reread number is: {readNumber}", "");
             //    testBuffer.FinishMapping();
             //}
+        }
+
+        public MainScene(TextAsset progressFile, TextAsset mapFile, TiledMap tiledMap) : this(progressFile, mapFile)
+        {
+            CollisionPlatforms = tiledMap.CollisionPlatforms;
+            SlopedCollisionPlatforms = tiledMap.SlopedCollisionPlatforms;
+            AxisAlignedCollisionPlatforms = tiledMap.AxisAlignedCollisionPlatforms;
+
+            LoadedRoom.Spawn = tiledMap.Spawn;
+            LoadedRoom.Size = tiledMap.Size;
+
         }
 
         public void Load()
@@ -174,7 +185,7 @@ namespace MusicTest
             for (int i = 0; i < LoadedRoom.CollisionPlatforms.Count; i++)
             {
                 ConfigCollisionPlatform configPlatform = LoadedRoom.CollisionPlatforms[i];
-                CollisionPlatform realPlatform = new CollisionPlatform(configPlatform.PointA, configPlatform.PointB);
+                Core.LineSegment realPlatform = new Core.LineSegment(configPlatform.PointA, configPlatform.PointB);
                 if (realPlatform.IsSloped)
                 {
                     SlopedCollisionPlatforms.Add(realPlatform);
@@ -420,6 +431,23 @@ namespace MusicTest
                 DebugObjects.RemoveAt(DebugObjects.Count - 1);
             }
 
+            // Camera Zoom Out
+            if (Engine.InputManager.IsKeyDown(Key.R))
+            {
+                if (Engine.Renderer.Camera.Zoom == 1f)
+                {
+                    Engine.Renderer.Camera.Zoom = 0.4f;
+                }
+                else if (Engine.Renderer.Camera.Zoom == 0.4f)
+                {
+                    Engine.Renderer.Camera.Zoom = 0.1f;
+                }
+                else if (Engine.Renderer.Camera.Zoom == 0.1f)
+                {
+                    Engine.Renderer.Camera.Zoom = 1f;
+                }
+            }
+
             // Quit on Escape press
             if (Engine.InputManager.IsKeyHeld(Key.Escape))
             {
@@ -450,7 +478,7 @@ namespace MusicTest
                 }
             }
 
-            foreach (CollisionPlatform plat in CollisionPlatforms)
+            foreach (Core.LineSegment plat in CollisionPlatforms)
             {
                 plat.Render(composer);
             }

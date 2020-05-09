@@ -5,9 +5,9 @@ using System.Numerics;
 
 namespace MusicTest.Core
 {
-    public class CollisionPlatform
+    public class LineSegment
     {
-        public CollisionPlatform(Vector2 pointA, Vector2 pointB, bool isSloped = false)
+        public LineSegment(Vector2 pointA, Vector2 pointB, bool isSloped = false)
         {
             PointA = pointA;
             PointB = pointB;
@@ -40,7 +40,7 @@ namespace MusicTest.Core
             Length = (float) Math.Sqrt(Math.Pow(Math.Abs(PointB.X - PointA.X), 2) + Math.Pow(Math.Abs(PointB.Y - PointA.Y), 2));
         }
 
-        public CollisionPlatform(float pointAX, float pointAY, float pointBX, float pointBY) : this(new Vector2(pointAX, pointAY), new Vector2(pointBX, pointBY))
+        public LineSegment(float pointAX, float pointAY, float pointBX, float pointBY) : this(new Vector2(pointAX, pointAY), new Vector2(pointBX, pointBY))
         { }
 
         public Vector2 PointA { get; set; }
@@ -75,7 +75,7 @@ namespace MusicTest.Core
 
         public void Render(RenderComposer composer)
         {
-            composer.RenderLine(new Vector3(PointA, 6), new Vector3(PointB, 6), Color.Red, 1);
+            composer.RenderLine(new Vector3(PointA, 6), new Vector3(PointB, 6), Color.Red, 2);
         }
     }
 }

@@ -3,7 +3,9 @@ using System.Numerics;
 using Emotion.Common;
 using Emotion.IO;
 using Emotion.Plugins.ImGuiNet;
+using Emotion.Standard.XML;
 using MusicTest.Core;
+using MusicTest.RoomData;
 
 namespace MusicTest
 {
@@ -33,10 +35,15 @@ namespace MusicTest
 
             Engine.Setup(config);
 
+            // Read tmx map file and create a TiledMap
+            TextAsset tmxMap = Engine.AssetLoader.Get<TextAsset>("Rooms/3x2.tmx");
+            XMLReader reader = new XMLReader(tmxMap.Content);
+            TiledMap tiledMap = new TiledMap(reader);
+
             TextAsset progressFile = Engine.AssetLoader.Get<TextAsset>("progress.json");
             TextAsset testRoom = Engine.AssetLoader.Get<TextAsset>("Rooms/testRoom.json");
 
-            MainScene scene = new MainScene(progressFile, testRoom);
+            MainScene scene = new MainScene(progressFile, testRoom, tiledMap);
             GameContext.Scene = scene;
 
             Engine.SceneManager.SetScene(scene);

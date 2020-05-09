@@ -23,6 +23,9 @@
     <None Update="Assets\map1.tmx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Assets\Rooms\3x2.tmx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Assets\Rooms\frozenCave.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

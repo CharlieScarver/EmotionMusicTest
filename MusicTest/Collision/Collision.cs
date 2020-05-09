@@ -6,11 +6,11 @@ namespace MusicTest.Core.Collision
     public static class Collision
     {
         #region CollisionWithPlatforms
-        public static CollisionPlatform IntersectsWithPlatforms(Rectangle rect)
+        public static LineSegment IntersectsWithPlatforms(Rectangle rect)
         {
             for (int i = 0; i < GameContext.Scene.CollisionPlatforms.Count; i++)
             {
-                CollisionPlatform platform = GameContext.Scene.CollisionPlatforms[i];
+                LineSegment platform = GameContext.Scene.CollisionPlatforms[i];
                 if (LineSegmentIntesectsRectangle(platform.PointA, platform.PointB, rect))
                 {
                     return platform;
@@ -19,11 +19,11 @@ namespace MusicTest.Core.Collision
 
             return null;
         }
-        public static CollisionPlatform IntersectsWithAxisAlignedPlatforms(Rectangle rect)
+        public static LineSegment IntersectsWithAxisAlignedPlatforms(Rectangle rect)
         {
             for (int i = 0; i < GameContext.Scene.AxisAlignedCollisionPlatforms.Count; i++)
             {
-                CollisionPlatform platform = GameContext.Scene.AxisAlignedCollisionPlatforms[i];
+                LineSegment platform = GameContext.Scene.AxisAlignedCollisionPlatforms[i];
                 if (LineSegmentIntesectsRectangle(platform.PointA, platform.PointB, rect))
                 {
                     return platform;
@@ -33,11 +33,11 @@ namespace MusicTest.Core.Collision
             return null;
         }
 
-        public static CollisionPlatform? IntersectsWithSlopedPlatforms(Rectangle rect)
+        public static LineSegment? IntersectsWithSlopedPlatforms(Rectangle rect)
         {
             for (int i = 0; i < GameContext.Scene.SlopedCollisionPlatforms.Count; i++)
             {
-                CollisionPlatform platform = GameContext.Scene.SlopedCollisionPlatforms[i];
+                LineSegment platform = GameContext.Scene.SlopedCollisionPlatforms[i];
                 if (LineSegmentIntesectsRectangle(platform.PointA, platform.PointB, rect))
                 {
                     return platform;
