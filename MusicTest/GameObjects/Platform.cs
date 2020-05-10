@@ -1,18 +1,17 @@
 ﻿using Emotion.Graphics;
-using Emotion.Primitives;
-using MusicTest.Extensions;
+using MusicTest.Collision;
 using System.Numerics;
 
 namespace MusicTest.GameObjects
 {
     public class Platform : Decoration
     {
-        public Platform(string name, string textureName, Vector2 size, Vector3 position, Line collisionLine) : base (name, textureName, size, position)
+        public Platform(string name, string textureName, Vector2 size, Vector3 position, LineSegment collisionLine) : base (name, textureName, size, position)
         {
             CollisionLine = collisionLine;
         }
 
-        public Line CollisionLine { get; set; }
+        public LineSegment CollisionLine { get; set; }
 
         public override void Render(RenderComposer composer)
         {

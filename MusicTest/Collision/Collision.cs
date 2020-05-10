@@ -1,7 +1,7 @@
 ﻿using Emotion.Primitives;
 using System.Numerics;
 
-namespace MusicTest.Core.Collision
+namespace MusicTest.Collision.Collision
 {
     public static class Collision
     {

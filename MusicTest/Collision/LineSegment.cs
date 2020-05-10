@@ -3,7 +3,7 @@ using Emotion.Primitives;
 using System;
 using System.Numerics;
 
-namespace MusicTest.Core
+namespace MusicTest.Collision
 {
     public class LineSegment
     {

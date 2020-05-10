@@ -1,6 +1,6 @@
 ﻿using Emotion.Scenography;
 
-namespace MusicTest.Core
+namespace MusicTest.Collision
 {
     public static class GameContext
     {

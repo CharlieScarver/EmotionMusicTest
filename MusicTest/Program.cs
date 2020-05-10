@@ -4,7 +4,7 @@ using Emotion.Common;
 using Emotion.IO;
 using Emotion.Plugins.ImGuiNet;
 using Emotion.Standard.XML;
-using MusicTest.Core;
+using MusicTest.Collision;
 using MusicTest.RoomData;
 
 namespace MusicTest

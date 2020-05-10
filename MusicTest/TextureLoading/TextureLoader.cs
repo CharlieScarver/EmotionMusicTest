@@ -3,7 +3,7 @@ using Emotion.IO;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace MusicTest.Core
+namespace MusicTest.Collision
 {
     public static class TextureLoader
     {

@@ -9,7 +9,7 @@ using Emotion.Scenography;
 using Emotion.Standard.Image.PNG;
 using Emotion.Tools.Windows;
 using Emotion.Utility;
-using MusicTest.Core;
+using MusicTest.Collision;
 using MusicTest.RoomData;
 using MusicTest.GameObjects;
 using MusicTest.Interactions;
@@ -19,7 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.Numerics;
 using MusicTest.Debug;
-using MusicTest.Core.Collision;
+using MusicTest.Collision.Collision;
 
 namespace MusicTest
 {
@@ -41,9 +41,10 @@ namespace MusicTest
         // Game Objects
         public Midori Player { get; set; }
         public List<Unit> Units { get; set; }
-        public List<Core.LineSegment> CollisionPlatforms { get; set; }
-        public List<Core.LineSegment> SlopedCollisionPlatforms { get; set; }
-        public List<Core.LineSegment> AxisAlignedCollisionPlatforms { get; set; }
+        public List<Unit> NonPlayerUnits { get; set; }
+        public List<Collision.LineSegment> CollisionPlatforms { get; set; }
+        public List<Collision.LineSegment> SlopedCollisionPlatforms { get; set; }
+        public List<Collision.LineSegment> AxisAlignedCollisionPlatforms { get; set; }
         public List<Decoration> Backgrounds { get; set; }
         public List<Decoration> BackgroundDecorations { get; set; }
         public List<Decoration> ForegroundDecorations { get; set; }
@@ -69,9 +70,10 @@ namespace MusicTest
 
             // Init collections
             Units = new List<Unit>();
-            CollisionPlatforms = new List<Core.LineSegment>();
-            SlopedCollisionPlatforms = new List<Core.LineSegment>();
-            AxisAlignedCollisionPlatforms = new List<Core.LineSegment>();
+            NonPlayerUnits = new List<Unit>();
+            CollisionPlatforms = new List<Collision.LineSegment>();
+            SlopedCollisionPlatforms = new List<Collision.LineSegment>();
+            AxisAlignedCollisionPlatforms = new List<Collision.LineSegment>();
             Backgrounds = new List<Decoration>();
             BackgroundDecorations = new List<Decoration>();
             ForegroundDecorations = new List<Decoration>();
@@ -179,13 +181,14 @@ namespace MusicTest
                         throw new Exception("No applicable classes");
                 }
                 Units.Add(unit);
+                NonPlayerUnits.Add(unit);
             }
 
             // Create platforms
             for (int i = 0; i < LoadedRoom.CollisionPlatforms.Count; i++)
             {
                 ConfigCollisionPlatform configPlatform = LoadedRoom.CollisionPlatforms[i];
-                Core.LineSegment realPlatform = new Core.LineSegment(configPlatform.PointA, configPlatform.PointB);
+                Collision.LineSegment realPlatform = new Collision.LineSegment(configPlatform.PointA, configPlatform.PointB);
                 if (realPlatform.IsSloped)
                 {
                     SlopedCollisionPlatforms.Add(realPlatform);
@@ -283,7 +286,7 @@ namespace MusicTest
                 GameObject gameObj = collection[i];
                 Vector2 worldMousePos = Engine.Renderer.Camera.ScreenToWorld(Engine.InputManager.MousePosition);
                 // Check if object collides with the mouse pointer
-                if (Collision.PointIsInRectangleInclusive(worldMousePos, gameObj.ToRectangle()))
+                if (Collision.Collision.Collision.PointIsInRectangleInclusive(worldMousePos, gameObj.ToRectangle()))
                 {
                     // Check if an object with this Name already exists in DebugObjects
                     DebugObject debugObj = new DebugObject(gameObj);
@@ -409,19 +412,26 @@ namespace MusicTest
             }
 
             // Interaction
-            if (Player.isInteracting && CurrentInteration == null)
+            if (Player.IsInteracting && CurrentInteration == null)
             {
                 CurrentInteration = new Interaction(Player, Player.InteractTarget);
             }
-            else if (!Player.isInteracting && CurrentInteration != null)
+            else if (!Player.IsInteracting && CurrentInteration != null)
             {
                 CurrentInteration = null;
             }
-            else if (Player.isInteracting && CurrentInteration != null)
+            else if (Player.IsInteracting && CurrentInteration != null)
             {
                 CurrentInteration.Update();
             }
 
+            for (int i = 0; i < NonPlayerUnits.Count; i++)
+            {
+                NonPlayerUnits[i].Update();
+            }
+
+            // Debug
+            // Mouse click to add to DebugObjects
             if (Engine.InputManager.IsMouseKeyDown(MouseKey.Left))
             {
                 AddDebugObject();
@@ -478,7 +488,7 @@ namespace MusicTest
                 }
             }
 
-            foreach (Core.LineSegment plat in CollisionPlatforms)
+            foreach (Collision.LineSegment plat in CollisionPlatforms)
             {
                 plat.Render(composer);
             }

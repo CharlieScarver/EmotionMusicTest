@@ -83,7 +83,7 @@ namespace Emotion.Game.Animation
         /// <summary>
         /// The index of the current frame within the total frame count. Zero indexed.
         /// </summary>
-        public int CurrentFrameIndex { get; protected set; }
+        public int CurrentFrameIndex { get; set; }
 
         /// <summary>
         /// The total number of frames in the spritesheet. Zero indexed. Inclusive.
@@ -513,5 +513,10 @@ namespace Emotion.Game.Animation
         }
 
         #endregion
+
+        public override string ToString() 
+        {
+            return $"CurrentFrameIndex: {CurrentFrameIndex}";
+        }
     }
 }

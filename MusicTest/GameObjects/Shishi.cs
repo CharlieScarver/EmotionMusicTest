@@ -1,5 +1,4 @@
-﻿using Emotion.Common;
-using Emotion.Primitives;
+﻿using Emotion.Primitives;
 using MusicTest.Interactions;
 using System.Collections.Generic;
 using System.Numerics;
@@ -8,6 +7,9 @@ namespace MusicTest.GameObjects
 {
     public class Shishi : Unit
     {
+        const float _verticalVelocity = -40;
+        const float _horizontalVelocity = 11;
+
         public Shishi(string name, string textureName, Vector3 position, Vector2 size) : base(name, textureName, position, size)
         {
             DialoguePiece d = new DialoguePiece(10, new List<string>() {
@@ -24,25 +26,36 @@ namespace MusicTest.GameObjects
             IsFacingRight = true;
             InteractionOffset = new Vector2(-80, 250);
 
+            //"X": 224.727,
+            //"Y": 274.181
             CollisionBox = new Transform(
-                X + 50,
-                Y,
+                X + 82,
+                Y + 124,
                 Z,
-                Width / 2,
-                Height
+                60,
+                150
             );
+
+            VelocityX = _horizontalVelocity;
+            StartingVelocityY = _verticalVelocity;
+        }
+
+        public override void ResetVelocities()
+        {
+            VelocityX = _horizontalVelocity;
+            StartingVelocityY = _verticalVelocity;
         }
 
         protected override void SetCollisionBoxX(float x)
         {
             CollisionBox.X = x;
-            X = x - 50;
+            X = x - 82;
         }
 
         protected override void SetCollisionBoxY(float y)
         {
             CollisionBox.Y = y;
-            Y = y;
+            Y = y - 124;
         }
     }
 }

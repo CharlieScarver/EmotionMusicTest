@@ -5,9 +5,9 @@ using Emotion.Graphics;
 using Emotion.IO;
 using Emotion.Primitives;
 using Emotion.Utility;
-using MusicTest.Core;
+using MusicTest.Collision;
 using MusicTest.RoomData;
-using MusicTest.Core.Collision;
+using MusicTest.Collision.Collision;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
@@ -45,6 +45,9 @@ namespace MusicTest.GameObjects
         public Vector2 InteractionOffset { get; set; }
         public bool IsPlayer { get; set; }
 
+        // Gravity Push
+        public AfterAndBack GravityPushPushDurationTimer { get; set; }
+
         // Other
         public List<DialoguePiece> Dialogues { get; set; }
 
@@ -57,10 +60,12 @@ namespace MusicTest.GameObjects
         public bool IsMovingLeft { get; set; }
         public bool IsMovingRight { get; set; }
         public bool IsFacingRight { get; set; }
-        public bool isInteracting { get; set; }
-        public bool isJumping { get; set; }
-        public bool isFalling { get; set; }
-        public bool isGrounded { get; set; }
+        public bool IsInteracting { get; set; }
+        public bool IsJumping { get; set; }
+        public bool IsFalling { get; set; }
+        public bool IsGrounded { get; set; }
+        public bool IsUnableToMove { get; set; }
+        public bool IsAffectedByGravityPush { get; set; }
         #endregion
 
         public Unit(string name, string textureName, Vector3 position, Vector2 size)
@@ -74,7 +79,7 @@ namespace MusicTest.GameObjects
 
             IsPlayer = false;
             IsIdle = true;
-            isGrounded = true;
+            IsGrounded = true;
 
             RunTimer = new AfterAndBack(150); // Progress 0
 
@@ -111,18 +116,25 @@ namespace MusicTest.GameObjects
             IsMovingLeft = unit.IsMovingLeft;
             IsMovingRight = unit.IsMovingRight;
             IsFacingRight = unit.IsFacingRight;
-            isInteracting = unit.isInteracting;
-            isJumping = unit.isJumping;
-            isFalling = unit.isFalling;
-            isGrounded = unit.isGrounded;
+            IsInteracting = unit.IsInteracting;
+            IsJumping = unit.IsJumping;
+            IsFalling = unit.IsFalling;
+            IsGrounded = unit.IsGrounded;
         }
 
         protected abstract void SetCollisionBoxX(float x);
         protected abstract void SetCollisionBoxY(float y);
+        public virtual void ResetVelocities()
+        {
+
+            VelocityX = _defaultHorizontalVelocity;
+            StartingVelocityY = _defaultVerticalVelocity;
+            VelocityY = _defaultVerticalVelocity;
+        }
 
         protected void ManageHorizontalMovement(Rectangle futurePosition)
         {
-            Core.LineSegment intersectedPlatform = Collision.IntersectsWithPlatforms(futurePosition);
+            Collision.LineSegment intersectedPlatform = Collision.Collision.Collision.IntersectsWithPlatforms(futurePosition);
 
             if (intersectedPlatform == null)
             {
@@ -139,7 +151,7 @@ namespace MusicTest.GameObjects
                         InclineAngle = intersectedPlatform.InclineAngleWithX;
                         // Check for collision a little higher
                         futurePosition.Y -= 3;
-                        intersectedPlatform = Collision.IntersectsWithSlopedPlatforms(futurePosition);
+                        intersectedPlatform = Collision.Collision.Collision.IntersectsWithSlopedPlatforms(futurePosition);
                     }
                     while (intersectedPlatform != null);
 
@@ -162,13 +174,14 @@ namespace MusicTest.GameObjects
 
         protected void ManageMovement()
         {
-            Room currentRoom = GameContext.Scene.LoadedRoom;
-
-            if(RunTimer.Progress != 0)
+            if (IsUnableToMove)
             {
-                Console.WriteLine(RunTimer.Progress);
+                return;
             }
+
+            Room currentRoom = GameContext.Scene.LoadedRoom;
             float newVelocity = VelocityX * RunTimer.Progress;
+
             if (IsMovingLeft) 
             {
                 // Make sure movement is within the room borders
@@ -201,30 +214,30 @@ namespace MusicTest.GameObjects
                 }
             }
 
-            if (isJumping)
+            if (IsJumping)
             {
-                if (JumpTimer.Finished && !isFalling)
+                if (JumpTimer.Finished && !IsFalling)
                 {
-                    isFalling = true;
+                    IsFalling = true;
                     JumpTimer.GoNormal();
                 }
 
-                if (isFalling)
+                if (IsFalling)
                 {
                     VelocityY = StartingVelocityY;
                 }
 
                 Rectangle futurePosition = new Rectangle(CollisionBox.X, CollisionBox.Y - (JumpTimer.Progress * VelocityY), CollisionBox.Width, CollisionBox.Height);
-                Core.LineSegment intersectedPlatform = Collision.IntersectsWithPlatforms(futurePosition);
+                Collision.LineSegment intersectedPlatform = Collision.Collision.Collision.IntersectsWithPlatforms(futurePosition);
                 if (intersectedPlatform == null)
                 {
                     SetCollisionBoxY(CollisionBox.Y - JumpTimer.Progress * VelocityY);
                 }
                 else
                 {
-                    isJumping = false;
-                    isFalling = false;
-                    isGrounded = true;
+                    IsJumping = false;
+                    IsFalling = false;
+                    IsGrounded = true;
                     JumpTimer.End();
                     //Y = 580;
                 }
@@ -239,13 +252,13 @@ namespace MusicTest.GameObjects
         protected void ApplyGravity() 
         {
             Rectangle futurePosition = new Rectangle(CollisionBox.X, CollisionBox.Y - VelocityY, CollisionBox.Width, CollisionBox.Height);
-            Core.LineSegment intersectedPlatform = Collision.IntersectsWithSlopedPlatforms(futurePosition) ?? Collision.IntersectsWithAxisAlignedPlatforms(futurePosition);
+            Collision.LineSegment intersectedPlatform = Collision.Collision.Collision.IntersectsWithSlopedPlatforms(futurePosition) ?? Collision.Collision.Collision.IntersectsWithAxisAlignedPlatforms(futurePosition);
 
             if (intersectedPlatform == null)
             {
                 SetCollisionBoxY(CollisionBox.Y - VelocityY);
-                isGrounded = false;
-                isFalling = true;
+                IsGrounded = false;
+                IsFalling = true;
             }
             else
             {
@@ -268,7 +281,7 @@ namespace MusicTest.GameObjects
                         }
                         // Check for collision a little higher
                         futurePosition.Y -= Math.Abs(StartingVelocityY * 0.1f);
-                        intersectedPlatform = Collision.IntersectsWithSlopedPlatforms(futurePosition);
+                        intersectedPlatform = Collision.Collision.Collision.IntersectsWithSlopedPlatforms(futurePosition);
                     }
                     while (intersectedPlatform != null);
 
@@ -280,14 +293,48 @@ namespace MusicTest.GameObjects
                     float distanceToPlatform = intersectedPlatform.PointA.Y - (CollisionBox.Y + CollisionBox.Height) - 1;
                     SetCollisionBoxY(CollisionBox.Y + distanceToPlatform);
                 }
-                isGrounded = true;
-                isFalling = false;
+                IsGrounded = true;
+                IsFalling = false;
             }
         }
 
         public virtual void Update()
         {
             ManageMovement();
+
+            if (IsAffectedByGravityPush)
+            {
+                float multiplier = 1;
+                if (GravityPushPushDurationTimer != null)
+                {
+                    multiplier = GravityPushPushDurationTimer.Progress;
+                    GravityPushPushDurationTimer.Update();
+                }
+                
+                // Horizontal
+                Rectangle futurePositionX = new Rectangle(CollisionBox.X + VelocityX * multiplier, CollisionBox.Y, CollisionBox.Width, CollisionBox.Height);
+                ManageHorizontalMovement(futurePositionX);
+                
+                // Vertical
+                Rectangle futurePositionY = new Rectangle(CollisionBox.X, CollisionBox.Y + VelocityY, CollisionBox.Width, CollisionBox.Height);
+                SetCollisionBoxY(futurePositionY.Y);
+
+                // Rotate clockwise in the air
+                // Make one full rotation for the duration of the timer
+                InclineAngle = 2 * (float)Math.PI * multiplier;
+
+                // Return the state of the unit back to normal after the push is over
+                if (GravityPushPushDurationTimer != null && GravityPushPushDurationTimer.Progress == 0)
+                {
+                    ResetVelocities();
+                    IsUnableToMove = false;
+                    IsAffectedByGravityPush = false;
+                    IsIdle = true;
+                    GravityPushPushDurationTimer = null;
+                    InclineAngle = 0;
+                }
+            }
+
 
             RunTimer.Update();
             JumpTimer.Update();
@@ -306,7 +353,7 @@ namespace MusicTest.GameObjects
             composer.RenderSprite(
                 Position,
                 Size,
-                Color.White,
+                !IsAffectedByGravityPush ? Color.White : Color.Pink,
                 TextureAsset.Texture,
                 null,
                 IsFacingRight
@@ -316,7 +363,7 @@ namespace MusicTest.GameObjects
                 composer.PopModelMatrix();
             }
 
-            if (isInteracting) 
+            if (IsInteracting) 
             {
                 string text = Dialogues[0].DialogueLines[0];
                 composer.RenderString(Position + new Vector3(-30, -30, 0), Color.Black, text, Engine.AssetLoader.Get<FontAsset>("debugFont.otf").GetAtlas(16));

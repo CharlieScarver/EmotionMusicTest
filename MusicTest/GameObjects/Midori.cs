@@ -5,10 +5,12 @@ using Emotion.Graphics;
 using Emotion.IO;
 using Emotion.Platform.Input;
 using Emotion.Primitives;
-using MusicTest.Core;
+using MusicTest.Collision;
 using System;
 using System.Numerics;
 using Emotion.Utility;
+using MusicTest.Collision.Collision;
+using System.Collections.Generic;
 
 namespace MusicTest.GameObjects
 {
@@ -21,6 +23,36 @@ namespace MusicTest.GameObjects
         const string _portraitPath = "better-midori.png";
         const string _spriteSheetPath = "Textures/better-pixel-midori-full-sheet-horizontal.png";
         const string _name = "Midori";
+
+        // TODO: Create consts for all hardcoded numbers
+
+        // Gravity Push
+        const int _gravityPushStartingFrame = 0;
+        const int _gravityPushEndingFrame = 17;
+        const int _gravityPushTimeBetweenFrames = 65;
+        const int _gravityPushPushFrameIndex = 15;
+        const int _gravityPushDefaultRange = 350;
+        const int _gravityPushDefaultPower = 40; // VelocityX
+        const int _gravityPushDefaultFloatPower = -2; // VelocityY
+        const float _gravityPushDefaultFloatRotation = 3.1f; // In radians
+
+        #region Status Properties
+        public bool IsGravityPushActive { get; set; }
+        #endregion
+
+        // Gravity Push
+        /// <summary>
+        /// The range of the Gravity Push area in a single direction in pixels.
+        /// Counted from the CollisionBox center.
+        /// </summary>
+        public float GravityPushRange { get; set; }
+        public float GravityPushPower { get; set; }
+        public List<Unit> ObjectsAffectedByGravityPush { get; set; }
+        public bool GravityPushNoTargetsFound { get; set; }
+
+        // Interactions
+        private int InteractRange { get; set; }
+        public Unit InteractTarget { get; set; }
 
         public Midori(Vector3 position) : base(_name, _portraitPath, position, new Vector2(250, 344.489f))
         {
@@ -63,13 +95,17 @@ namespace MusicTest.GameObjects
             JumpTimer = new AfterAndBack(400);
             GravityTimer = new AfterAndBack(100);
             GravityTimer.End(); // Set Progress to 1
+
+            // Gravity Push
+            IsGravityPushActive = false;
+            GravityPushRange = _gravityPushDefaultRange;
+            GravityPushPower = _gravityPushDefaultPower;
+            ObjectsAffectedByGravityPush = new List<Unit>();
+            GravityPushNoTargetsFound = false;
         }
 
         public Midori(Unit unit) : base(unit)
         {}
-
-        private int InteractRange { get; set; }
-        public Unit InteractTarget { get; set; }
 
         protected override void SetCollisionBoxX(float x)
         {
@@ -83,15 +119,16 @@ namespace MusicTest.GameObjects
             Y = y - 40;
         }
 
+        public override void ResetVelocities()
+        {
+            StartingVelocityY = _verticalVelocity;
+            VelocityX = _horizontalVelocity;
+        }
+
         private void Interact()
         {
-            foreach (Unit unit in GameContext.Scene.Units)
+            foreach (Unit unit in GameContext.Scene.NonPlayerUnits)
             {
-                if (unit.IsPlayer)
-                {
-                    continue;
-                }
-
                 if (unit.ToRectangle().IntersectsInclusive(this.ToRectangle()))
                 {
                     if (InteractTarget != null)
@@ -110,7 +147,7 @@ namespace MusicTest.GameObjects
 
             if (InteractTarget == null)
             {
-                isInteracting = false;
+                IsInteracting = false;
             }
             else
             {
@@ -127,37 +164,38 @@ namespace MusicTest.GameObjects
 
         protected void ManageInput()
         {
-            IsIdle = true;
-            //IsMovingLeft = false;
-            //IsMovingRight = false;
+            if (!IsUnableToMove)
+            {
+                IsIdle = true;
+            }
             
             // Interaction
-            if (Engine.InputManager.IsKeyDown(Key.F))
+            if (Engine.InputManager.IsKeyDown(Key.F) && !IsUnableToMove)
             {
-                if (!isInteracting)
+                if (!IsInteracting)
                 {
                     IsMovingLeft = false;
                     IsMovingRight = false;
                     IsIdle = true;
-                    isInteracting = true;
+                    IsInteracting = true;
                     Interact();
                     return;
                 }
                 else if (GameContext.Scene.CurrentInteration.Finished)
                 {
-                    isInteracting = false;
+                    IsInteracting = false;
                     InteractTarget = null;
                     return;
                 }
             }
 
-            if (isInteracting)
+            if (IsInteracting)
             {
                 return;
             }
 
             // Movement
-            if (Engine.InputManager.IsKeyHeld(Key.A))
+            if (Engine.InputManager.IsKeyHeld(Key.A) && !IsUnableToMove)
             {
                 if (RunTimer.Progress == 0 && !IsMovingLeft && !IsMovingRight)
                 {
@@ -178,19 +216,8 @@ namespace MusicTest.GameObjects
                     RunTimer.End();
                 }
             }
-            //else
-            //{
-            //    if (IsMovingLeft && RunTimer.Progress == 1)
-            //    {
-            //        RunTimer.GoInReverse();
-            //    }
-            //    else if (IsMovingLeft && RunTimer.Progress == 0)
-            //    {
-            //        IsMovingLeft = false;
-            //    }
-            //}
             
-            if (Engine.InputManager.IsKeyHeld(Key.D))
+            if (Engine.InputManager.IsKeyHeld(Key.D) && !IsUnableToMove)
             {
                 if (RunTimer.Progress == 0 && !IsMovingLeft && !IsMovingRight)
                 {
@@ -211,42 +238,44 @@ namespace MusicTest.GameObjects
                     RunTimer.End();
                 }
             }
-            //else
-            //{
-            //    if (IsMovingRight && RunTimer.Progress == 1)
-            //    {
-            //        RunTimer.GoInReverse();
-            //    }
-            //    else if (IsMovingRight && RunTimer.Progress == 0)
-            //    {
-            //        IsMovingLeft = false;
-            //    }
-            //}
 
             // Jumping
-            if (Engine.InputManager.IsKeyHeld(Key.Space) && isGrounded)
+            if (Engine.InputManager.IsKeyHeld(Key.Space) && IsGrounded && !IsUnableToMove)
             {
-                isGrounded = false;
-                isJumping = true;
+                IsGrounded = false;
+                IsJumping = true;
                 JumpTimer.GoInReverse();
                 VelocityY = _jumpVelocity;
+            }
+
+            // Gravity Push
+            if (Engine.InputManager.IsKeyHeld(Key.G) && IsGrounded && !IsUnableToMove)
+            {
+                IsIdle = false;
+                IsMovingLeft = false;
+                IsMovingRight = false;
+                IsUnableToMove = true;
+                IsGravityPushActive = true;
+
+                Sprite.Reset();
             }
 
             // Debug
             // Teleport to X
             if (Engine.InputManager.IsKeyHeld(Key.LeftControl))
             {
-                isGrounded = true;
-                isFalling = false;
-                isJumping = false;
+                IsGrounded = true;
+                IsFalling = false;
+                IsJumping = false;
                 JumpTimer.End();
                 SetCollisionBoxY(500);
                 SetCollisionBoxX(700);
-            } else if (Engine.InputManager.IsKeyHeld(Key.RightControl))
+            }
+            else if (Engine.InputManager.IsKeyHeld(Key.RightControl))
             {
-                isGrounded = true;
-                isFalling = false;
-                isJumping = false;
+                IsGrounded = true;
+                IsFalling = false;
+                IsJumping = false;
                 JumpTimer.End();
                 SetCollisionBoxY(500);
                 SetCollisionBoxX(11500);
@@ -256,6 +285,89 @@ namespace MusicTest.GameObjects
             {
                 CodeSwitch = !CodeSwitch;
                 Console.WriteLine(CodeSwitch);
+            }
+        }
+
+        public void Action_GravityPush()
+        {
+            // First call
+            if (Sprite.CurrentFrameIndex >= _gravityPushStartingFrame && Sprite.CurrentFrameIndex < _gravityPushPushFrameIndex && !GravityPushNoTargetsFound)
+            {
+                Rectangle gravityPushArea = new Rectangle(
+                    CollisionBox.Center.X - GravityPushRange,
+                    CollisionBox.Center.Y - GravityPushRange,
+                    GravityPushRange * 2,
+                    GravityPushRange * 2
+                );
+                for (int i = 0; i < GameContext.Scene.NonPlayerUnits.Count; i++)
+                {
+                    Unit unit = GameContext.Scene.NonPlayerUnits[i];
+                    if (unit.ToRectangle().IntersectsInclusive(gravityPushArea))
+                    {
+                        ObjectsAffectedByGravityPush.Add(unit);
+
+                        unit.IsMovingLeft = false;
+                        unit.IsMovingRight = false;
+                        unit.IsJumping = false;
+                        unit.IsFalling = false;
+                        unit.IsGrounded = false;
+                        unit.IsIdle = false;
+
+                        unit.IsUnableToMove = true;
+                        unit.IsAffectedByGravityPush = true;
+
+                        unit.VelocityX = 0;
+                        unit.VelocityY = _gravityPushDefaultFloatPower;
+                        unit.StartingVelocityY = _gravityPushDefaultFloatPower;
+                        unit.GravityPushPushDurationTimer = null;
+                    }
+                }
+                // If no targets are found the first time, save that to avoid this loop check on next frames
+                // We can't check the frame index because we can't set the CurrentFrameIndex :(
+                GravityPushNoTargetsFound = true;
+            }
+            else if (Sprite.CurrentFrameIndex == _gravityPushPushFrameIndex)
+            {
+                for (int i = 0; i < GameContext.Scene.NonPlayerUnits.Count; i++)
+                {
+                    Unit unit = GameContext.Scene.NonPlayerUnits[i];
+                    if (unit.Center.X < Center.X)
+                    {
+                        // If the unit is on the left push it to the left
+                        unit.VelocityX = -GravityPushPower;
+                    }
+                    else
+                    {
+                        // If the unit is on the right push it to the right
+                        unit.VelocityX = GravityPushPower;
+                    }
+                    unit.GravityPushPushDurationTimer = new AfterAndBack(1000);
+                    unit.GravityPushPushDurationTimer.End(); // Set Progress to 1
+                    unit.GravityPushPushDurationTimer.GoInReverse();
+                }
+            }
+            //else if (Sprite.CurrentFrameIndex > _gravityPushPushFrameIndex)
+            //{
+            //    // Nothing?
+            //}
+            else if (Sprite.CurrentFrameIndex == _gravityPushEndingFrame)
+            {
+                // Release the units
+                //for (int i = 0; i < GameContext.Scene.NonPlayerUnits.Count; i++)
+                //{
+                //    Unit unit = GameContext.Scene.NonPlayerUnits[i];
+                //    unit.ResetVelocities();
+                //    unit.IsUnableToMove = false;
+                //    unit.IsAffectedByGravityPush = false;
+                //    unit.IsIdle = true;
+                //}
+
+                ObjectsAffectedByGravityPush.Clear();
+                IsIdle = true;
+                IsUnableToMove = false;
+                IsGravityPushActive = false;
+
+                GravityPushNoTargetsFound = false;
             }
         }
 
@@ -283,21 +395,25 @@ namespace MusicTest.GameObjects
                 Sprite.TimeBetweenFrames = 65;
                // Sprite.Reset();
             }
+            else if (IsGravityPushActive)
+            {
+                Sprite.StartingFrame = _gravityPushStartingFrame;
+                Sprite.EndingFrame = _gravityPushEndingFrame;
+                Sprite.TimeBetweenFrames = _gravityPushTimeBetweenFrames;
+            }
 
             Sprite.Update(Engine.DeltaTime);
+
+            // Gravity Push
+            // Positioned after Sprite.Update because it needs the updated sprite frame index
+            if (IsGravityPushActive)
+            {
+                Action_GravityPush();
+            }
         }
 
         public override void Render(RenderComposer composer)
         {
-            //composer.RenderSprite(
-            //    Position,
-            //    Size,
-            //    Color.White,
-            //    TextureAsset.Texture,
-            //    null,
-            //    IsFacingRight
-            //);
-
             if (InclineAngle != 0f)
             {
                 composer.PushModelMatrix(
@@ -307,7 +423,7 @@ namespace MusicTest.GameObjects
             composer.RenderSprite(
                 Position,
                 new Vector2(360, 360),
-                Color.White,
+                !IsGravityPushActive ? Color.White : Color.Pink,
                 Sprite.Texture,
                 Sprite.CurrentFrame,
                 IsFacingRight, false
@@ -316,24 +432,20 @@ namespace MusicTest.GameObjects
             {
                 composer.PopModelMatrix();
             }
-            //composer.RenderOutline(Position, new Vector2(360, 360), Color.Red, 1);
 
-            //composer.RenderCircleOutline(new Vector3(Center, Z), InteractRange, Color.Red, true);
-            //composer.RenderOutline(Position, Size, Color.Red, 1);
-
-            //Rectangle rect = CollisionBox.ToRectangle();
-            //Vector3 topLeft = new Vector3(rect.TopLeft, 10);
-            //Vector3 topRight = new Vector3(rect.TopRight, 10);
-            //Vector3 bottomRight = new Vector3(rect.BottomRight, 10);
-            //Vector3 bottomLeft = new Vector3(rect.X, rect.Bottom, 10);
-            //composer.RenderLine(rect.TopLeft.ToVec3(CollisionBox.Z), rect.TopRight.ToVec3(CollisionBox.Z), Color.Red);
-            //composer.RenderLine(rect.TopRight.ToVec3(CollisionBox.Z), rect.BottomRight.ToVec3(CollisionBox.Z), Color.Green);
-            //composer.RenderLine(rect.BottomRight.ToVec3(CollisionBox.Z), rect.BottomLeft.ToVec3(CollisionBox.Z), Color.Cyan);
-            //composer.RenderLine(rect.BottomLeft.ToVec3(CollisionBox.Z), rect.TopLeft.ToVec3(CollisionBox.Z), Color.Yellow);
-
-            //Rectangle futurePosition = new Rectangle(X, Y - (GravityTimer.Progress * _gravityVelocity), Width, Height);
-            //composer.RenderOutline(futurePosition, Color.Green, 1);
-            //composer.PopModelMatrix();
+            if (IsGravityPushActive)
+            {
+                composer.RenderOutline(
+                    new Vector3(
+                        CollisionBox.Center.X - GravityPushRange,
+                        CollisionBox.Center.Y - GravityPushRange,
+                        15
+                    ),
+                    new Vector2(GravityPushRange * 2),
+                    Color.Pink,
+                    2
+                );
+            }
         }
     }
 }

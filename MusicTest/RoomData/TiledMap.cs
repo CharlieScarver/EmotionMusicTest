@@ -2,7 +2,7 @@
 using Emotion.Standard.TMX.Layer;
 using Emotion.Standard.TMX.Object;
 using Emotion.Standard.XML;
-using MusicTest.Core;
+using MusicTest.Collision;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
