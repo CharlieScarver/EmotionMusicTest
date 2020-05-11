@@ -252,7 +252,35 @@
 			"Type": "Shishi",
 			"TextureName": "better-shishi.png",
 			"Position": {
+				"X": 1900,
+				"Y": 320,
+				"Z": 4
+			},
+			"Size": {
+				"X": 224.727,
+				"Y": 274.181
+			}
+		},
+		{
+			"Name": "Shishi 2",
+			"Type": "Shishi",
+			"TextureName": "better-shishi.png",
+			"Position": {
 				"X": 1200,
+				"Y": 320,
+				"Z": 4
+			},
+			"Size": {
+				"X": 224.727,
+				"Y": 274.181
+			}
+		},
+		{
+			"Name": "Shishi 3",
+			"Type": "Shishi",
+			"TextureName": "better-shishi.png",
+			"Position": {
+				"X": 2300,
 				"Y": 320,
 				"Z": 4
 			},
