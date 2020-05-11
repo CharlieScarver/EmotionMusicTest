@@ -163,7 +163,7 @@ namespace MusicTest.GameObjects
                 else
                 {
                     // If there is a step smaller than your horizontal velocity, climb it
-                    if ((CollisionBox.Y + CollisionBox.Height) - intersectedPlatform.PointA.Y - 1 <= VelocityX)
+                    if ((CollisionBox.Y + CollisionBox.Height) - intersectedPlatform.PointA.Y - 1 <= Math.Abs(VelocityX))
                     {
                         SetCollisionBoxX(futurePosition.X);
                         SetCollisionBoxY(intersectedPlatform.PointA.Y - CollisionBox.Height - 1);
