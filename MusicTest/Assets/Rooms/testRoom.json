@@ -288,6 +288,20 @@
 				"X": 224.727,
 				"Y": 274.181
 			}
+		},
+		{
+			"Name": "Shishi 4",
+			"Type": "Shishi",
+			"TextureName": "better-shishi.png",
+			"Position": {
+				"X": 2600,
+				"Y": 320,
+				"Z": 4
+			},
+			"Size": {
+				"X": 224.727,
+				"Y": 274.181
+			}
 		}
 	],
 	"CollisionPlatforms": [

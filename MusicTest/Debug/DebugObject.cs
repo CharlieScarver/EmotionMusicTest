@@ -104,11 +104,34 @@ namespace MusicTest.Debug
                 }
 
                 // Draw future position for units
-                Vector3 futurePosition = new Vector3(
-                    unit.CollisionBox.X,
-                    unit.CollisionBox.Y - (unit.GravityTimer.Progress * unit.StartingVelocityY),
-                    unit.CollisionBox.Z
-                );
+                Vector3 futurePosition;
+                if (!unit.IsAffectedByGravityPush)
+                {
+                    futurePosition = new Vector3(
+                        unit.CollisionBox.X + (unit.VelocityX * unit.RunTimer.Progress),
+                        unit.CollisionBox.Y - (unit.GravityTimer.Progress * unit.StartingVelocityY),
+                        unit.CollisionBox.Z
+                    );
+                }
+                else
+                {
+                    if (unit.GravityPushPushDurationTimer != null)
+                    {
+                        futurePosition = new Vector3(
+                            unit.CollisionBox.X + (unit.VelocityX * unit.GravityPushPushDurationTimer.Progress),
+                            unit.CollisionBox.Y - unit.StartingVelocityY,
+                            unit.CollisionBox.Z
+                       );
+                    }
+                    else
+                    {
+                        futurePosition = new Vector3(
+                            unit.CollisionBox.X,
+                            unit.CollisionBox.Y - unit.StartingVelocityY,
+                            unit.CollisionBox.Z
+                       );
+                    }
+                }
                 composer.RenderOutline(futurePosition, unit.CollisionBox.Size, Color.Cyan, 1);
                 // Draw CollisionBox for units
                 composer.RenderOutline(unit.CollisionBox.Position, unit.CollisionBox.Size, Color.Red, 2);
