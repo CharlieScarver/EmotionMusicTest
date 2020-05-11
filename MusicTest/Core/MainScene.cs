@@ -561,7 +561,7 @@ namespace MusicTest
             composer.SetUseViewMatrix(true);
 
             // Render the Emotion Tools UI
-            composer.RenderToolsMenu();
+            //composer.RenderToolsMenu();
         }
 
     }
