@@ -12,6 +12,8 @@ namespace MusicTest.GameObjects
 
         public Shishi(string name, string textureName, Vector3 position, Vector2 size) : base(name, textureName, position, size)
         {
+            PortraitSize = new Vector2(674.181f, 822.543f); // Size(224.727f, 274.181f) * 3
+
             DialoguePiece d = new DialoguePiece(10, new List<string>() {
                 "Magic be damned! A Dori!",
                 "Ahem.. I mean.. Greetings, friend.",

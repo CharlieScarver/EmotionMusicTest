@@ -54,14 +54,16 @@ namespace MusicTest.GameObjects
         private int InteractRange { get; set; }
         public Unit InteractTarget { get; set; }
 
-        public Midori(Vector3 position) : base(_name, _portraitPath, position, new Vector2(250, 344.489f))
+        public Midori(Vector3 position) : base(_name, _portraitPath, position, new Vector2(360, 360))
         {
             Name = _name;
             IsPlayer = true;
 
             Position = position;
-            Size = new Vector2(360, 360); // Full Size 1773x2213
+            Size = new Vector2(360, 360);
             TextureAsset = Engine.AssetLoader.Get<TextureAsset>($"Textures/{_portraitPath}");
+            PortraitSize = new Vector2(750, 1033.467f); // Size(250, 344.489f) * 3
+            // Full Portrait Size is 1773x2213
 
             TextureAsset spriteAsset = Engine.AssetLoader.Get<TextureAsset>(_spriteSheetPath);
             Sprite = new AnimatedTexture(

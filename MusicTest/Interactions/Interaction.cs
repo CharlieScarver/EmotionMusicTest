@@ -101,7 +101,7 @@ namespace MusicTest.Interactions
             }
             composer.RenderSprite(
                 Unit1Position,
-                Unit1.Size * 3,
+                Unit1.PortraitSize,
                 Color.White,
                 Unit1.TextureAsset.Texture,
                 null,
@@ -119,7 +119,7 @@ namespace MusicTest.Interactions
             }
             composer.RenderSprite(
                 Unit2Position,
-                Unit2.Size * 3,
+                Unit2.PortraitSize,
                 Color.White,
                 Unit2.TextureAsset.Texture,
                 null,

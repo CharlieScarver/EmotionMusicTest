@@ -26,6 +26,7 @@ namespace MusicTest.GameObjects
         public string TextureName { get; set; }
         public TextureAsset TextureAsset { get; set; }
         public AnimatedTexture Sprite { get; set; }
+        public Vector2 PortraitSize { get; set; }
         
         // Moving
         public float VelocityX { get; set; }
