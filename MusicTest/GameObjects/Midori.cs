@@ -36,8 +36,14 @@ namespace MusicTest.GameObjects
         const int _gravityPushDefaultFloatPower = -2; // VelocityY
         const float _gravityPushDefaultFloatRotation = 3.1f; // In radians
 
+        // Magic Flow
+        const int _magicFlowVelocity = 10;
+        const int _magicFlowFloatRadius = 10; // in pixels
+
+
         #region Status Properties
         public bool IsGravityPushActive { get; set; }
+        public bool IsMagicFlowActive { get; set; }
         #endregion
 
         // Gravity Push
@@ -49,6 +55,10 @@ namespace MusicTest.GameObjects
         public float GravityPushPower { get; set; }
         public List<Unit> ObjectsAffectedByGravityPush { get; set; }
         public bool GravityPushNoTargetsFound { get; set; }
+
+        // Magic Flow
+        public int CurrentMagicFlowSegmentIndex { get; set; } // Set to 0 when magic flow starts
+        public MagicFlow CurrentMagicFlow { get; set; }
 
         // Interactions
         private int InteractRange { get; set; }
@@ -262,6 +272,25 @@ namespace MusicTest.GameObjects
                 Sprite.Reset();
             }
 
+            // Magic Flow
+            if (Engine.InputManager.IsKeyHeld(Key.H) && !IsUnableToMove && !IsMagicFlowActive)
+            {
+                // TODO: Reset timers
+                IsIdle = false;
+                IsMovingLeft = false;
+                IsMovingRight = false;
+                IsJumping = false; // Reset jump timer
+                IsFalling = false;
+                // IsUnableToMove = true; // ?
+                IsMagicFlowActive = true;
+
+                // Set CurrentMagicFlow
+                CurrentMagicFlow = null; // ?
+                CurrentMagicFlowSegmentIndex = 0;
+
+                Sprite.Reset();
+            }
+
             // Debug
             // Teleport to X
             if (Engine.InputManager.IsKeyHeld(Key.LeftControl))
@@ -371,6 +400,38 @@ namespace MusicTest.GameObjects
 
                 GravityPushNoTargetsFound = false;
             }
+        }
+
+        public void Action_MagicFlow()
+        {
+            // First call
+            Collision.LineSegment currentSegment = CurrentMagicFlow.Lines[CurrentMagicFlowSegmentIndex];
+            Vector2 destinationPoint = currentSegment.PointB;
+
+            Vector2 v = destinationPoint - CollisionBox.Center;
+            float vLength = (float) Math.Sqrt(Math.Pow(v.X, 2) + Math.Pow(v.Y, 2));
+
+            Vector2 u = v / vLength;
+            Vector2 newPosition = CollisionBox.Center + (_magicFlowVelocity * u);
+
+            if (destinationPoint.X > CollisionBox.Center.X && newPosition.X >= destinationPoint.X)
+            {
+                // If there are more lines, go to the next one
+                if (CurrentMagicFlowSegmentIndex + 1 < CurrentMagicFlow.Lines.Count)
+                {
+                    CurrentMagicFlowSegmentIndex += 1;
+                }
+                // If not, end the Magic Flow sequence
+                else
+                {
+                    IsMagicFlowActive = false;
+                    CurrentMagicFlow = null;
+                    CurrentMagicFlowSegmentIndex = 0;
+                }
+            }
+
+            SetCollisionBoxX(newPosition.X);
+            SetCollisionBoxY(newPosition.Y);
         }
 
         public override void Update()
