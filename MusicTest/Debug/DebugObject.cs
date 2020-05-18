@@ -133,6 +133,10 @@ namespace MusicTest.Debug
                     }
                 }
                 composer.RenderOutline(futurePosition, unit.CollisionBox.Size, Color.Cyan, 1);
+
+                // Draw last position of the CollisionBox
+                composer.RenderOutline(unit.LastState.CollisionBox.Position, unit.LastState.CollisionBox.Size, Color.Yellow, 2);
+
                 // Draw CollisionBox for units
                 composer.RenderOutline(unit.CollisionBox.Position, unit.CollisionBox.Size, Color.Red, 2);
             }
@@ -141,7 +145,7 @@ namespace MusicTest.Debug
                 // Draw texture center
                 composer.RenderCircle(Item.Center.ToVec3(Item.Z), 3, Color.Green, true);
 
-                // Draw CollisionBox for units
+                // Draw texture rectangle
                 composer.RenderOutline(dec.Position, dec.DisplaySize, Color.Red, 2);
             }
         }
