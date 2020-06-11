@@ -9,7 +9,6 @@ using MusicTest.Collision;
 using System;
 using System.Numerics;
 using Emotion.Utility;
-using MusicTest.Collision.Collision;
 using System.Collections.Generic;
 
 namespace MusicTest.GameObjects
@@ -275,18 +274,25 @@ namespace MusicTest.GameObjects
             // Magic Flow
             if (Engine.InputManager.IsKeyHeld(Key.H) && !IsUnableToMove && !IsMagicFlowActive)
             {
+                // Set CurrentMagicFlow
+                CurrentMagicFlow = CollisionUtils.RectangleIntesectsWithMagicFlow(CollisionBox.ToRectangle());
+                if (CurrentMagicFlow == null)
+                {
+                    return;
+                }
+                CurrentMagicFlowSegmentIndex = 0;
+                SetCollisionBoxX(CurrentMagicFlow.Segments[0].PointA.X - (CollisionBox.Width / 2));
+                SetCollisionBoxY(CurrentMagicFlow.Segments[0].PointA.Y - (CollisionBox.Height / 2));
+                MagicFlowCounter = 1;
+
                 // TODO: Reset timers
                 IsIdle = false;
                 IsMovingLeft = false;
                 IsMovingRight = false;
                 IsJumping = false; // Reset jump timer
                 IsFalling = false;
-                // IsUnableToMove = true; // ?
+                IsUnableToMove = true; // ?
                 IsMagicFlowActive = true;
-
-                // Set CurrentMagicFlow
-                CurrentMagicFlow = null; // ?
-                CurrentMagicFlowSegmentIndex = 0;
 
                 Sprite.Reset();
             }
@@ -402,24 +408,43 @@ namespace MusicTest.GameObjects
             }
         }
 
+        public int MagicFlowCounter { get; set; } = 1;
         public void Action_MagicFlow()
         {
             // First call
-            Collision.LineSegment currentSegment = CurrentMagicFlow.Lines[CurrentMagicFlowSegmentIndex];
+            Collision.LineSegment currentSegment = CurrentMagicFlow.Segments[CurrentMagicFlowSegmentIndex];
             Vector2 destinationPoint = currentSegment.PointB;
 
-            Vector2 v = destinationPoint - CollisionBox.Center;
-            float vLength = (float) Math.Sqrt(Math.Pow(v.X, 2) + Math.Pow(v.Y, 2));
+            //Vector2 v = destinationPoint - CollisionBox.Center;
+            //float vLength = (float) Math.Sqrt(Math.Pow(v.X, 2) + Math.Pow(v.Y, 2));
 
-            Vector2 u = v / vLength;
-            Vector2 newPosition = CollisionBox.Center + (_magicFlowVelocity * u);
+            //Vector2 u = v / vLength;
+            //Vector2 newCenterPosition = CollisionBox.Center + (_magicFlowVelocity * u);
+            float t = MagicFlowCounter / 10f; // (_magicFlowVelocity) / currentSegment.Length;
+            Vector2 newCenterPosition = new Vector2(
+                ((1 - t) * currentSegment.PointA.X) + (t * currentSegment.PointB.X),
+                ((1 - t) * currentSegment.PointA.Y) + (t * currentSegment.PointB.Y)
+            );
+            if (MagicFlowCounter < 15)
+            {
+                MagicFlowCounter += 1;
+            }
 
-            if (destinationPoint.X > CollisionBox.Center.X && newPosition.X >= destinationPoint.X)
+            Collision.LineSegment debugSegment = new Collision.LineSegment(currentSegment.PointA, newCenterPosition);
+
+            Console.WriteLine($"Delta from A {debugSegment.Length}; t = {t}; Distance = {currentSegment.Length}");
+
+            bool reachedDestination = currentSegment.IsLeftToRight ?
+                (destinationPoint.X >= CollisionBox.Center.X && newCenterPosition.X >= destinationPoint.X) :
+                (destinationPoint.X <= CollisionBox.Center.X && newCenterPosition.X <= destinationPoint.X);
+
+            if (newCenterPosition.X == destinationPoint.X && newCenterPosition.Y == destinationPoint.Y)
             {
                 // If there are more lines, go to the next one
-                if (CurrentMagicFlowSegmentIndex + 1 < CurrentMagicFlow.Lines.Count)
+                if (CurrentMagicFlowSegmentIndex + 1 < CurrentMagicFlow.Segments.Count)
                 {
                     CurrentMagicFlowSegmentIndex += 1;
+                    MagicFlowCounter = 1;
                 }
                 // If not, end the Magic Flow sequence
                 else
@@ -427,11 +452,12 @@ namespace MusicTest.GameObjects
                     IsMagicFlowActive = false;
                     CurrentMagicFlow = null;
                     CurrentMagicFlowSegmentIndex = 0;
+                    IsUnableToMove = false;
                 }
             }
 
-            SetCollisionBoxX(newPosition.X);
-            SetCollisionBoxY(newPosition.Y);
+            SetCollisionBoxX(newCenterPosition.X - (CollisionBox.Width / 2));
+            SetCollisionBoxY(newCenterPosition.Y - (CollisionBox.Height / 2));
         }
 
         public override void Update()
@@ -473,10 +499,21 @@ namespace MusicTest.GameObjects
             {
                 Action_GravityPush();
             }
+
+            if (IsMagicFlowActive)
+            {
+                Action_MagicFlow();
+            }
         }
 
         public override void Render(RenderComposer composer)
         {
+            if (IsMagicFlowActive)
+            {
+                composer.RenderCircle(CollisionBox.Center.ToVec3(Z), 15, Color.Pink, true);
+                return;
+            }
+
             if (InclineAngle != 0f)
             {
                 composer.PushModelMatrix(

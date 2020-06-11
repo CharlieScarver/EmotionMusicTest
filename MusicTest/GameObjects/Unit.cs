@@ -7,7 +7,6 @@ using Emotion.Primitives;
 using Emotion.Utility;
 using MusicTest.Collision;
 using MusicTest.RoomData;
-using MusicTest.Collision.Collision;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
@@ -135,7 +134,7 @@ namespace MusicTest.GameObjects
 
         protected void ManageHorizontalMovement(Rectangle futurePosition)
         {
-            Collision.LineSegment intersectedPlatform = Collision.Collision.Collision.IntersectsWithPlatforms(futurePosition);
+            Collision.LineSegment intersectedPlatform = CollisionUtils.IntersectsWithPlatforms(futurePosition);
 
             if (intersectedPlatform == null)
             {
@@ -152,7 +151,7 @@ namespace MusicTest.GameObjects
                         InclineAngle = intersectedPlatform.InclineAngleWithX;
                         // Check for collision a little higher
                         futurePosition.Y -= 3;
-                        intersectedPlatform = Collision.Collision.Collision.IntersectsWithSlopedPlatforms(futurePosition);
+                        intersectedPlatform = CollisionUtils.IntersectsWithSlopedPlatforms(futurePosition);
                     }
                     while (intersectedPlatform != null);
 
@@ -229,7 +228,7 @@ namespace MusicTest.GameObjects
                 }
 
                 Rectangle futurePosition = new Rectangle(CollisionBox.X, CollisionBox.Y - (JumpTimer.Progress * VelocityY), CollisionBox.Width, CollisionBox.Height);
-                Collision.LineSegment intersectedPlatform = Collision.Collision.Collision.IntersectsWithPlatforms(futurePosition);
+                Collision.LineSegment intersectedPlatform = CollisionUtils.IntersectsWithPlatforms(futurePosition);
                 if (intersectedPlatform == null)
                 {
                     SetCollisionBoxY(CollisionBox.Y - JumpTimer.Progress * VelocityY);
@@ -253,7 +252,7 @@ namespace MusicTest.GameObjects
         protected void ApplyGravity() 
         {
             Rectangle futurePosition = new Rectangle(CollisionBox.X, CollisionBox.Y - VelocityY, CollisionBox.Width, CollisionBox.Height);
-            Collision.LineSegment intersectedPlatform = Collision.Collision.Collision.IntersectsWithSlopedPlatforms(futurePosition) ?? Collision.Collision.Collision.IntersectsWithAxisAlignedPlatforms(futurePosition);
+            Collision.LineSegment intersectedPlatform = CollisionUtils.IntersectsWithSlopedPlatforms(futurePosition) ?? CollisionUtils.IntersectsWithAxisAlignedPlatforms(futurePosition);
 
             if (intersectedPlatform == null)
             {
@@ -282,7 +281,7 @@ namespace MusicTest.GameObjects
                         }
                         // Check for collision a little higher
                         futurePosition.Y -= Math.Abs(StartingVelocityY * 0.1f);
-                        intersectedPlatform = Collision.Collision.Collision.IntersectsWithSlopedPlatforms(futurePosition);
+                        intersectedPlatform = CollisionUtils.IntersectsWithSlopedPlatforms(futurePosition);
                     }
                     while (intersectedPlatform != null);
 

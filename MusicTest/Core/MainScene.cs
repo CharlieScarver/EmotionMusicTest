@@ -19,7 +19,6 @@ using System;
 using System.Collections.Generic;
 using System.Numerics;
 using MusicTest.Debug;
-using MusicTest.Collision.Collision;
 
 namespace MusicTest
 {
@@ -50,6 +49,8 @@ namespace MusicTest
         public List<Decoration> ForegroundDecorations { get; set; }
         public List<DebugObject> DebugObjects { get; set; }
 
+        public List<MagicFlow> MagicFlows { get; set; }
+
         // Interaction
         public Interaction CurrentInteration { get; set; }
 
@@ -78,6 +79,7 @@ namespace MusicTest
             BackgroundDecorations = new List<Decoration>();
             ForegroundDecorations = new List<Decoration>();
             DebugObjects = new List<DebugObject>();
+            MagicFlows = new List<MagicFlow>();
 
             // Testing for jittering
             //Engine.Renderer.Camera.Zoom = 0.5f;
@@ -184,6 +186,24 @@ namespace MusicTest
                 NonPlayerUnits.Add(unit);
             }
 
+            // Magic Flows
+            MagicFlow m = new MagicFlow();
+            m.Segments.Add(new Collision.LineSegment(100, 5400, 950, 4600));
+            m.Segments.Add(new Collision.LineSegment(950, 4600, 1450, 4800));
+            m.Segments.Add(new Collision.LineSegment(1450, 4800, 2000, 4200));
+            MagicFlows.Add(m);
+
+            m = new MagicFlow();
+            m.Segments.Add(new Collision.LineSegment(1450, 5400, 1750, 5300));
+            m.Segments.Add(new Collision.LineSegment(1750, 5300, 1950, 5200));
+            m.Segments.Add(new Collision.LineSegment(1950, 5200, 2050, 5100));
+            m.Segments.Add(new Collision.LineSegment(2050, 5100, 2100, 5000));
+            m.Segments.Add(new Collision.LineSegment(2100, 5000, 2100, 4900));
+            m.Segments.Add(new Collision.LineSegment(2100, 4900, 2050, 4800));
+            m.Segments.Add(new Collision.LineSegment(2050, 4800, 1950, 4700));
+            m.Segments.Add(new Collision.LineSegment(1950, 4700, 1750, 4600));
+            MagicFlows.Add(m);
+
             // Create platforms
             for (int i = 0; i < LoadedRoom.CollisionPlatforms.Count; i++)
             {
@@ -286,7 +306,7 @@ namespace MusicTest
                 GameObject gameObj = collection[i];
                 Vector2 worldMousePos = Engine.Renderer.Camera.ScreenToWorld(Engine.InputManager.MousePosition);
                 // Check if object collides with the mouse pointer
-                if (Collision.Collision.Collision.PointIsInRectangleInclusive(worldMousePos, gameObj.ToRectangle()))
+                if (CollisionUtils.PointIsInRectangleInclusive(worldMousePos, gameObj.ToRectangle()))
                 {
                     // Check if an object with this Name already exists in DebugObjects
                     DebugObject debugObj = new DebugObject(gameObj);
@@ -491,6 +511,12 @@ namespace MusicTest
             foreach (Collision.LineSegment plat in CollisionPlatforms)
             {
                 plat.Render(composer);
+            }
+
+            // Draw Magic Flows
+            foreach (MagicFlow mf in MagicFlows)
+            {
+                mf.Render(composer);
             }
 
             Player.Render(composer);

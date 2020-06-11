@@ -9,16 +9,16 @@ namespace MusicTest.GameObjects
 {
     public class MagicFlow : GameObject
     {
-        public List<Collision.LineSegment> Lines { get; set; }
+        public List<Collision.LineSegment> Segments { get; set; }
 
         public MagicFlow()
         {
-            Lines = new List<Collision.LineSegment>();
+            Segments = new List<Collision.LineSegment>();
         }
 
         public override void Render(RenderComposer composer)
         {
-            foreach (Collision.LineSegment seg in Lines)
+            foreach (Collision.LineSegment seg in Segments)
             {
                 composer.RenderLine(new Vector3(seg.PointA, 6), new Vector3(seg.PointB, 6), Color.Pink, 2);
             }

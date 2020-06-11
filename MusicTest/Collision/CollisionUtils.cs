@@ -1,11 +1,12 @@
 ﻿using Emotion.Primitives;
+using MusicTest.GameObjects;
 using System.Numerics;
 
-namespace MusicTest.Collision.Collision
+namespace MusicTest.Collision
 {
-    public static class Collision
+    public static class CollisionUtils
     {
-        #region CollisionWithPlatforms
+        #region Collision With Platforms
         public static LineSegment IntersectsWithPlatforms(Rectangle rect)
         {
             for (int i = 0; i < GameContext.Scene.CollisionPlatforms.Count; i++)
@@ -41,6 +42,40 @@ namespace MusicTest.Collision.Collision
                 if (LineSegmentIntesectsRectangle(platform.PointA, platform.PointB, rect))
                 {
                     return platform;
+                }
+            }
+
+            return null;
+        }
+
+        #endregion
+
+        #region Collision With Magic Flows
+
+        public static MagicFlow RectangleIntesectsWithMagicFlow(Rectangle rect)
+        {
+            foreach (MagicFlow mf in GameContext.Scene.MagicFlows)
+            {
+                if (mf.Segments.Count > 1)
+                {
+                    // Check first segment
+                    if (PointIsInRectangleInclusive(mf.Segments[0].PointA, rect) || PointIsInRectangleInclusive(mf.Segments[0].PointB, rect))
+                    {
+                        return mf;
+                    }
+                    // Check last segment
+                    else if (PointIsInRectangleInclusive(mf.Segments[mf.Segments.Count-1].PointA, rect) || PointIsInRectangleInclusive(mf.Segments[mf.Segments.Count - 1].PointB, rect))
+                    {
+                        return mf;
+                    }
+                }
+                else if (mf.Segments.Count == 1)
+                {
+                    // Check first segment
+                    if (PointIsInRectangleInclusive(mf.Segments[0].PointA, rect) || PointIsInRectangleInclusive(mf.Segments[0].PointB, rect))
+                    {
+                        return mf;
+                    }
                 }
             }
 

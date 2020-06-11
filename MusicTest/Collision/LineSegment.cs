@@ -14,6 +14,7 @@ namespace MusicTest.Collision
 
             IsSloped = PointA.Y != PointB.Y;
 
+            IsLeftToRight = PointA.X > PointB.X;
             IsAscending = PointA.Y > PointB.Y;
 
             // Set the slope (this is m from the line equation y = mx + b) (needed for the angle)
@@ -22,10 +23,10 @@ namespace MusicTest.Collision
 
             if (divisor == 0)
             {
-                throw new DivideByZeroException();
+                //throw new DivideByZeroException();
             }
 
-            Slope = divident / divisor;
+            Slope = IsSloped ? divident / divisor : 0;
 
             // Set the incline angle
             InclineAngleWithX = (float) Math.Atan(Slope);
@@ -48,14 +49,19 @@ namespace MusicTest.Collision
         public Vector2 PointB { get; set; }
 
         /// <summary>
-        /// Is the line is has a sloped (m != 0) or is axis-aligned.
+        /// If the line segment is sloped (m != 0) or is axis-aligned.
         /// </summary>
         public bool IsSloped { get; set; }
 
         /// <summary>
-        /// Is the line is ascending or descending from Point A to B
+        /// If the line segment is ascending or descending from Point A to B
         /// </summary>
         public bool IsAscending { get; set; }
+
+        /// <summary>
+        /// If Point A is on the left or the right
+        /// </summary>
+        public bool IsLeftToRight { get; set; }
 
         /// <summary>
         /// This is "m" from the line equation y = mx + b
