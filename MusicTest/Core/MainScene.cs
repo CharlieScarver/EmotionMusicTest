@@ -121,6 +121,7 @@ namespace MusicTest
             CollisionPlatforms = tiledMap.CollisionPlatforms;
             SlopedCollisionPlatforms = tiledMap.SlopedCollisionPlatforms;
             AxisAlignedCollisionPlatforms = tiledMap.AxisAlignedCollisionPlatforms;
+            MagicFlows = tiledMap.MagicFlows;
 
             LoadedRoom.Spawn = tiledMap.Spawn;
             LoadedRoom.Size = tiledMap.Size;
@@ -188,20 +189,20 @@ namespace MusicTest
 
             // Magic Flows
             MagicFlow m = new MagicFlow();
-            m.Segments.Add(new Collision.LineSegment(100, 5400, 950, 4600));
-            m.Segments.Add(new Collision.LineSegment(950, 4600, 1450, 4800));
-            m.Segments.Add(new Collision.LineSegment(1450, 4800, 2000, 4200));
+            m.AddSegment(new Collision.LineSegment(100, 5400, 950, 4600));
+            m.AddSegment(new Collision.LineSegment(950, 4600, 1450, 4800));
+            m.AddSegment(new Collision.LineSegment(1450, 4800, 2000, 4200));
             MagicFlows.Add(m);
 
             m = new MagicFlow();
-            m.Segments.Add(new Collision.LineSegment(1450, 5400, 1750, 5300));
-            m.Segments.Add(new Collision.LineSegment(1750, 5300, 1950, 5200));
-            m.Segments.Add(new Collision.LineSegment(1950, 5200, 2050, 5100));
-            m.Segments.Add(new Collision.LineSegment(2050, 5100, 2100, 5000));
-            m.Segments.Add(new Collision.LineSegment(2100, 5000, 2100, 4900));
-            m.Segments.Add(new Collision.LineSegment(2100, 4900, 2050, 4800));
-            m.Segments.Add(new Collision.LineSegment(2050, 4800, 1950, 4700));
-            m.Segments.Add(new Collision.LineSegment(1950, 4700, 1750, 4600));
+            m.AddSegment(new Collision.LineSegment(1450, 5400, 1750, 5300));
+            m.AddSegment(new Collision.LineSegment(1750, 5300, 1950, 5200));
+            m.AddSegment(new Collision.LineSegment(1950, 5200, 2050, 5100));
+            m.AddSegment(new Collision.LineSegment(2050, 5100, 2100, 5000));
+            m.AddSegment(new Collision.LineSegment(2100, 5000, 2100, 4900));
+            m.AddSegment(new Collision.LineSegment(2100, 4900, 2050, 4800));
+            m.AddSegment(new Collision.LineSegment(2050, 4800, 1950, 4700));
+            m.AddSegment(new Collision.LineSegment(1950, 4700, 1750, 4600));
             MagicFlows.Add(m);
 
             // Create platforms

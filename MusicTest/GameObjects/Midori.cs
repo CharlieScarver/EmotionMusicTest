@@ -18,7 +18,7 @@ namespace MusicTest.GameObjects
         //const float _verticalVelocity = -100;
         const float _verticalVelocity = -40;
         const float _jumpVelocity = 45;
-        const float _horizontalVelocity = 11;
+        const float _horizontalVelocity = 13;
         const string _portraitPath = "better-midori.png";
         const string _spriteSheetPath = "Textures/better-pixel-midori-full-sheet-horizontal.png";
         const string _name = "Midori";
@@ -36,9 +36,8 @@ namespace MusicTest.GameObjects
         const float _gravityPushDefaultFloatRotation = 3.1f; // In radians
 
         // Magic Flow
-        const int _magicFlowVelocity = 10;
+        const float _magicFlowVelocity = 55f;
         const int _magicFlowFloatRadius = 10; // in pixels
-
 
         #region Status Properties
         public bool IsGravityPushActive { get; set; }
@@ -58,6 +57,7 @@ namespace MusicTest.GameObjects
         // Magic Flow
         public int CurrentMagicFlowSegmentIndex { get; set; } // Set to 0 when magic flow starts
         public MagicFlow CurrentMagicFlow { get; set; }
+        public float MagicFlowCurrentSegmentProgress { get; set; } = 0; // decimal percentage
 
         // Interactions
         private int InteractRange { get; set; }
@@ -115,6 +115,7 @@ namespace MusicTest.GameObjects
             GravityPushNoTargetsFound = false;
         }
 
+        // Empty constructor that calls the Unit(Unit) constructor for LastState
         public Midori(Unit unit) : base(unit)
         {}
 
@@ -280,10 +281,21 @@ namespace MusicTest.GameObjects
                 {
                     return;
                 }
-                CurrentMagicFlowSegmentIndex = 0;
-                SetCollisionBoxX(CurrentMagicFlow.Segments[0].PointA.X - (CollisionBox.Width / 2));
-                SetCollisionBoxY(CurrentMagicFlow.Segments[0].PointA.Y - (CollisionBox.Height / 2));
-                MagicFlowCounter = 1;
+
+                if (CurrentMagicFlow.TraverseFirstToLast)
+                {
+                    // If traversing from first to last => start from Point A of the first segment
+                    CurrentMagicFlowSegmentIndex = 0;
+                    SetCollisionBoxX(CurrentMagicFlow.Segments[CurrentMagicFlowSegmentIndex].PointA.X - (CollisionBox.Width / 2));
+                    SetCollisionBoxY(CurrentMagicFlow.Segments[CurrentMagicFlowSegmentIndex].PointA.Y - (CollisionBox.Height / 2));
+                }
+                else
+                {
+                    // If traversing from last to first => start from Point B of the last segment
+                    CurrentMagicFlowSegmentIndex = CurrentMagicFlow.Segments.Count - 1;
+                    SetCollisionBoxX(CurrentMagicFlow.Segments[CurrentMagicFlowSegmentIndex].PointB.X - (CollisionBox.Width / 2));
+                    SetCollisionBoxY(CurrentMagicFlow.Segments[CurrentMagicFlowSegmentIndex].PointB.Y - (CollisionBox.Height / 2));
+                }
 
                 // TODO: Reset timers
                 IsIdle = false;
@@ -408,52 +420,84 @@ namespace MusicTest.GameObjects
             }
         }
 
-        public int MagicFlowCounter { get; set; } = 1;
-        public void Action_MagicFlow()
+        /// <summary>
+        /// The main logic for the Traverse Magic Flow action.
+        /// When triggered, if Midori is colliding with the first or last segment of a Magic Flow, she will start traversing it.
+        /// While traversing, Midori becomes a small pink sphere and is uncontrollable. 
+        /// The pink sphere is in the center of Midori's CollisionBox.
+        /// When she reaches the end of the flow she turns back to normal and the player regains control.
+        /// </summary>
+        public void Action_TraverseMagicFlow()
         {
-            // First call
             Collision.LineSegment currentSegment = CurrentMagicFlow.Segments[CurrentMagicFlowSegmentIndex];
-            Vector2 destinationPoint = currentSegment.PointB;
 
+            Vector2 sourcePoint;
+            Vector2 destinationPoint;
+            if (CurrentMagicFlow.TraverseFirstToLast)
+            {
+                sourcePoint = currentSegment.PointA;
+                destinationPoint = currentSegment.PointB;
+            }
+            else
+            {
+                sourcePoint = currentSegment.PointB;
+                destinationPoint = currentSegment.PointA;
+            }
+
+            // Solution with vectors
             //Vector2 v = destinationPoint - CollisionBox.Center;
             //float vLength = (float) Math.Sqrt(Math.Pow(v.X, 2) + Math.Pow(v.Y, 2));
 
             //Vector2 u = v / vLength;
             //Vector2 newCenterPosition = CollisionBox.Center + (_magicFlowVelocity * u);
-            float t = MagicFlowCounter / 10f; // (_magicFlowVelocity) / currentSegment.Length;
-            Vector2 newCenterPosition = new Vector2(
-                ((1 - t) * currentSegment.PointA.X) + (t * currentSegment.PointB.X),
-                ((1 - t) * currentSegment.PointA.Y) + (t * currentSegment.PointB.Y)
-            );
-            if (MagicFlowCounter < 15)
+
+            // Solution with distance percentage
+            // t = distanceWeWantToTraverseOnTheSegment / totalDistanceOfThatSegment
+            float t = _magicFlowVelocity / currentSegment.Length;
+
+            // Add up the t values for the current segment
+            MagicFlowCurrentSegmentProgress += t;
+
+            // A value of 1 means 100% of the line will be traversed so we make sure it's not more
+            if (MagicFlowCurrentSegmentProgress > 1)
             {
-                MagicFlowCounter += 1;
+                MagicFlowCurrentSegmentProgress = 1;
             }
 
-            Collision.LineSegment debugSegment = new Collision.LineSegment(currentSegment.PointA, newCenterPosition);
+            // The new position for the center of the CollisionBox
+            Vector2 newCenterPosition = new Vector2(
+                ((1 - MagicFlowCurrentSegmentProgress) * sourcePoint.X) + (MagicFlowCurrentSegmentProgress * destinationPoint.X),
+                ((1 - MagicFlowCurrentSegmentProgress) * sourcePoint.Y) + (MagicFlowCurrentSegmentProgress * destinationPoint.Y)
+            );
 
-            Console.WriteLine($"Delta from A {debugSegment.Length}; t = {t}; Distance = {currentSegment.Length}");
+            // Debug print
+            //Collision.LineSegment debugSegment = new Collision.LineSegment(
+            //    CurrentMagicFlow.TraverseFirstToLast ? currentSegment.PointA : currentSegment.PointB,
+            //    newCenterPosition
+            //);
+            //Console.WriteLine($"Delta from source point {debugSegment.Length}; t = {MagicFlowCurrentSegmentProgress}; Distance = {currentSegment.Length}");
 
-            bool reachedDestination = currentSegment.IsLeftToRight ?
-                (destinationPoint.X >= CollisionBox.Center.X && newCenterPosition.X >= destinationPoint.X) :
-                (destinationPoint.X <= CollisionBox.Center.X && newCenterPosition.X <= destinationPoint.X);
-
+            // If the destination is reached
             if (newCenterPosition.X == destinationPoint.X && newCenterPosition.Y == destinationPoint.Y)
             {
                 // If there are more lines, go to the next one
-                if (CurrentMagicFlowSegmentIndex + 1 < CurrentMagicFlow.Segments.Count)
+                if (CurrentMagicFlow.TraverseFirstToLast && CurrentMagicFlowSegmentIndex + 1 < CurrentMagicFlow.Segments.Count)
                 {
                     CurrentMagicFlowSegmentIndex += 1;
-                    MagicFlowCounter = 1;
+                }
+                else if (!CurrentMagicFlow.TraverseFirstToLast && CurrentMagicFlowSegmentIndex > 0)
+                {
+                    CurrentMagicFlowSegmentIndex -= 1;
                 }
                 // If not, end the Magic Flow sequence
                 else
                 {
-                    IsMagicFlowActive = false;
                     CurrentMagicFlow = null;
-                    CurrentMagicFlowSegmentIndex = 0;
+                    IsMagicFlowActive = false;
                     IsUnableToMove = false;
                 }
+
+                MagicFlowCurrentSegmentProgress = 0;
             }
 
             SetCollisionBoxX(newCenterPosition.X - (CollisionBox.Width / 2));
@@ -502,7 +546,7 @@ namespace MusicTest.GameObjects
 
             if (IsMagicFlowActive)
             {
-                Action_MagicFlow();
+                Action_TraverseMagicFlow();
             }
         }
 

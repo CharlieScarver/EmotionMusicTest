@@ -335,7 +335,7 @@ namespace MusicTest.GameObjects
                 }
             }
 
-
+            // Update timers
             RunTimer.Update();
             JumpTimer.Update();
 

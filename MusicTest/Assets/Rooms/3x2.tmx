@@ -1,16 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.2" tiledversion="1.3.4" orientation="orthogonal" renderorder="right-down" width="15000" height="10000" tilewidth="1" tileheight="1" infinite="0" nextlayerid="3" nextobjectid="10">
+<map version="1.2" tiledversion="1.3.4" orientation="orthogonal" renderorder="right-down" width="15000" height="10000" tilewidth="1" tileheight="1" infinite="0" nextlayerid="4" nextobjectid="20">
  <properties>
-  <property name="SpawnX" type="float" value="150"/>
+  <property name="SpawnX" type="float" value="550"/>
   <property name="SpawnY" type="float" value="5500"/>
   <property name="SpawnZ" type="float" value="4"/>
  </properties>
- <objectgroup id="2" name="Object Layer 1">
+ <objectgroup id="2" name="Platforms 1">
   <object id="1" name="Middle Floor" x="-1.33333" y="5650.67">
    <polyline points="0,0 1224,-18.6667 1804,-45.3333 2557.33,-77.3333 3386.67,-109.333 4076,-90.6667 4764,-57.3333 5500,-29.3333"/>
   </object>
   <object id="2" name="Floating Platform" x="874.644" y="5220.33">
    <polyline points="-9.3078,-129 668.783,-165 1126.03,-166.667"/>
+  </object>
+  <object id="10" x="3856" y="5080">
+   <polyline points="0,0 728,-8 1198,28"/>
+  </object>
+  <object id="11" x="6152" y="5640">
+   <polyline points="-182,-6 544,-24 1328,-80 2152,-208 3248,-400 4304,-592 5304,-736 5904,-2216"/>
+  </object>
+  <object id="12" x="10112" y="4488">
+   <polyline points="0,0 584,24"/>
+  </object>
+  <object id="13" x="9448" y="4472">
+   <polyline points="106.061,3.0303 -656,0"/>
+  </object>
+  <object id="14" x="8184" y="4408">
+   <polyline points="81.8182,12.1212 -664,-16"/>
+  </object>
+  <object id="15" x="6944" y="4360">
+   <polyline points="154.545,12.1212 -704,0 -1800,-104 -3144,-312 -3632,-328"/>
+  </object>
+ </objectgroup>
+ <objectgroup id="3" name="Magic Flows 1">
+  <object id="17" x="296.97" y="5469.7">
+   <polyline points="0,0 54.5455,-200 121.212,-403.03 209.091,-600 330.303,-821.212 506.061,-1051.52 718.182,-1245.45 960.606,-1393.94 1287.88,-1527.27 1666.67,-1633.33 2021.21,-1706.06 2469.7,-1757.58 2809.09,-1766.67 3121.21,-1739.39 3390.91,-1693.94"/>
+  </object>
+  <object id="19" x="4024.24" y="4948.48">
+   <polyline points="0,0 -200,-106.061 -390.909,-263.636 -469.697,-439.394 -524.242,-687.879 -551.515,-781.818 -618.182,-842.424 -912.121,-896.97 -1060.61,-984.848 -1130.3,-1160.61 -1190.91,-1339.39 -1212.12,-1496.97 -1151.52,-1675.76 -1078.79,-1906.06 -990.909,-2024.24 -942.424,-2051.52 -833.333,-2069.7 -687.879,-2060.61 -596.97,-2033.33 -460.606,-1933.33 -290.909,-1757.58 -139.394,-1518.18 -33.3333,-1263.64"/>
   </object>
  </objectgroup>
 </map>

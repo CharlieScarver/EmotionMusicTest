@@ -12,7 +12,7 @@ namespace MusicTest.Collision
             for (int i = 0; i < GameContext.Scene.CollisionPlatforms.Count; i++)
             {
                 LineSegment platform = GameContext.Scene.CollisionPlatforms[i];
-                if (LineSegmentIntesectsRectangle(platform.PointA, platform.PointB, rect))
+                if (LineSegmentIntesectsRectangle(platform, rect))
                 {
                     return platform;
                 }
@@ -25,7 +25,7 @@ namespace MusicTest.Collision
             for (int i = 0; i < GameContext.Scene.AxisAlignedCollisionPlatforms.Count; i++)
             {
                 LineSegment platform = GameContext.Scene.AxisAlignedCollisionPlatforms[i];
-                if (LineSegmentIntesectsRectangle(platform.PointA, platform.PointB, rect))
+                if (LineSegmentIntesectsRectangle(platform, rect))
                 {
                     return platform;
                 }
@@ -39,7 +39,7 @@ namespace MusicTest.Collision
             for (int i = 0; i < GameContext.Scene.SlopedCollisionPlatforms.Count; i++)
             {
                 LineSegment platform = GameContext.Scene.SlopedCollisionPlatforms[i];
-                if (LineSegmentIntesectsRectangle(platform.PointA, platform.PointB, rect))
+                if (LineSegmentIntesectsRectangle(platform, rect))
                 {
                     return platform;
                 }
@@ -59,21 +59,26 @@ namespace MusicTest.Collision
                 if (mf.Segments.Count > 1)
                 {
                     // Check first segment
-                    if (PointIsInRectangleInclusive(mf.Segments[0].PointA, rect) || PointIsInRectangleInclusive(mf.Segments[0].PointB, rect))
+                    if (LineSegmentIntesectsRectangle(mf.Segments[0], rect))
                     {
+                        // Has to be set on every check because it could have been changed on the last check
+                        mf.TraverseFirstToLast = true;
                         return mf;
                     }
                     // Check last segment
-                    else if (PointIsInRectangleInclusive(mf.Segments[mf.Segments.Count-1].PointA, rect) || PointIsInRectangleInclusive(mf.Segments[mf.Segments.Count - 1].PointB, rect))
+                    else if (LineSegmentIntesectsRectangle(mf.Segments[mf.Segments.Count - 1], rect))
                     {
+                        mf.TraverseFirstToLast = false;
                         return mf;
                     }
                 }
                 else if (mf.Segments.Count == 1)
                 {
                     // Check first segment
-                    if (PointIsInRectangleInclusive(mf.Segments[0].PointA, rect) || PointIsInRectangleInclusive(mf.Segments[0].PointB, rect))
+                    if (LineSegmentIntesectsRectangle(mf.Segments[0], rect))
                     {
+                        // Has to be set on every check because it could have been changed on the last check
+                        mf.TraverseFirstToLast = true;
                         return mf;
                     }
                 }
@@ -95,6 +100,15 @@ namespace MusicTest.Collision
                 LineSegmentsIntersect3(A, B, rect.TopLeft, rect.TopRight) ||
                 LineSegmentsIntersect3(A, B, rect.TopLeft, bottomLeft) ||
                 LineSegmentsIntersect3(A, B, rect.TopRight, rect.BottomRight);
+        }
+
+        static bool LineSegmentIntesectsRectangle(LineSegment segm, Rectangle rect)
+        {
+            Vector2 bottomLeft = new Vector2(rect.X, rect.Bottom);
+            return LineSegmentsIntersect3(segm.PointA, segm.PointB, bottomLeft, rect.BottomRight) ||
+                LineSegmentsIntersect3(segm.PointA, segm.PointB, rect.TopLeft, rect.TopRight) ||
+                LineSegmentsIntersect3(segm.PointA, segm.PointB, rect.TopLeft, bottomLeft) ||
+                LineSegmentsIntersect3(segm.PointA, segm.PointB, rect.TopRight, rect.BottomRight);
         }
 
         /// <summary>
