@@ -81,7 +81,7 @@ namespace MusicTest.GameObjects
             IsIdle = true;
             IsGrounded = true;
 
-            RunTimer = new AfterAndBack(150); // Progress 0
+            RunTimer = new AfterAndBack(200); // Progress 0
 
             JumpTimer = new AfterAndBack(600);
             GravityTimer = new AfterAndBack(300);
@@ -366,7 +366,7 @@ namespace MusicTest.GameObjects
             if (IsInteracting) 
             {
                 string text = Dialogues[0].DialogueLines[0];
-                composer.RenderString(Position + new Vector3(-30, -30, 0), Color.Black, text, Engine.AssetLoader.Get<FontAsset>("debugFont.otf").GetAtlas(16));
+                composer.RenderString(Position + new Vector3(-30, -30, 0), Color.Black, text, Engine.AssetLoader.Get<FontAsset>("Fonts/Calibri 400.ttf").GetAtlas(16));
             }
 
 

@@ -34,7 +34,7 @@ namespace MusicTest.Interactions
             Texture = Engine.AssetLoader.Get<TextureAsset>("Textures/better-transparent-black.png");
 
             FontSize = _defaultFontSize;
-            Font = Engine.AssetLoader.Get<FontAsset>("debugFont.otf");
+            Font = Engine.AssetLoader.Get<FontAsset>("Fonts/Calibri 400.ttf");
             Finished = false;
 
             CurrentLetterIndex = 0;

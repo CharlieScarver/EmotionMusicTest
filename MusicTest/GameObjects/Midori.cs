@@ -69,7 +69,7 @@ namespace MusicTest.GameObjects
             IsPlayer = true;
 
             Position = position;
-            Size = new Vector2(360, 360);
+            Size = new Vector2(360, 360); // 264, 264
             TextureAsset = Engine.AssetLoader.Get<TextureAsset>($"Textures/{_portraitPath}");
             PortraitSize = new Vector2(750, 1033.467f); // Size(250, 344.489f) * 3
             // Full Portrait Size is 1773x2213
@@ -326,8 +326,8 @@ namespace MusicTest.GameObjects
                 IsFalling = false;
                 IsJumping = false;
                 JumpTimer.End();
-                SetCollisionBoxY(500);
-                SetCollisionBoxX(11500);
+                SetCollisionBoxY(5100);
+                SetCollisionBoxX(550);
             }
 
             if (Engine.InputManager.IsKeyDown(Key.Q))
@@ -552,26 +552,32 @@ namespace MusicTest.GameObjects
 
         public override void Render(RenderComposer composer)
         {
+            // If she's in a magic flow render her as a circle
             if (IsMagicFlowActive)
             {
                 composer.RenderCircle(CollisionBox.Center.ToVec3(Z), 15, Color.Pink, true);
                 return;
             }
 
+            // If walking on an incline apply rotation
             if (InclineAngle != 0f)
             {
                 composer.PushModelMatrix(
                     Matrix4x4.CreateRotationZ(InclineAngle, new Vector3(Center, 0))
                 );
             }
+
+            // Render the sprite
             composer.RenderSprite(
                 Position,
-                new Vector2(360, 360),
+                Size,
                 !IsGravityPushActive ? Color.White : Color.Pink,
                 Sprite.Texture,
                 Sprite.CurrentFrame,
                 IsFacingRight, false
             );
+
+            // Remove the rotation matrix
             if (InclineAngle != 0f)
             {
                 composer.PopModelMatrix();
