@@ -1,4 +1,5 @@
 ﻿using Emotion.Primitives;
+using MusicTest.Events;
 using MusicTest.GameObjects;
 using System.Numerics;
 
@@ -6,6 +7,24 @@ namespace MusicTest.Collision
 {
     public static class CollisionUtils
     {
+        #region Collision With Scene Changers
+
+        public static SceneChanger IntersectsWithSceneChangers(Rectangle rect)
+        {
+            for (int i = 0; i < GameContext.Scene.SceneChangers.Count; i++)
+            {
+                SceneChanger sceneChanger = GameContext.Scene.SceneChangers[i];
+                if (rect.Intersects(sceneChanger.ToRectangle()))
+                {
+                    return sceneChanger;
+                }
+            }
+
+            return null;
+        }
+
+        #endregion
+
         #region Collision With Platforms
         public static LineSegment IntersectsWithPlatforms(Rectangle rect)
         {

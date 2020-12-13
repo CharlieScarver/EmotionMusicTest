@@ -1,4 +1,5 @@
 ﻿using Emotion.Primitives;
+using MusicTest.Events;
 using MusicTest.GameObjects;
 using System.Collections.Generic;
 using System.Numerics;
@@ -21,6 +22,7 @@ namespace MusicTest.RoomData
         public List<ConfigDecoration> ForegroundDecorations { get; set; }
         public List<ConfigUnit> Units { get; set; }
         public List<ConfigCollisionPlatform> CollisionPlatforms { get; set; }
+        public List<SceneChanger> SceneChangers { get; set; }
 
         // Textures
         public List<string> Textures { get; set; }

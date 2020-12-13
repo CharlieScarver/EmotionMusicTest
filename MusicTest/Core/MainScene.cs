@@ -19,9 +19,16 @@ using System;
 using System.Collections.Generic;
 using System.Numerics;
 using MusicTest.Debug;
+using MusicTest.Events;
 
 namespace MusicTest
 {
+    // Event Args
+    public class ChangeSceneEventArgs : EventArgs
+    {
+        public string NextScenePath { get; set; }
+    }
+
     public class MainScene : IScene
     {
         // MusicTest
@@ -50,9 +57,23 @@ namespace MusicTest
         public List<DebugObject> DebugObjects { get; set; }
 
         public List<MagicFlow> MagicFlows { get; set; }
+        
+        // Scene Changers
+        public List<SceneChanger> SceneChangers { get; set; } 
 
         // Interaction
         public Interaction CurrentInteration { get; set; }
+
+        // Events
+        public event EventHandler<ChangeSceneEventArgs> ChangeSceneEvent;
+
+        // Event Handlers
+        protected virtual void OnChangeScene(ChangeSceneEventArgs e)
+        {
+            EventHandler<ChangeSceneEventArgs> handler = ChangeSceneEvent;
+            // Raise the event
+            handler?.Invoke(this, e);
+        }
 
         public MainScene(TextAsset progressFile, TextAsset mapFile)
         { 
@@ -80,6 +101,7 @@ namespace MusicTest
             ForegroundDecorations = new List<Decoration>();
             DebugObjects = new List<DebugObject>();
             MagicFlows = new List<MagicFlow>();
+            SceneChangers = new List<SceneChanger>();
 
             // Testing for jittering
             //Engine.Renderer.Camera.Zoom = 0.5f;
@@ -122,10 +144,10 @@ namespace MusicTest
             SlopedCollisionPlatforms = tiledMap.SlopedCollisionPlatforms;
             AxisAlignedCollisionPlatforms = tiledMap.AxisAlignedCollisionPlatforms;
             MagicFlows = tiledMap.MagicFlows;
+            BackgroundDecorations = tiledMap.BackgroundDecorations;
 
             LoadedRoom.Spawn = tiledMap.Spawn;
             LoadedRoom.Size = tiledMap.Size;
-
         }
 
         public void Load()
@@ -276,6 +298,12 @@ namespace MusicTest
                         configDecor.ShadowReverseIntensity
                     )
                 );
+            }
+
+            for (int i = 0; i < LoadedRoom.SceneChangers.Count; i++)
+            {
+                SceneChanger sceneChanger = LoadedRoom.SceneChangers[i];
+                SceneChangers.Add(sceneChanger);
             }
         }
 
@@ -446,9 +474,19 @@ namespace MusicTest
                 CurrentInteration.Update();
             }
 
+            // Update all non-player units
             for (int i = 0; i < NonPlayerUnits.Count; i++)
             {
                 NonPlayerUnits[i].Update();
+            }
+
+            // Check for collision with Scene changers
+            SceneChanger sceneChanger = CollisionUtils.IntersectsWithSceneChangers(Player.CollisionBox.ToRectangle());
+            if (sceneChanger != null)
+            {
+                ChangeSceneEventArgs eventArgs = new ChangeSceneEventArgs();
+                eventArgs.NextScenePath = sceneChanger.NextScene;
+                this.OnChangeScene(eventArgs);
             }
 
             // Debug
@@ -520,6 +558,13 @@ namespace MusicTest
                 mf.Render(composer);
             }
 
+            // Render Scene Changers
+            for (int i = 0; i < SceneChangers.Count; i++)
+            {
+                SceneChangers[i].Render(composer);
+            }
+
+            // Render the player
             Player.Render(composer);
 
             foreach (Decoration dec in ForegroundDecorations)
@@ -569,7 +614,7 @@ namespace MusicTest
                     new Vector3(debugObjDisplayWidth * i, 0, 15),
                     Color.Red,
                     debugObj.ToString(),
-                    Engine.AssetLoader.Get<FontAsset>("debugFont.otf").GetAtlas(fontSize)
+                    Engine.AssetLoader.Get<FontAsset>("Fonts/Calibri 400.ttf").GetAtlas(fontSize)
                 );
             }
 
@@ -580,7 +625,7 @@ namespace MusicTest
                 new Vector3(20, Engine.Configuration.RenderSize.Y - 80, 15),
                 Color.Red,
                 Engine.InputManager.MousePosition.ToString(),
-                Engine.AssetLoader.Get<FontAsset>("debugFont.otf").GetAtlas(18)
+                Engine.AssetLoader.Get<FontAsset>("Fonts/Calibri 400.ttf").GetAtlas(18)
             );
 
 

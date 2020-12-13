@@ -629,5 +629,20 @@
 		"pixel-midori-full-sheet-horizontal.png",
 		"better-transparent-black.png",
 		"better-mapTexture_13.png"
+	],
+	"SceneChangers": [
+		{
+			"Name":  "Change to Collision Scene",
+			"NextScene": "Rooms/testRoom-collision.json",
+			"Size": {
+				"X": 100,
+				"Y": 200
+			},
+			"Position": {
+				"X": 11300,
+				"Y": 4550,
+				"Z": 3
+			}
+		}
 	]
 }

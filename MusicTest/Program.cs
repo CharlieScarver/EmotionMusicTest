@@ -10,13 +10,29 @@ using MusicTest.RoomData;
 namespace MusicTest
 {
     public class Program
-    {        
+    {
+        private static void OnChangeScene(object sender, ChangeSceneEventArgs e)
+        {
+            TextAsset progressFile = Engine.AssetLoader.Get<TextAsset>("progress.json");
+            TextAsset nextRoom = Engine.AssetLoader.Get<TextAsset>(e.NextScenePath);
+
+            // Read tmx map file and create a TiledMap
+            TextAsset tmxMap = Engine.AssetLoader.Get<TextAsset>("Rooms/3x2.tmx");
+            XMLReader reader = new XMLReader(tmxMap.Content);
+            TiledMap tiledMap = new TiledMap(reader);
+
+            MainScene scene = new MainScene(progressFile, nextRoom, tiledMap);
+            GameContext.Scene = scene;
+            scene.ChangeSceneEvent += OnChangeScene;
+
+            Engine.SceneManager.SetScene(scene);
+        }
+
         private static void Main()
         {
             int i = -1073740940;
             uint ui = (uint) i;
             Console.WriteLine(ui.ToString("X"));
-
 
             // Configuration.
             Configurator config = new Configurator();
@@ -45,6 +61,7 @@ namespace MusicTest
 
             MainScene scene = new MainScene(progressFile, testRoom, tiledMap);
             GameContext.Scene = scene;
+            scene.ChangeSceneEvent += OnChangeScene;
 
             Engine.SceneManager.SetScene(scene);
             Engine.Run();

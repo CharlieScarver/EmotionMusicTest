@@ -14,10 +14,10 @@
 	"Platforms": [
 	],
 	"BackgroundDecorations": [
-		
+
 	],
 	"ForegroundDecorations": [
-		
+
 	],
 	"Units": [
 		{
@@ -338,5 +338,20 @@
 		"pixel-midori-full-sheet-horizontal.png",
 		"better-transparent-black.png",
 		"mapTexture_13.png"
+	],
+	"SceneChangers": [
+		{
+			"Name": "Change to Main Scene",
+			"NextScene": "Rooms/testRoom.json",
+			"Size": {
+				"X": 100,
+				"Y": 200
+			},
+			"Position": {
+				"X": 11300,
+				"Y": 500,
+				"Z": 3
+			}
+		}
 	]
 }
