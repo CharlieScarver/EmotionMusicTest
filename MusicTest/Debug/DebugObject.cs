@@ -148,8 +148,25 @@ namespace MusicTest.Debug
                 // Draw texture center
                 composer.RenderCircle(Item.Center.ToVec3(Item.Z), 3, Color.Green, true);
 
-                // Draw texture rectangle
+                // Draw texture rectangle (without rotation)
+                composer.RenderOutline(dec.Position, dec.DisplaySize, Color.Blue, 2);
+
+                if (dec.Rotation != 0f)
+                {
+                    // Tiled rotates images around the bottom left corner
+                    composer.PushModelMatrix(
+                       Matrix4x4.CreateRotationZ(dec.Rotation, new Vector3(dec.X, dec.Y + dec.DisplaySize.Y, 0))
+                   );
+                }
+
+                // Draw texture rectangle (with rotation)
                 composer.RenderOutline(dec.Position, dec.DisplaySize, Color.Red, 2);
+
+                if (dec.Rotation != 0f)
+                {
+                    // Tiled rotates images around the bottom left corner
+                    composer.PopModelMatrix();
+                }
             }
         }
     }

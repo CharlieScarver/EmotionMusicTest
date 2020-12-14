@@ -373,8 +373,14 @@ namespace MusicTest
 
         public bool IsTransformOnSreen(Transform transform) 
         {
+            Rectangle cameraRect = Engine.Renderer.Camera.GetWorldBoundingRect();
+            // Double the rect size to avoid hiding onscreen decorations that have been rotated
+            cameraRect.X -= cameraRect.Size.X / 2;
+            cameraRect.Y -= cameraRect.Size.Y / 2;
+            cameraRect.Size *= 2;
+
             return transform.ToRectangle().IntersectsInclusive(
-                Engine.Renderer.Camera.GetWorldBoundingRect()
+                cameraRect
             );
         }
 

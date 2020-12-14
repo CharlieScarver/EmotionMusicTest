@@ -2,12 +2,11 @@
 using Emotion.Standard.TMX.Layer;
 using Emotion.Standard.TMX.Object;
 using Emotion.Standard.XML;
+using Emotion.Utility;
 using MusicTest.Collision;
 using MusicTest.GameObjects;
-using System;
 using System.Collections.Generic;
 using System.Numerics;
-using System.Text;
 
 namespace MusicTest.RoomData
 {
@@ -19,6 +18,8 @@ namespace MusicTest.RoomData
             SlopedCollisionPlatforms = new List<LineSegment>();
             AxisAlignedCollisionPlatforms = new List<LineSegment>();
             MagicFlows = new List<MagicFlow>();
+            BackgroundDecorations = new List<Decoration>();
+            TilesetMap = new Dictionary<int, string>();
 
             Size = new Vector2(Width, Height);
 
@@ -41,9 +42,22 @@ namespace MusicTest.RoomData
         public List<LineSegment> SlopedCollisionPlatforms { get; set; }
         public List<LineSegment> AxisAlignedCollisionPlatforms { get; set; }
         public List<MagicFlow> MagicFlows { get; set; }
+        public List<Decoration> BackgroundDecorations { get; set; }
+
+        public Dictionary<int, string> TilesetMap { get; set; }
 
         public void CreateObjects()
         {
+            // Create a dictionary to map GIDs to their source images
+            foreach (TmxTileset tileset in Tilesets)
+            {
+                string[] sourceSplit = tileset.Source.Split("/");
+                TilesetMap.Add(tileset.FirstGid, sourceSplit[sourceSplit.Length - 1]);
+                // TODO - Possibly load textures asynchronously here
+                // or add them to MainScene.Textures to pass to TextureLoader.Load although that won't help
+                // because the Decoration constructor will Get/Load them before the TextureLoader
+            }
+
             foreach (TmxObjectLayer objLayer in ObjectLayers)
             {
                 foreach (TmxObject obj in objLayer.Objects)
@@ -83,6 +97,40 @@ namespace MusicTest.RoomData
                             }
 
                             MagicFlows.Add(flow);
+                        }
+                    }
+                    else if (objLayer.Name.Contains("Assets"))
+                    {
+                        if (obj.ObjectType == TmxObjectType.Image)
+                        {
+                            if (obj.Gid == null)
+                            {
+                                continue;
+                            }
+
+                            float decorationZ;
+                            try
+                            {
+                                float.TryParse(obj.Properties["Z"], out decorationZ);
+                            }
+                            catch (KeyNotFoundException)
+                            {
+                                decorationZ = 3;
+                            }
+
+                            // In Tiled an image's X,Y coordinates represent the bottom-left corner of the image
+                            Decoration decoration = new Decoration(
+                                "Asset" + obj.X,
+                                TilesetMap[(int)obj.Gid],
+                                new Vector2((float)obj.Width, (float)obj.Height),
+                                new Vector3((float)obj.X, (float)obj.Y, decorationZ),
+                                new Vector2((float)obj.Width, (float)obj.Height),
+                                null,
+                                false,
+                                Maths.DegreesToRadians((float)obj.Rotation)
+                            );
+
+                            BackgroundDecorations.Add(decoration);
                         }
                     }
                 }

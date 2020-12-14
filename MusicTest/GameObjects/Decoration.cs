@@ -18,6 +18,12 @@ namespace MusicTest.GameObjects
         [JsonProperty(Required = Required.AllowNull)]
         public Rectangle? TextureArea { get; set; }
 
+        /// <summary>
+        /// Rotation in radians. 
+        /// Decorations rotate around the bottom left corner to match Tiled rotation.
+        /// </summary>
+        public float Rotation { get; set; }
+
         public bool FlipX { get; set; }
 
         /// <summary>
@@ -38,9 +44,10 @@ namespace MusicTest.GameObjects
 
         public int VelocityOffsetX { get; set; }
 
-        public Decoration(string name, string textureName, Vector2 size, Vector3 position, Vector2? displaySize = null, Rectangle? textureArea = null, bool flipX = false, float blurIntensity = 0, int shadowReverseIntensity = 255) {
+        public Decoration(string name, string textureName, Vector2 size, Vector3 position, Vector2? displaySize = null, Rectangle? textureArea = null, bool flipX = false, float rotation = 0, float blurIntensity = 0, int shadowReverseIntensity = 255) {
             Name = name;
             TextureName = textureName;
+            // Used in MainScene.IsTransformOnSreen()
             Size = size;
             Position = position;
 
@@ -48,6 +55,7 @@ namespace MusicTest.GameObjects
             DisplaySize = displaySize ?? size;
             TextureArea = textureArea;
             FlipX = flipX;
+            Rotation = rotation;
 
             // Effects
             // TODO: Default values for numerical parameters are not taken into account for some reason
@@ -74,18 +82,27 @@ namespace MusicTest.GameObjects
                 return;
             }
 
-            // Apply Blur effect if such is set
             if (BlurIntensity > 0)
             {
+                // Apply Blur effect if such is set
                 composer.SetShader(BlurShader.Shader);
                 BlurShader.Shader.SetUniformFloat("sigma", BlurIntensity);
             }
 
-            // Apply Shadow effect if such is set
             Color color = Color.White;
             if (ShadowReverseIntensity < 255)
             {
+                // Apply Shadow effect if such is set
                 color = new Color(ShadowReverseIntensity, ShadowReverseIntensity, ShadowReverseIntensity); // 180 for a shadowy look
+            }
+
+            if (Rotation != 0f)
+            {
+                // Apply rotation if such is set
+                // Tiled rotates images around the bottom left corner
+                 composer.PushModelMatrix(
+                    Matrix4x4.CreateRotationZ(Rotation, new Vector3(X, Y + DisplaySize.Y, 0))
+                );
             }
 
             // Render
@@ -98,8 +115,15 @@ namespace MusicTest.GameObjects
                 FlipX
             );
 
+            if (Rotation != 0f)
+            {
+                // Remove the rotation matrix
+                composer.PopModelMatrix();
+            }
+
             if (BlurIntensity > 0)
             {
+                // Remove the blur shader
                 composer.SetShader(null);
             }
         }

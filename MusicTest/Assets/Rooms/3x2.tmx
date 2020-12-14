@@ -1,18 +1,93 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.2" tiledversion="1.3.4" orientation="orthogonal" renderorder="right-down" width="15000" height="10000" tilewidth="1" tileheight="1" infinite="0" nextlayerid="4" nextobjectid="20">
+<map version="1.2" tiledversion="1.3.4" orientation="orthogonal" renderorder="right-down" width="15000" height="10000" tilewidth="1" tileheight="1" infinite="0" nextlayerid="9" nextobjectid="61">
  <properties>
-  <property name="SpawnX" type="float" value="550"/>
-  <property name="SpawnY" type="float" value="5500"/>
+  <property name="SpawnX" type="float" value="1000"/>
+  <property name="SpawnY" type="float" value="5300"/>
   <property name="SpawnZ" type="float" value="4"/>
  </properties>
+ <tileset firstgid="1" name="snow-rock" tilewidth="2659" tileheight="1466" tilecount="1" columns="1">
+  <image source="../Textures/snow-rock.png" width="2659" height="1466"/>
+ </tileset>
+ <tileset firstgid="2" name="floating-platform" tilewidth="546" tileheight="261" tilecount="1" columns="1">
+  <image source="../Textures/floating-platform.png" width="546" height="261"/>
+ </tileset>
+ <tileset firstgid="3" name="bare-cliff" tilewidth="907" tileheight="1094" tilecount="1" columns="1">
+  <image source="../Textures/bare-cliff.png" width="907" height="1094"/>
+ </tileset>
+ <tileset firstgid="4" name="snow-cap" tilewidth="548" tileheight="386" tilecount="1" columns="1">
+  <image source="../Textures/snow-cap.png" width="548" height="386"/>
+ </tileset>
+ <tileset firstgid="5" name="snow-edge" tilewidth="2591" tileheight="1479" tilecount="1" columns="1">
+  <image source="../Textures/snow-edge.png" width="2591" height="1479"/>
+ </tileset>
+ <tileset firstgid="6" name="snow-floor" tilewidth="3400" tileheight="1381" tilecount="1" columns="1">
+  <image source="../Textures/snow-floor.png" width="3400" height="1381"/>
+ </tileset>
+ <tileset firstgid="7" name="snow-small-pile" tilewidth="716" tileheight="423" tilecount="1" columns="1">
+  <image source="../Textures/snow-small-pile.png" width="716" height="423"/>
+ </tileset>
+ <tileset firstgid="8" name="grass-patch" tilewidth="3157" tileheight="840" tilecount="1" columns="1">
+  <image source="../Textures/grass-patch.png" width="3157" height="840"/>
+ </tileset>
+ <tileset firstgid="9" name="snow-shrub" tilewidth="935" tileheight="1444" tilecount="1" columns="1">
+  <image source="../Textures/snow-shrub.png" width="935" height="1444"/>
+ </tileset>
+ <tileset firstgid="10" name="pine-tree-trunk" tilewidth="1942" tileheight="2167" tilecount="1" columns="1">
+  <image source="../Textures/pine-tree-trunk.png" width="1942" height="2167"/>
+ </tileset>
+ <objectgroup id="8" name="Assets 0 - Floor">
+  <object id="49" gid="6" x="-1340" y="6606" width="3400" height="1381"/>
+  <object id="50" gid="6" x="2031.39" y="6606" width="3400" height="1381"/>
+  <object id="58" gid="6" x="6088" y="6353.5" width="2173.2" height="882.701" rotation="351"/>
+  <object id="59" gid="6" x="8217.98" y="6015.98" width="2173.2" height="882.701" rotation="351"/>
+  <object id="60" gid="6" x="10347.2" y="5678.57" width="2173.2" height="882.701" rotation="351"/>
+ </objectgroup>
+ <objectgroup id="4" name="Assets 1">
+  <object id="21" gid="1" x="347" y="5901" width="664.75" height="366.5">
+   <properties>
+    <property name="Z" type="float" value="5"/>
+   </properties>
+  </object>
+  <object id="24" gid="1" x="4435" y="5597" width="399" height="219.983"/>
+  <object id="25" gid="2" x="867" y="5475" width="1129.72" height="540.033"/>
+  <object id="48" gid="2147483649" x="2107.1" y="5630.75" width="505.275" height="278.576"/>
+  <object id="26" gid="2" x="4490.81" y="5233.63" width="574.939" height="274.834" rotation="6.02488"/>
+  <object id="27" gid="2" x="3807" y="5299" width="752.391" height="359.659"/>
+  <object id="28" gid="3" x="2843" y="5557" width="461.051" height="556.108"/>
+  <object id="29" gid="3" x="11571.2" y="4987.19" width="907" height="1094" rotation="349.049"/>
+  <object id="30" gid="3" x="6551" y="5615" width="681.494" height="822"/>
+  <object id="31" gid="3" x="7079" y="5743" width="770.283" height="929.096">
+   <properties>
+    <property name="Z" type="float" value="5"/>
+   </properties>
+  </object>
+  <object id="32" gid="3" x="11400.8" y="5256.3" width="706.416" height="852.06" rotation="315.79"/>
+  <object id="33" gid="3" x="11154.2" y="4977.82" width="972.575" height="1173.09" rotation="343.553"/>
+  <object id="39" gid="3" x="6039.71" y="4968.46" width="681.494" height="822" rotation="291.231"/>
+  <object id="40" gid="3" x="4727.44" y="4155.53" width="733.933" height="927.84" rotation="88.0555"/>
+  <object id="41" name="tt" gid="1073741827" x="7226.23" y="4787.57" width="733.933" height="927.84" rotation="258.214"/>
+  <object id="44" gid="5" x="2785.74" y="4543.04" width="1132.87" height="646.666" rotation="10.1154"/>
+  <object id="45" gid="3" x="4612.49" y="4874.11" width="796.479" height="960.692" rotation="284.725"/>
+  <object id="56" gid="5" x="5397.11" y="6359" width="1546.89" height="883"/>
+ </objectgroup>
+ <objectgroup id="6" name="Assets 2">
+  <object id="35" gid="4" x="2822" y="5207" width="423.067" height="298"/>
+  <object id="37" gid="4" x="7373.18" y="4596.75" width="971.96" height="312.042"/>
+  <object id="38" gid="4" x="11398.7" y="4279.99" width="784" height="558" rotation="355.95"/>
+  <object id="42" gid="1" x="5873" y="4507" width="663" height="365.535"/>
+  <object id="43" gid="3" x="4273.31" y="4869" width="772.691" height="932"/>
+ </objectgroup>
+ <objectgroup id="7" name="Assets 3">
+  <object id="36" gid="4" x="4243.93" y="4291" width="685.503" height="482.854"/>
+ </objectgroup>
  <objectgroup id="2" name="Platforms 1">
-  <object id="1" name="Middle Floor" x="-1.33333" y="5650.67">
-   <polyline points="0,0 1224,-18.6667 1804,-45.3333 2557.33,-77.3333 3386.67,-109.333 4076,-90.6667 4764,-57.3333 5500,-29.3333"/>
+  <object id="1" name="Middle Floor" x="0" y="5650">
+   <polyline points="1.33333,-5.33333 1224,-20 1804,-45.3333 2557.33,-77.3333 3386.67,-109.333 4076,-90.6667 4764,-57.3333 5500,-29.3333"/>
   </object>
   <object id="2" name="Floating Platform" x="874.644" y="5220.33">
    <polyline points="-9.3078,-129 668.783,-165 1126.03,-166.667"/>
   </object>
-  <object id="10" x="3856" y="5080">
+  <object id="10" name="Floating Platform 2" x="3856" y="5080">
    <polyline points="0,0 728,-8 1198,28"/>
   </object>
   <object id="11" x="6152" y="5640">
@@ -25,10 +100,10 @@
    <polyline points="106.061,3.0303 -656,0"/>
   </object>
   <object id="14" x="8184" y="4408">
-   <polyline points="81.8182,12.1212 -664,-16"/>
+   <polyline points="81.8182,12.1212 -313.929,-33.8956 -664,-16"/>
   </object>
-  <object id="15" x="6944" y="4360">
-   <polyline points="154.545,12.1212 -704,0 -1800,-104 -3144,-312 -3632,-328"/>
+  <object id="15" name="Upper Floor" x="6944" y="4360">
+   <polyline points="154.545,12.1212 -704,0 -1800,-104 -2083.95,-188.302 -2129.46,-417.147 -2366.16,-446.607 -2581.08,-414.262 -2605.13,-216.952 -2971.01,-206.073 -3310,-264 -3632,-328"/>
   </object>
  </objectgroup>
  <objectgroup id="3" name="Magic Flows 1">
@@ -37,6 +112,12 @@
   </object>
   <object id="19" x="4024.24" y="4948.48">
    <polyline points="0,0 -200,-106.061 -390.909,-263.636 -469.697,-439.394 -524.242,-687.879 -551.515,-781.818 -618.182,-842.424 -912.121,-896.97 -1060.61,-984.848 -1130.3,-1160.61 -1190.91,-1339.39 -1212.12,-1496.97 -1151.52,-1675.76 -1078.79,-1906.06 -990.909,-2024.24 -942.424,-2051.52 -833.333,-2069.7 -687.879,-2060.61 -596.97,-2033.33 -460.606,-1933.33 -290.909,-1757.58 -139.394,-1518.18 -33.3333,-1263.64"/>
+  </object>
+  <object id="20" x="6996" y="5436">
+   <polyline points="0,0 224,-32 484,-84 836,-216 1112,-344 1356,-464 1636,-664 1736,-840 1780,-1084 1772,-1320 1716,-1528 1540,-1752 1216,-1900 904,-1964 628,-1980 244,-1908 -92,-1768 -428,-1652 -752,-1556 -1228,-1428 -1576,-1380"/>
+  </object>
+  <object id="57" x="1212.12" y="5412.12">
+   <polyline points="0,0 166.667,15.1515 324.242,63.6364 481.818,124.242 651.515,251.515 890.909,390.909 1163.64,496.97 1415.15,557.576 1639.39,554.545 1987.88,572.727 2366.67,618.182 2754.55,672.727 2972.73,675.758 3293.94,669.697 3736.36,681.818 4069.7,709.091 4439.39,778.788 4915.15,778.788 5227.27,721.212 5542.42,672.727 5884.85,675.758 6163.64,654.545 6542.42,600 6851.52,569.697 7209.09,512.121 7690.91,387.879 7924.24,242.424 8042.42,60.6061 8081.82,-96.9697 8115.15,-293.939 8112.12,-572.727"/>
   </object>
  </objectgroup>
 </map>
